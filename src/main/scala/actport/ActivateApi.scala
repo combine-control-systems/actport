@@ -109,7 +109,18 @@ object ActivateApi {
   def set_block_size(block: Block, blockSize: Array[Double]): Block = {
     require(blockSize.length == 2, "Size array must contain exactly two elements.")
     require(blockSize.foldLeft(false) { (s, v) => s || v >= 0.0 }, "Size cannot be negative.")
-    val size = Size(blockSize(0).toInt, blockSize(1).toInt)
+
+    val width = {
+      val w = blockSize(0).toInt
+      if (w <= Configuration.minimumWidth) Configuration.minimumWidth else w
+    }
+
+    val height = {
+      val h = blockSize(1).toInt
+      if (h <= Configuration.minimumHeight) Configuration.minimumHeight else h
+    }
+
+    val size = Size(width, height)
     block match {
       case b: ActivateBlock => b.copy(size = size)
       case b: ActivateSuperBlock => b.copy(size = size)
@@ -263,6 +274,11 @@ object ActivateApi {
       case b: ActivateBlock => b.copy(identity)
       case b: ActivateSuperBlock => b.copy(identity)
     }
+  }
+
+  def set_block_mask_impl(block: Block, parameters: ActivateStruct, label: String): Block = {
+    System.err.println("set_block_mask_impl not implemented yet")
+    block
   }
 
   // -------------------- Super Block

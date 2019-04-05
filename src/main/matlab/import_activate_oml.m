@@ -20,7 +20,7 @@ function import_activate_oml(filename)
     % embed functions as well.
     src = regexprep(src, '(.*end)(.*)', '$2\neval(scsm);\n$1')
 
-    % Add imporpt of API.
+    % Add import of API.
     src = sprintf('import actport.ActivateApi.*\n%s', src);
 
     filename = sprintf('oml_import_%10.0f.m', posixtime(datetime));
