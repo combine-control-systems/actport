@@ -1,10 +1,9 @@
 package actport
 
-import java.awt.Color
+import java.awt.{Color, Rectangle}
 
 sealed trait Block {
   def name: String
-  def path: String
   def identity: String
   def origin: Point
   def size: Size
@@ -16,11 +15,14 @@ sealed trait Block {
   def outputCount: Int
   def eventInputCount: Int
   def eventOutputCount: Int
+
+  def rect: Rectangle = new Rectangle(origin.x, origin.y, size.width, size.height)
+
+  def toMatlab(path: String): Seq[String]
 }
 
 case class ActivateBlock(blockType: String,
                          name: String = "",
-                         path: String = "",
                          identity: String = "",
                          override val origin: Point = Point(),
                          size: Size = Size(),
@@ -32,10 +34,19 @@ case class ActivateBlock(blockType: String,
                          outputCount: Int = 0,
                          eventInputCount: Int = 0,
                          eventOutputCount: Int = 0,
-                         parameters: ActivateStruct = ActivateStruct.empty) extends Block
+                         parameters: ActivateStruct = ActivateStruct.empty) extends Block {
+
+  def toMatlab(path: String): Seq[String] = {
+    implicit val block: Block = this
+    blockType match {
+      case "system/Ports/Input" => generators.InputPort(path)
+      case "system/Ports/Output" => generators.OutputPort(path)
+      case _ => generators.Undefined(path)
+    }
+  }
+}
 
 case class ActivateSuperBlock(name: String = "",
-                              path: String = "",
                               identity: String = "",
                               origin: Point = Point(),
                               size: Size = Size(),
@@ -48,4 +59,9 @@ case class ActivateSuperBlock(name: String = "",
                               eventInputCount: Int = 0,
                               eventOutputCount: Int = 0,
                               diagram: Option[Diagram] = None,
-                              atomic: Boolean = false) extends Block
+                              atomic: Boolean = false) extends Block {
+
+  override def toMatlab(path: String): Seq[String] = {
+    generators.SuperBlock.apply(path)(this)
+  }
+}

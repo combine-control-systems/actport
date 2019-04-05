@@ -8,6 +8,6 @@ lazy val commonSettings = Seq(
 lazy val actport = (project in file(".")).
   settings(commonSettings: _*).
   settings(
-//    unmanagedBase := file("C:\\Program Files\\MATLAB\\R2019a\\java\\jar")
-//    mainClass in assembly := Some("com.example.Main"),
-  )
+    libraryDependencies ++= Seq(
+      "com.github.bigwheel" %% "util-backports" % "1.1"
+    ))

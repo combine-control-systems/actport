@@ -14,11 +14,11 @@ function import_activate_oml(filename)
     src = regexprep(src, 'function[^\n]+', '$0\nimport actport.ActivateApi.*');
 
     % Rename all add_block calls to avoid shadowing add_block from the Simulink API.
-    src = regexprep(src, 'add_block', 'add_block_');
+    src = regexprep(src, 'add_block', 'add_block_2');
 
     % Matlab must have script code at the beginning of the file in order to be able to
     % embed functions as well.
-    src = regexprep(src, '(.*end)(.*)', '$2\n$1')
+    src = regexprep(src, '(.*end)(.*)', '$2\neval(scsm);\n$1')
 
     % Add imporpt of API.
     src = sprintf('import actport.ActivateApi.*\n%s', src);

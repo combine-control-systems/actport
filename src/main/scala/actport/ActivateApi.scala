@@ -251,7 +251,11 @@ object ActivateApi {
     * @return diagram object
     */
   def add_block_impl(diagram: Diagram, block: Block, blockName: String): Array[Object] = {
-    Array(diagram.copy(children = diagram.children :+ block), block.name)
+    val blockWithName = block match {
+      case b: ActivateBlock => b.copy(name = blockName)
+      case b: ActivateSuperBlock => b.copy(name = blockName)
+    }
+    Array(diagram.copy(children = diagram.children :+ blockWithName), blockWithName.name)
   }
 
   def set_block_ident(block: Block, identity: String): Block = {
@@ -384,8 +388,17 @@ object ActivateApi {
     diagram
   }
 
-  def evaluate_model(diagram: Diagram): Diagram = {
-    System.err.println("evalutate_model is not implemented yet")
-    diagram
+  /** Evaluates the model and generates Matlab commands to generate Simulink model.
+    *
+    * @param diagram
+    * @return
+    */
+  def evaluate_model(diagram: Diagram): String = {
+    import simulink._
+    val diagramName = diagram.name.getOrElse("New Model")
+    (Seq(
+      newSystem(diagramName),
+      openSystem(diagramName)
+    ) ++ diagram.toMatlab(diagramName)).mkString("\n")
   }
 }
