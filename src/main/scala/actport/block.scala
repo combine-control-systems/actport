@@ -36,14 +36,7 @@ case class ActivateBlock(blockType: String,
                          eventOutputCount: Int = 0,
                          parameters: ActivateStruct = ActivateStruct.empty) extends Block {
 
-  def toMatlab(path: String): Seq[String] = {
-    implicit val block: Block = this
-    blockType match {
-      case "system/Ports/Input" => generators.InputPort(path)
-      case "system/Ports/Output" => generators.OutputPort(path)
-      case _ => generators.Undefined(path)
-    }
-  }
+  def toMatlab(path: String): Seq[String] = generators.dispatch(this, path)
 }
 
 case class ActivateSuperBlock(name: String = "",

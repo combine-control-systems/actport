@@ -82,7 +82,7 @@ object ActivateApi {
     * @return block instance
     */
   def instantiate_block(blockType: String): ActivateBlock = {
-    ActivateBlock(blockType)
+    ActivateBlock(blockType = blockType)
   }
 
   /** Set block coordinate origin.
@@ -271,8 +271,8 @@ object ActivateApi {
 
   def set_block_ident(block: Block, identity: String): Block = {
     block match {
-      case b: ActivateBlock => b.copy(identity)
-      case b: ActivateSuperBlock => b.copy(identity)
+      case b: ActivateBlock => b.copy(identity = identity)
+      case b: ActivateSuperBlock => b.copy(identity = identity)
     }
   }
 

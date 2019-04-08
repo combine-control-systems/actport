@@ -18,7 +18,7 @@ function import_activate_oml(filename)
 
     % Matlab must have script code at the beginning of the file in order to be able to
     % embed functions as well.
-    src = regexprep(src, '(.*end)(.*)', '$2\neval(scsm);\n$1')
+    src = regexprep(src, '(.*end)(.*)', '$2\neval(scsm);\n$1');
 
     % Add import of API.
     src = sprintf('import actport.ActivateApi.*\n%s', src);
