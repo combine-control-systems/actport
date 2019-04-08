@@ -6,8 +6,11 @@ package object generators {
   def dispatch(implicit block: ActivateBlock, path: String): Seq[String] = {
     block.blockType match {
       case "system/MathOperations/Sum" => generators.Sum(path)
+      case "system/MatrixOperations/MatrixGain" => generators.MatrixGain(path)
       case "system/Ports/Input" => generators.InputPort(path)
       case "system/Ports/Output" => generators.OutputPort(path)
+      case "system/Routing/Demux" => generators.Demux(path)
+      case "system/Routing/Mux" => generators.Mux(path)
       case "system/SignalViewers/Scope" => generators.Scope(path)
       case _ => generators.Undefined(path)
     }
