@@ -13,7 +13,7 @@ case class Diagram(name: Option[String] = None,
                    eventLinks: Vector[Link] = Vector.empty) {
 
   def toMatlab(path: String): Seq[String] = {
-    children.flatMap { c => c.toMatlab(path) } ++
+    children.flatMap(_.toMatlab(path)) ++
     explicitLinks.flatMap(_.toMatlab(path))
   }
 }

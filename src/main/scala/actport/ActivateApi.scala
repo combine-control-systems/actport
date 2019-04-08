@@ -2,6 +2,8 @@ package actport
 
 import java.awt.Color
 
+import scala.util.chaining._
+
 object ActivateApi {
   def test(a: Object): Unit = {
     println(a.getClass.getCanonicalName)
@@ -411,10 +413,14 @@ object ActivateApi {
     */
   def evaluate_model(diagram: Diagram): String = {
     import simulink._
-    val diagramName = diagram.name.getOrElse("New Model")
-    (Seq(
-      newSystem(diagramName),
-      openSystem(diagramName)
-    ) ++ diagram.toMatlab(diagramName)).mkString("\n")
+
+    // Apply transforms before exporting diagram.
+    transforms.Split.eliminateSplitBlocks(diagram).pipe { d =>
+      val diagramName = d.name.getOrElse("New Model")
+      (Seq(
+        newSystem(diagramName),
+        openSystem(diagramName)
+      ) ++ d.toMatlab(diagramName)).mkString("\n")
+    }
   }
 }

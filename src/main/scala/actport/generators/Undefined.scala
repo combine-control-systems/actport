@@ -23,10 +23,9 @@ object Undefined extends Generator[Block] {
 
     Seq(
       addBlock("simulink/Ports & Subsystems/Subsystem", blockPath),
-      setParam(blockPath, "position", block.rect),
       deleteLine(blockPath, "In1/1", "Out1/1"),
       deleteBlock(s"$blockPath/In1"),
       deleteBlock(s"$blockPath/Out1")
-    ) ++ inputPorts ++ outputPorts ++ eventInputPort ++ eventOutputPort
+    ) ++ inputPorts ++ outputPorts ++ eventInputPort ++ eventOutputPort ++ commonProperties(path)
   }
 }

@@ -8,8 +8,7 @@ object Scope extends Generator[Block] {
     val blockPath = s"$path/${block.name}"
     Seq(
       addBlock("simulink/Sinks/Scope", blockPath),
-      setParam(blockPath, "position", block.rect),
       setParam(blockPath, "NumInputPorts", block.inputCount)
-    )
+    ) ++ commonProperties(path)
   }
 }

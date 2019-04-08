@@ -12,13 +12,12 @@ object SuperBlock extends Generator[ActivateSuperBlock] {
 
     Seq(
       addBlock("simulink/Ports & Subsystems/Subsystem", blockPath),
-      setParam(blockPath, "position", block.rect),
 
       // Remove default ports.
       deleteLine(blockPath, "In1/1", "Out1/1"),
       deleteBlock(s"$blockPath/In1"),
       deleteBlock(s"$blockPath/Out1"),
 
-    ) ++ block.diagram.map(_.toMatlab(blockPath)).getOrElse(Seq.empty) ++ eventPort
+    ) ++ block.diagram.map(_.toMatlab(blockPath)).getOrElse(Seq.empty) ++ eventPort ++ commonProperties(path)
   }
 }
