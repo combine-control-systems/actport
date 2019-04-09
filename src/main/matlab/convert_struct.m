@@ -1,12 +1,13 @@
-function sout = convert_struct(sin)
-    sout = actport.ActivateStruct();
-    keys = fieldnames(sin);
+function struct_out = convert_struct(struct_in)
+    struct_out = actport.ActivateStruct();
+    keys = fieldnames(struct_in);
     for i = 1:length(keys)
-        key = keys{i};
-        value = sin.(key);
+        % Single character strings, e.g. 'A', becomes Char and not String by default.
+        key = string(keys{i});
+        value = struct_in.(key);
         if isstruct(value)
             value = convert_struct(value);
         end
-        sout.put(key, value);
+        struct_out.put(key, value);
     end
 end

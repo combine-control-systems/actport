@@ -4,10 +4,10 @@ import actport.Block
 import actport.simulink._
 
 object OutputPort extends Generator[Block] {
-  override def apply(path: String)(implicit block: Block): Seq[String] = {
+  override def apply(path: String)(implicit block: Block): Seq[Expression] = {
     val blockPath = s"$path/${block.name}"
     Seq(
-      addBlock("simulink/Ports & Subsystems/Out1", blockPath)
+      AddBlock("simulink/Ports & Subsystems/Out1", blockPath)
     ) ++ commonProperties(path)
   }
 }

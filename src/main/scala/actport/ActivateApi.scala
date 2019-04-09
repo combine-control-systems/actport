@@ -2,6 +2,8 @@ package actport
 
 import java.awt.Color
 
+import actport.simulink.{NewSystem, OpenSystem}
+
 import scala.util.chaining._
 
 object ActivateApi {
@@ -412,15 +414,13 @@ object ActivateApi {
     * @return
     */
   def evaluate_model(diagram: Diagram): String = {
-    import simulink._
-
     // Apply transforms before exporting diagram.
     transforms.Split.eliminateSplitBlocks(diagram).pipe { d =>
       val diagramName = d.name.getOrElse("New Model")
-      (Seq(
-        newSystem(diagramName),
-        openSystem(diagramName)
-      ) ++ d.toMatlab(diagramName)).mkString("\n")
+      (Seq(NewSystem(diagramName), OpenSystem(diagramName)) ++ d.toExpression(diagramName))
+        .map(_.serialize)
+        .tap(_.foreach(println))
+        .mkString("\n")
     }
   }
 }

@@ -2,6 +2,8 @@ package actport
 
 import java.awt.{Color, Rectangle}
 
+import actport.simulink.Expression
+
 sealed trait Block {
   def name: String
   def identity: String
@@ -18,7 +20,7 @@ sealed trait Block {
 
   def rect: Rectangle = new Rectangle(origin.x, origin.y, size.width, size.height)
 
-  def toMatlab(path: String): Seq[String]
+  def toExpression(path: String): Seq[Expression]
 }
 
 case class ActivateBlock(blockType: String,
@@ -36,7 +38,7 @@ case class ActivateBlock(blockType: String,
                          eventOutputCount: Int = 0,
                          parameters: ActivateStruct = ActivateStruct.empty) extends Block {
 
-  def toMatlab(path: String): Seq[String] = generators.dispatch(this, path)
+  def toExpression(path: String): Seq[Expression] = generators.dispatch(this, path)
 }
 
 case class ActivateSuperBlock(name: String = "",
@@ -54,7 +56,7 @@ case class ActivateSuperBlock(name: String = "",
                               diagram: Option[Diagram] = None,
                               atomic: Boolean = false) extends Block {
 
-  override def toMatlab(path: String): Seq[String] = {
+  override def toExpression(path: String): Seq[Expression] = {
     generators.SuperBlock.apply(path)(this)
   }
 }

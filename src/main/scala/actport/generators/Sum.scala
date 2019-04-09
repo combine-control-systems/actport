@@ -4,7 +4,7 @@ import actport.simulink._
 import actport.{ActivateBlock, ActivateStruct}
 
 object Sum extends Generator[ActivateBlock] {
-  override def apply(path: String)(implicit block: ActivateBlock): Seq[String] = {
+  override def apply(path: String)(implicit block: ActivateBlock): Seq[Expression] = {
     val blockPath = s"$path/${block.name}"
 
     // This is a partial expression which does not handle cases where the type matching fails.
@@ -15,8 +15,8 @@ object Sum extends Generator[ActivateBlock] {
     }
 
     Seq(
-      addBlock("simulink/Math Operations/Add", blockPath),
-      setParam(blockPath, "Inputs", signs)
+      AddBlock("simulink/Math Operations/Add", blockPath),
+      SetParam(blockPath, "Inputs", signs)
     ) ++ commonProperties(path)
   }
 }

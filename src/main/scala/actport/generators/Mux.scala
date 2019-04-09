@@ -4,12 +4,12 @@ import actport.ActivateBlock
 import actport.simulink._
 
 object Mux extends Generator[ActivateBlock] {
-  override def apply(path: String)(implicit block: ActivateBlock): Seq[String] = {
+  override def apply(path: String)(implicit block: ActivateBlock): Seq[Expression] = {
     val blockPath = s"$path/${block.name}"
 
     Seq(
-      addBlock("simulink/Signal Routing/Mux", blockPath),
-      setParam(blockPath, "Inputs", block.inputCount)
+      AddBlock("simulink/Signal Routing/Mux", blockPath),
+      SetParam(blockPath, "Inputs", block.inputCount)
     ) ++ commonProperties(path)
   }
 }

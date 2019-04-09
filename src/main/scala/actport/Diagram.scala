@@ -2,6 +2,8 @@ package actport
 
 import java.awt.Color
 
+import actport.simulink.Expression
+
 case class Diagram(name: Option[String] = None,
                    path: Option[String] = None,
                    children: Vector[Block] = Vector.empty,
@@ -12,8 +14,8 @@ case class Diagram(name: Option[String] = None,
                    explicitLinks: Vector[Link] = Vector.empty,
                    eventLinks: Vector[Link] = Vector.empty) {
 
-  def toMatlab(path: String): Seq[String] = {
-    children.flatMap(_.toMatlab(path)) ++
-    explicitLinks.flatMap(_.toMatlab(path))
+  def toExpression(path: String): Seq[Expression] = {
+    children.flatMap(_.toExpression(path)) ++
+    explicitLinks.flatMap(_.toExpression(path))
   }
 }

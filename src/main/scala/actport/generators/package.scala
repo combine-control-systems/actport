@@ -3,7 +3,7 @@ package actport
 import actport.simulink._
 
 package object generators {
-  def dispatch(implicit block: ActivateBlock, path: String): Seq[String] = {
+  def dispatch(implicit block: ActivateBlock, path: String): Seq[Expression] = {
     block.blockType match {
       case "system/MathOperations/Sum" => generators.Sum(path)
       case "system/MatrixOperations/MatrixGain" => generators.MatrixGain(path)
@@ -11,6 +11,7 @@ package object generators {
       case "system/Ports/Output" => generators.OutputPort(path)
       case "system/Routing/Demux" => generators.Demux(path)
       case "system/Routing/Mux" => generators.Mux(path)
+      case "system/SignalGenerators/Random" => generators.Random(path)
       case "system/SignalViewers/Scope" => generators.Scope(path)
       case _ => generators.Undefined(path)
     }
@@ -20,15 +21,15 @@ package object generators {
     *
     * @param path  block path
     * @param block Activate block
-    * @return sequence of Matlab Simulink API calls.
+    * @return sequence of expressions
     */
-  def commonProperties(path: String)(implicit block: Block): Seq[String] = {
+  def commonProperties(path: String)(implicit block: Block): Seq[Expression] = {
     val blockPath = s"$path/${block.name}"
     Seq(
-      setParam(blockPath, "BackgroundColor", block.backgroundColor),
-      setParam(blockPath, "ForegroundColor", block.foregroundColor),
-      setParam(blockPath, "Position", block.rect),
-      setParam(blockPath, "Orientation", if (block.flip) "left" else "right")
+      SetParam(blockPath, "BackgroundColor", block.backgroundColor),
+      SetParam(blockPath, "ForegroundColor", block.foregroundColor),
+      SetParam(blockPath, "Position", block.rect),
+      SetParam(blockPath, "Orientation", if (block.flip) "left" else "right")
     )
   }
 }
