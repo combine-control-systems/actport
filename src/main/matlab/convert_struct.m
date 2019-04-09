@@ -8,6 +8,10 @@ function struct_out = convert_struct(struct_in)
         if isstruct(value)
             value = convert_struct(value);
         end
+        % Same for values as for keys. We want Strings and not Chars.
+        if ischar(value) && length(value) <= 1
+            value = string(value);
+        end
         struct_out.put(key, value);
     end
 end

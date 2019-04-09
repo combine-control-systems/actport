@@ -14,7 +14,6 @@ object MatrixGain extends Generator[ActivateBlock] {
     Seq(
       AddBlock("simulink/Math Operations/Gain", blockPath),
       SetParam(blockPath, "Gain", p.get("gain") match {
-        case Some(c: Char) => s"$c"
         case Some(s: String) => s
         case _ => "1.0"
       }),
