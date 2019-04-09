@@ -75,7 +75,6 @@ object Random extends Generator[ActivateBlock] {
       case _ => Undefined(blockPath)
     }
 
-    import scala.util.chaining._
-    (wrapper ++ content ++ commonProperties(path)).tap(_.foreach(println))
+    wrapper ++ content ++ commonProperties(path)
   }
 }

@@ -3,8 +3,9 @@ package actport
 import actport.simulink._
 
 package object generators {
-  def dispatch(implicit block: ActivateBlock, path: String): Seq[Expression] = {
+  def dispatch(path: String)(implicit block: ActivateBlock): Seq[Expression] = {
     block.blockType match {
+      case "system/ActivationOperations/SampleClock" => generators.SampleClock(path)
       case "system/MathOperations/Sum" => generators.Sum(path)
       case "system/MatrixOperations/MatrixGain" => generators.MatrixGain(path)
       case "system/Ports/Input" => generators.InputPort(path)

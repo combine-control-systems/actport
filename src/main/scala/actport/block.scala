@@ -38,7 +38,7 @@ case class ActivateBlock(blockType: String,
                          eventOutputCount: Int = 0,
                          parameters: ActivateStruct = ActivateStruct.empty) extends Block {
 
-  def toExpression(path: String): Seq[Expression] = generators.dispatch(this, path)
+  def toExpression(path: String): Seq[Expression] = generators.dispatch(path)(this)
 }
 
 case class ActivateSuperBlock(name: String = "",

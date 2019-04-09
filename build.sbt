@@ -9,5 +9,8 @@ lazy val actport = (project in file(".")).
   settings(commonSettings: _*).
   settings(
     libraryDependencies ++= Seq(
-      "com.github.bigwheel" %% "util-backports" % "1.1"
+      "com.github.bigwheel" %% "util-backports" % Settings.backportsVersion,
+      "com.lihaoyi" %% "fastparse" % Settings.fastparseVersion,
+      "org.scalatest" %% "scalatest" % Settings.scalaTestVersion % Test,
+      "org.scalacheck" %% "scalacheck" % Settings.scalaCheckVersion % Test
     ))
