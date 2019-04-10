@@ -11,7 +11,7 @@ object Split {
     * @return updated Diagram
     */
   def eliminateSplitBlocks(diagram: Diagram): Diagram = {
-    diagram.children.zipWithIndex.foldLeft(diagram) { case (diagramState, (child, index)) =>
+    diagram.children.foldLeft(diagram) { (diagramState, child) =>
       child match {
 
         // Eliminate split blocks.
@@ -20,6 +20,8 @@ object Split {
 
         // Also do this recursively for super blocks.
         case superBlock: ActivateSuperBlock =>
+          val index = diagramState.children.indexOf(superBlock)
+          if (index == -1) throw new RuntimeException("SuperBlock did not exist among children.")
           val updatedChildren = diagramState.children
             // Update the SuperBlock with a new Diagram with all Split blocks eliminated.
             .updated(index, superBlock.copy(diagram = superBlock.diagram.map(eliminateSplitBlocks)))
