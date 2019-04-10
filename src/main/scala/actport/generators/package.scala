@@ -18,6 +18,7 @@ package object generators {
       case "system/Ports/Output" => generators.OutputPort(path)
       case "system/Routing/Demux" => generators.Demux(path)
       case "system/Routing/Mux" => generators.Mux(path)
+      case "system/SignalGenerators/Constant" => generators.Constant(path)
       case "system/SignalGenerators/Random" => generators.Random(path)
       case "system/SignalViewers/Scope" => generators.Scope(path)
       case _ => generators.Undefined(path)

@@ -415,7 +415,7 @@ object ActivateApi {
       val diagramName = d.name.getOrElse("New Model")
       (Seq(NewSystem(diagramName), OpenSystem(diagramName)) ++ d.toExpression(diagramName))
         .map(_.serialize)
-        .tap(_.foreach(println))
+//        .tap(_.foreach(println))
         .mkString("\n")
     }
   }
