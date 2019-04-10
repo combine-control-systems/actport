@@ -37,7 +37,7 @@ object ActivateApi {
   /** NOT SURE WHAT THIS IS
     *
     * @param diagram diagram object
-    * @param value 0 = off, 1 = on
+    * @param value   0 = off, 1 = on
     * @return diagram object
     */
   def set_diagram_3d(diagram: Diagram, value: Int): Diagram = {
@@ -48,7 +48,7 @@ object ActivateApi {
   /** Zoom level.
     *
     * @param diagram diagram object
-    * @param zoom zoom level > 0
+    * @param zoom    zoom level > 0
     * @return diagram object
     */
   def set_diagram_zoom(diagram: Diagram, zoom: Double): Diagram = {
@@ -59,7 +59,7 @@ object ActivateApi {
   /** Set name of diagram.
     *
     * @param diagram diagram object
-    * @param name name of diagram
+    * @param name    name of diagram
     * @return diagram object
     */
   def set_diagram_name(diagram: Diagram, name: String): Diagram = {
@@ -91,7 +91,7 @@ object ActivateApi {
 
   /** Set block coordinate origin.
     *
-    * @param block block object
+    * @param block  block object
     * @param origin 2-element array of doubles representing a coordinate
     * @return block object
     */
@@ -106,7 +106,7 @@ object ActivateApi {
 
   /** Set size of block.
     *
-    * @param block block object
+    * @param block     block object
     * @param blockSize 2-element array of doubles representing width and height
     * @return block object
     */
@@ -134,7 +134,7 @@ object ActivateApi {
   /** Set block flip.
     *
     * @param block block object
-    * @param flip 0 = no flip, 1 = flip
+    * @param flip  0 = no flip, 1 = flip
     * @return block object
     */
   def set_block_flip(block: Block, flip: Int): Block = {
@@ -194,7 +194,7 @@ object ActivateApi {
 
   /** Set number of input ports.
     *
-    * @param block block object
+    * @param block      block object
     * @param inputCount number of inputs
     * @return block object
     */
@@ -208,7 +208,7 @@ object ActivateApi {
 
   /** Set number of output ports.
     *
-    * @param block block object
+    * @param block       block object
     * @param outputCount number of outputs
     * @return block object
     */
@@ -222,7 +222,7 @@ object ActivateApi {
 
   /** Set number of event inputs.
     *
-    * @param block block object
+    * @param block           block object
     * @param eventInputCount number of event inputs
     * @return block object
     */
@@ -236,7 +236,7 @@ object ActivateApi {
 
   /** Set number of event outputs.
     *
-    * @param block block object
+    * @param block            block object
     * @param eventOutputCount number of event outputs
     * @return block object
     */
@@ -250,35 +250,34 @@ object ActivateApi {
 
   /** Set block parameters.
     *
-    * @param block block object
+    * @param block      block object
     * @param parameters block parameters
     * @return block object
     */
-  def set_block_parameters_impl(block: ActivateBlock, parameters: ActivateStruct): ActivateBlock = {
+  def set_block_parameters_impl(block: ActivateBlock, parameters: ActivateStruct): ActivateBlock =
     block.copy(parameters = parameters)
-  }
+
 
   /** Add block to diagram.
     *
-    * @param diagram diagram object
-    * @param block block object
+    * @param diagram   diagram object
+    * @param block     block object
     * @param blockName name to assign block (must be unique within the diagram)
     * @return diagram object
     */
-  def add_block_impl(diagram: Diagram, block: Block, blockName: String): Array[Object] = {
-    val blockWithName = block match {
+  def add_block_impl(diagram: Diagram, block: Block, blockName: String): Array[Object] =
+    (block match {
       case b: ActivateBlock => b.copy(name = blockName)
       case b: ActivateSuperBlock => b.copy(name = blockName)
-    }
-    Array(diagram.copy(children = diagram.children :+ blockWithName), blockWithName.name)
-  }
+    }).pipe(b => Array(diagram.copy(children = diagram.children :+ b), b.name))
 
-  def set_block_ident(block: Block, identity: String): Block = {
+
+  def set_block_ident(block: Block, identity: String): Block =
     block match {
       case b: ActivateBlock => b.copy(identity = identity)
       case b: ActivateSuperBlock => b.copy(identity = identity)
     }
-  }
+
 
   def set_block_mask_impl(block: Block, parameters: ActivateStruct, label: String): Block = {
     System.err.println("set_block_mask_impl not implemented yet")
@@ -291,23 +290,20 @@ object ActivateApi {
     *
     * @return empty super block
     */
-  def instantiate_super_block(): ActivateSuperBlock = {
-    ActivateSuperBlock()
-  }
+  def instantiate_super_block(): ActivateSuperBlock = ActivateSuperBlock()
 
   /** Add diagram to super block.
     *
-    * @param block super block
+    * @param block   super block
     * @param diagram diagram to add
     * @return super block
     */
-  def fill_super_block(block: ActivateSuperBlock, diagram: Diagram): ActivateSuperBlock = {
+  def fill_super_block(block: ActivateSuperBlock, diagram: Diagram): ActivateSuperBlock =
     block.copy(diagram = Some(diagram))
-  }
 
   /** Make super block atomic or not.
     *
-    * @param block super block
+    * @param block  super block
     * @param atomic 0 = not atomic, 1 = atomic
     * @return super block
     */
@@ -324,10 +320,10 @@ object ActivateApi {
 
   /** Add an explicit link to diagram.
     *
-    * @param diagram diagram object
-    * @param start start port, array of [block, string with port number, "output"]
+    * @param diagram     diagram object
+    * @param start       start port, array of [block, string with port number, "output"]
     * @param destination destination port, array of [block, string with port number, "input"]
-    * @param points array of points for routing of the link
+    * @param points      array of points for routing of the link
     * @param unknownFlag NOT SURE WHAT THIS IS
     * @return diagram object
     */
@@ -349,10 +345,10 @@ object ActivateApi {
 
   /** Add event link to diagram.
     *
-    * @param diagram diagram object.
-    * @param start start port, array of [block, string with event port number, "output"]
+    * @param diagram     diagram object.
+    * @param start       start port, array of [block, string with event port number, "output"]
     * @param destination destination port, array of [block, string with event port number, "input"]
-    * @param points array of points for routing of the link
+    * @param points      array of points for routing of the link
     * @param unknownFlag NOT SURE WHAT THIS IS
     * @return diagram object
     */
@@ -372,7 +368,7 @@ object ActivateApi {
 
   /** Set workspace for model.
     *
-    * @param diagram diagram object
+    * @param diagram   diagram object
     * @param workspace workspace
     * @return diagram object
     */
@@ -383,7 +379,7 @@ object ActivateApi {
 
   /** Set initial time of simulation.
     *
-    * @param diagram diagram object
+    * @param diagram     diagram object
     * @param initialTime initial time as a string
     * @return diagram object
     */
@@ -394,7 +390,7 @@ object ActivateApi {
 
   /** Set final time of simulation.
     *
-    * @param diagram diagram object
+    * @param diagram   diagram object
     * @param finalTime final time as a string
     * @return diagram object
     */

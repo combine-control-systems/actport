@@ -3,6 +3,12 @@ package actport
 import actport.simulink._
 
 package object generators {
+  /** Dispatch block to generate expressions.
+    *
+    * @param path  path in diagram
+    * @param block Activate block identifier
+    * @return sequence of expressions to create the block in Simulink
+    */
   def dispatch(path: String)(implicit block: ActivateBlock): Seq[Expression] = {
     block.blockType match {
       case "system/ActivationOperations/SampleClock" => generators.SampleClock(path)

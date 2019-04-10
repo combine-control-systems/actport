@@ -6,7 +6,7 @@ function import_activate_oml(filename)
 
     % We need to wrap the code in a function in order to make Matlab
     % want to read the source code at all.
-    fid = fopen('../resources/examples/Controller.oml');
+    fid = fopen('../resources/examples/Watertank.oml');
     src = fread(fid, '*char')';
     fclose(fid);
 
