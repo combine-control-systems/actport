@@ -17,6 +17,7 @@ package object generators {
       case "system/Dynamical/Derivative" => generators.Derivative(path)
       case "system/Dynamical/Integral" => generators.Integral(path)
       case "system/MathOperations/Gain" => generators.Gain(path)
+      case "system/MatrixOperations/MatrixConcatenation" => generators.MatrixConcatenation(path)
       case "system/MathOperations/MathFunc" => generators.MathFunc(path)
       case "system/MathOperations/Sum" => generators.Sum(path)
       case "system/MatrixOperations/MatrixGain" => generators.MatrixGain(path)
