@@ -65,7 +65,7 @@ case class AddLine(system: SimulinkPath, out: SimulinkPort, in: SimulinkPort,
 case class SetMatlabFunctionScript(path: SimulinkPath, script: MatlabScript) extends Expression {
   override def serialize: String = {
     // Use a type 4 UUID as a suffix to avoid namespace collisions.
-    val uuid = UUID.randomUUID()
+    val uuid = UUID.randomUUID().toString.replace("-", "")
     s"""sf_$uuid = sfroot();
        |block_$uuid = sf.find('Path', '$path', '-isa', 'Stateflow.EMChart');
        |block_$uuid.Script = '$script';
