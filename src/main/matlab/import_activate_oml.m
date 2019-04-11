@@ -6,7 +6,7 @@ function import_activate_oml(filename)
 
     % We need to wrap the code in a function in order to make Matlab
     % want to read the source code at all.
-    fid = fopen('../resources/examples/Discrete_Kalman_Filter.oml');
+    fid = fopen(filename);
     src = fread(fid, '*char')';
     fclose(fid);
 
