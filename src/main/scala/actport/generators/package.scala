@@ -20,6 +20,7 @@ package object generators {
       case "system/MathOperations/MathFunc" => generators.MathFunc(path)
       case "system/MathOperations/Sum" => generators.Sum(path)
       case "system/MatrixOperations/MatrixGain" => generators.MatrixGain(path)
+      case "system/MatrixOperations/Transpose" => generators.Transpose(path)
       case "system/Ports/Input" => generators.InputPort(path)
       case "system/Ports/Output" => generators.OutputPort(path)
       case "system/Routing/Demux" => generators.Demux(path)
