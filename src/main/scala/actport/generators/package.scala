@@ -12,6 +12,7 @@ package object generators {
   def dispatch(path: SimulinkPath)(implicit block: ActivateBlock): Seq[Expression] = {
     block.blockType match {
       case "system/ActivationOperations/SampleClock" => generators.SampleClock(path)
+      case "system/Dynamical/ContStateSpace" => generators.StateSpace(path)
       case "system/Dynamical/Derivative" => generators.Derivative(path)
       case "system/Dynamical/Integral" => generators.Integral(path)
       case "system/MathOperations/Gain" => generators.Gain(path)
