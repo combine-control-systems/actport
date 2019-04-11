@@ -2,7 +2,7 @@ package actport
 
 import java.awt.Color
 
-import actport.simulink.Expression
+import actport.simulink.{Expression, SimulinkPath}
 
 case class Diagram(name: Option[String] = None,
                    path: Option[String] = None,
@@ -14,7 +14,7 @@ case class Diagram(name: Option[String] = None,
                    explicitLinks: Vector[Link] = Vector.empty,
                    eventLinks: Vector[Link] = Vector.empty) {
 
-  def toExpression(path: String): Seq[Expression] = {
+  def toExpression(path: SimulinkPath): Seq[Expression] = {
     children.flatMap(_.toExpression(path)) ++
     explicitLinks.flatMap(_.toExpression(path))
   }

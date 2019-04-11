@@ -1,6 +1,6 @@
 package actport
 
-import actport.simulink.{AddLine, Expression, SmartAutoRouting}
+import actport.simulink._
 
 case class Link(start: String,
                 startPort: Int,
@@ -8,9 +8,9 @@ case class Link(start: String,
                 destinationPort: Int,
                 points: Vector[Point] = Vector.empty) {
 
-  def toExpression(path: String): Seq[Expression] = {
-    val s = s"$start/$startPort"
-    val d = s"$destination/$destinationPort"
+  def toExpression(path: SimulinkPath): Seq[Expression] = {
+    val s = SimulinkPort(s"$start/$startPort")
+    val d = SimulinkPort(s"$destination/$destinationPort")
     Seq(AddLine(path, s, d, SmartAutoRouting))
   }
 }

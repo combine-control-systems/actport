@@ -4,11 +4,11 @@ import actport.Block
 import actport.simulink._
 
 object Scope extends Generator[Block] {
-  override def apply(path: String)(implicit block: Block): Seq[Expression] = {
-    val blockPath = s"$path/${block.name}"
+  override def apply(path: SimulinkPath)(implicit block: Block): Seq[Expression] = {
+    val blockPath = path / block.name
     Seq(
       AddBlock(Simulink.Sinks.Scope, blockPath),
-      SetParam(blockPath, "NumInputPorts", block.inputCount)
+      SetParam(blockPath, SimulinkParameterName("NumInputPorts"), block.inputCount)
     ) ++ commonProperties(path)
   }
 }

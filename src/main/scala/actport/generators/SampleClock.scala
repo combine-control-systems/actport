@@ -1,7 +1,7 @@
 package actport.generators
 
 import actport.ActivateBlock
-import actport.simulink.{AddBlock, Expression, SetParam, Simulink}
+import actport.simulink._
 import fastparse.Parsed.Success
 import sun.reflect.generics.reflectiveObjects.NotImplementedException
 
@@ -40,10 +40,10 @@ object SampleClock extends Generator[ActivateBlock] {
     }
   }
 
-  override def apply(path: String)(implicit block: ActivateBlock): Seq[Expression] = {
+  override def apply(path: SimulinkPath)(implicit block: ActivateBlock): Seq[Expression] = {
     import fastparse.parse
 
-    val blockPath = s"$path/${block.name}"
+    val blockPath = path / block.name
 
     val p = block.parameters.asScala
 
@@ -73,21 +73,21 @@ object SampleClock extends Generator[ActivateBlock] {
       case Parser.ActivatedAtInitialTime =>
         Seq(
           AddBlock(Simulink.Sources.Step, blockPath),
-          SetParam(blockPath, "Time", offset)
+          SetParam(blockPath, SimulinkParameterName("Time"), offset)
         )
       // TODO: Not sure how to handle this case.
       case Parser.AlwaysActive => throw new NotImplementedException()
       case Parser.Expression(expr) =>
         Seq(
           AddBlock(Simulink.Sources.CounterLimited, blockPath),
-          SetParam(blockPath, "uplimit", 1),
-          SetParam(blockPath, "tsamp", expr)
+          SetParam(blockPath, SimulinkParameterName("uplimit"), 1),
+          SetParam(blockPath, SimulinkParameterName("tsamp"), expr)
         )
       case Parser.SamplePeriod(ts) =>
         Seq(
           AddBlock(Simulink.Sources.CounterLimited, blockPath),
-          SetParam(blockPath, "uplimit", 1),
-          SetParam(blockPath, "tsamp", ts)
+          SetParam(blockPath, SimulinkParameterName("uplimit"), 1),
+          SetParam(blockPath, SimulinkParameterName("tsamp"), ts)
         )
     }) ++ commonProperties(path)
   }

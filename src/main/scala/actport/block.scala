@@ -2,7 +2,7 @@ package actport
 
 import java.awt.{Color, Rectangle}
 
-import actport.simulink.Expression
+import actport.simulink.{Expression, SimulinkPath}
 
 sealed trait Block {
   def name: String
@@ -20,7 +20,7 @@ sealed trait Block {
 
   def rect: Rectangle = new Rectangle(origin.x, origin.y, size.width, size.height)
 
-  def toExpression(path: String): Seq[Expression]
+  def toExpression(path: SimulinkPath): Seq[Expression]
 }
 
 case class ActivateBlock(blockType: String,
@@ -38,7 +38,7 @@ case class ActivateBlock(blockType: String,
                          eventOutputCount: Int = 0,
                          parameters: ActivateStruct = ActivateStruct.empty) extends Block {
 
-  def toExpression(path: String): Seq[Expression] = generators.dispatch(path)(this)
+  def toExpression(path: SimulinkPath): Seq[Expression] = generators.dispatch(path)(this)
 }
 
 case class ActivateSuperBlock(name: String = "",
@@ -56,7 +56,7 @@ case class ActivateSuperBlock(name: String = "",
                               diagram: Option[Diagram] = None,
                               atomic: Boolean = false) extends Block {
 
-  override def toExpression(path: String): Seq[Expression] = {
+  override def toExpression(path: SimulinkPath): Seq[Expression] = {
     generators.SuperBlock.apply(path)(this)
   }
 }

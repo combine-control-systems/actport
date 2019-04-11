@@ -20,19 +20,19 @@ case class OpenSystem(name: String) extends Expression {
   override def serialize: String = s"open_system('$name');"
 }
 
-case class AddBlock(source: String, destination: String) extends Expression {
+case class AddBlock(source: SimulinkSource, destination: SimulinkPath) extends Expression {
   override def serialize: String = s"add_block('$source', '$destination');"
 }
 
-case class DeleteLine(system: String, outputPort: String, inputPort: String) extends Expression {
+case class DeleteLine(system: SimulinkPath, outputPort: SimulinkPort, inputPort: SimulinkPort) extends Expression {
   override def serialize: String = s"delete_line('$system', '$outputPort', '$inputPort');"
 }
 
-case class DeleteBlock(block: String) extends Expression {
+case class DeleteBlock(block: SimulinkPath) extends Expression {
   override def serialize: String = s"delete_block('$block');"
 }
 
-case class SetParam[A](target: String, name: String, value: A) extends Expression {
+case class SetParam[A](target: SimulinkPath, name: SimulinkParameterName, value: A) extends Expression {
   override def serialize: String = {
     val serializedValue = value match {
       case v: String => s"'$v'"
@@ -53,14 +53,14 @@ case class SetParam[A](target: String, name: String, value: A) extends Expressio
   }
 }
 
-case class AddLine(system: String, out: String, in: String,
+case class AddLine(system: SimulinkPath, out: SimulinkPort, in: SimulinkPort,
                    autoRouting: AutoRouting = DisableAutoRouting) extends Expression {
   override def serialize: String =
     s"add_line('$system', '$out', '$in', 'autorouting', '${autoRouting.value}');"
 }
 
 // https://stackoverflow.com/questions/10335564/load-code-for-a-matlab-function-block-at-simulink-runtime
-case class SetMatlabFunctionScript(path: String, script: String) extends Expression {
+case class SetMatlabFunctionScript(path: SimulinkPath, script: MatlabScript) extends Expression {
   override def serialize: String = {
     // Use a type 4 UUID as a suffix to avoid namespace collisions.
     val uuid = UUID.randomUUID()

@@ -6,8 +6,8 @@ import actport.simulink._
 import scala.collection.JavaConverters._
 
 object MathFunc extends Generator[ActivateBlock] {
-  override def apply(path: String)(implicit block: ActivateBlock): Seq[Expression] = {
-    val blockPath = s"$path/${block.name}"
+  override def apply(path: SimulinkPath)(implicit block: ActivateBlock): Seq[Expression] = {
+    val blockPath = path / block.name
 
     val p = block.parameters.asScala
 
@@ -28,66 +28,66 @@ object MathFunc extends Generator[ActivateBlock] {
       // There is no log2 available, so we calculate using log(x)/log(2).
       case Some("'log2'") => Seq(
         AddBlock(Simulink.UserDefinedFunctions.MatlabFunction, blockPath),
-        SetMatlabFunctionScript(blockPath,
+        SetMatlabFunctionScript(blockPath, MatlabScript(
           """function y = f(x)
             |%#codegen
             |y = log(x)/log(2);
             |end
-          """.stripMargin
+          """.stripMargin)
         )
       )
       // There is no erf in Simulink and we have to resort to Matlab.
       case Some("'erf'") => Seq(
         AddBlock(Simulink.UserDefinedFunctions.MatlabFunction, blockPath),
-        SetMatlabFunctionScript(blockPath,
+        SetMatlabFunctionScript(blockPath, MatlabScript(
           """function y = f(x)
             |%#codegen
             |y = erf(x);
             |end
-          """.stripMargin)
+          """.stripMargin))
       )
       // There is no erfc in Simulink and we have to resort to Matlab.
       case Some("'erfc'") => Seq(
         AddBlock(Simulink.UserDefinedFunctions.MatlabFunction, blockPath),
-        SetMatlabFunctionScript(blockPath,
+        SetMatlabFunctionScript(blockPath, MatlabScript(
           """function y = f(x)
             |%#codegen
             |y = erfc(x);
             |end
-          """.stripMargin)
+          """.stripMargin))
       )
       case Some("'2^u'") => Seq(
         AddBlock(Simulink.UserDefinedFunctions.MatlabFunction, blockPath),
-        SetMatlabFunctionScript(blockPath,
+        SetMatlabFunctionScript(blockPath, MatlabScript(
         """function y = f(x)
           |%#codegen
           |y = 2.^x;
           |end
-        """.stripMargin)
+        """.stripMargin))
       )
       case Some("'round'") => Seq(
         AddBlock(Simulink.MathOperations.RoundingFunction, blockPath),
-        SetParam(blockPath, "Operator", "round")
+        SetParam(blockPath, SimulinkParameterName("Operator"), "round")
       )
       case Some("'floor'") => Seq(
         AddBlock(Simulink.MathOperations.RoundingFunction, blockPath),
-        SetParam(blockPath, "Operator", "floor")
+        SetParam(blockPath, SimulinkParameterName("Operator"), "floor")
       )
       case Some("'ceil'") => Seq(
         AddBlock(Simulink.MathOperations.RoundingFunction, blockPath),
-        SetParam(blockPath, "Operator", "ceil")
+        SetParam(blockPath, SimulinkParameterName("Operator"), "ceil")
       )
       case Some("'int'") => Seq(
         AddBlock(Simulink.MathOperations.RoundingFunction, blockPath),
-        SetParam(blockPath, "Operator", "fix")
+        SetParam(blockPath, SimulinkParameterName("Operator"), "fix")
       )
       // Default value.
       case _ => mathFunc(blockPath, "exp")
     }) ++ commonProperties(path)
   }
 
-  private def mathFunc(path: String, functionName: String): Seq[Expression] = Seq(
+  private def mathFunc(path: SimulinkPath, functionName: String): Seq[Expression] = Seq(
     AddBlock(Simulink.MathOperations.MathFunction, path),
-    SetParam(path, "Operator", functionName)
+    SetParam(path, SimulinkParameterName("Operator"), functionName)
   )
 }

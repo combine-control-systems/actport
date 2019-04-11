@@ -4,12 +4,12 @@ import actport.ActivateBlock
 import actport.simulink._
 
 object Demux extends Generator[ActivateBlock] {
-  override def apply(path: String)(implicit block: ActivateBlock): Seq[Expression] = {
-    val blockPath = s"$path/${block.name}"
+  override def apply(path: SimulinkPath)(implicit block: ActivateBlock): Seq[Expression] = {
+    val blockPath = path / block.name
 
     Seq(
       AddBlock(Simulink.SignalRouting.Demux, blockPath),
-      SetParam(blockPath, "Outputs", block.outputCount)
+      SetParam(blockPath, SimulinkParameterName("Outputs"), block.outputCount)
     ) ++ commonProperties(path)
   }
 }

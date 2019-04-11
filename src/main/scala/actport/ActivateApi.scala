@@ -2,7 +2,7 @@ package actport
 
 import java.awt.Color
 
-import actport.simulink.{NewSystem, OpenSystem}
+import actport.simulink.{NewSystem, OpenSystem, SimulinkPath}
 
 import scala.util.chaining._
 
@@ -413,7 +413,7 @@ object ActivateApi {
     // Apply transforms before exporting diagram.
     transforms.Split.eliminateSplitBlocks(diagram).pipe { d =>
       val diagramName = d.name.getOrElse("New Model")
-      (Seq(NewSystem(diagramName), OpenSystem(diagramName)) ++ d.toExpression(diagramName))
+      (Seq(NewSystem(diagramName), OpenSystem(diagramName)) ++ d.toExpression(SimulinkPath(diagramName)))
         .map(_.serialize)
         .tap(_.foreach(println))
         .mkString("\n")

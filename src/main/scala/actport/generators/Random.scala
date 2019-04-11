@@ -6,20 +6,20 @@ import actport.simulink._
 import scala.collection.JavaConverters._
 
 object Random extends Generator[ActivateBlock] {
-  override def apply(path: String)(implicit block: ActivateBlock): Seq[Expression] = {
-    val blockPath = s"$path/${block.name}"
-    val randomPath = s"$blockPath/Random"
+  override def apply(path: SimulinkPath)(implicit block: ActivateBlock): Seq[Expression] = {
+    val blockPath = path / block.name
+    val randomPath = blockPath / "Random"
 
     val p = block.parameters.asScala
 
     val wrapper = Seq(
       // We need to wrap the random block in a subsystem to be able to trigger it externally.
-      AddBlock(Simulink.PortsAndSubsystems.Subsystem, s"$blockPath"),
-      DeleteLine(s"$blockPath", "In1/1", "Out1/1"),
-      DeleteBlock(s"$blockPath/In1"),
-      DeleteBlock(s"$blockPath/Out1"),
-      AddBlock(Simulink.PortsAndSubsystems.Trigger, s"$blockPath/Trigger"),
-      SetParam(s"$blockPath/Trigger", "TriggerType", "either"),
+      AddBlock(Simulink.PortsAndSubsystems.Subsystem, blockPath),
+      DeleteLine(blockPath, SimulinkPort("In1/1"), SimulinkPort("Out1/1")),
+      DeleteBlock(blockPath / "In1"),
+      DeleteBlock(blockPath / "Out1"),
+      AddBlock(Simulink.PortsAndSubsystems.Trigger, blockPath / "Trigger"),
+      SetParam(blockPath / "Trigger", SimulinkParameterName("TriggerType"), "either"),
     )
 
     val commonContent = Seq(
@@ -27,11 +27,11 @@ object Random extends Generator[ActivateBlock] {
       // TODO: Activate generates different signals for a single seed while Simulink generates identical signals
       //       for one seed. Setting a vector of seeds gives different seeds to each signal.
       p.get("seed") match {
-        case Some(seed: String) => SetParam(randomPath, "Seed", seed)
-        case _ => SetParam(randomPath, "Seed", "0")
+        case Some(seed: String) => SetParam(randomPath, SimulinkParameterName("Seed"), seed)
+        case _ => SetParam(randomPath, SimulinkParameterName("Seed"), "0")
       },
       // Sample time.
-      SetParam(randomPath, "SampleTime", "-1")
+      SetParam(randomPath, SimulinkParameterName("SampleTime"), "-1")
     )
 
     // We need to choose different Simulink blocks based on the random distribution.
@@ -40,34 +40,34 @@ object Random extends Generator[ActivateBlock] {
       case Some(d: String) if d == "'Normal'" =>
         Seq(
           AddBlock(Simulink.Sources.RandomNumber, randomPath),
-          AddBlock(Simulink.PortsAndSubsystems.Out1, s"$blockPath/Value"),
-          AddLine(blockPath, "Random/1", "Value/1", SmartAutoRouting),
+          AddBlock(Simulink.PortsAndSubsystems.Out1, blockPath / "Value"),
+          AddLine(blockPath, SimulinkPort("Random/1"), SimulinkPort("Value/1"), SmartAutoRouting),
           // Mean value.
           p.get("A") match {
-            case Some(mean: String) => SetParam(randomPath, "Mean", mean)
-            case _ => SetParam(randomPath, "Mean", "0")
+            case Some(mean: String) => SetParam(randomPath, SimulinkParameterName("Mean"), mean)
+            case _ => SetParam(randomPath, SimulinkParameterName("Mean"), "0")
           },
           // Variance.
           p.get("B") match {
-            case Some(variance: String) => SetParam(randomPath, "Variance", variance)
-            case _ => SetParam(randomPath, "Variance", "1")
+            case Some(variance: String) => SetParam(randomPath, SimulinkParameterName("Variance"), variance)
+            case _ => SetParam(randomPath, SimulinkParameterName("Variance"), "1")
           }
         ) ++ commonContent
 
       case Some(d: String) if d == "'Uniform'" =>
         Seq(
           AddBlock(Simulink.Sources.UniformRandomNumber, randomPath),
-          AddBlock(Simulink.PortsAndSubsystems.Out1, s"$blockPath/Value"),
-          AddLine(blockPath, "Random/1", "Value/1", SmartAutoRouting),
+          AddBlock(Simulink.PortsAndSubsystems.Out1, blockPath / "Value"),
+          AddLine(blockPath, SimulinkPort("Random/1"), SimulinkPort("Value/1"), SmartAutoRouting),
           // Lower value.
           p.get("A") match {
-            case Some(lower: String) => SetParam(randomPath, "Minimum", lower)
-            case _ => SetParam(randomPath, "Minimum", "0")
+            case Some(lower: String) => SetParam(randomPath, SimulinkParameterName("Minimum"), lower)
+            case _ => SetParam(randomPath, SimulinkParameterName("Minimum"), "0")
           },
           // Range value.
           p.get("B") match {
-            case Some(range: String) => SetParam(randomPath, "Maximum", range)
-            case _ => SetParam(randomPath, "Maximum", "1")
+            case Some(range: String) => SetParam(randomPath, SimulinkParameterName("Maximum"), range)
+            case _ => SetParam(randomPath, SimulinkParameterName("Maximum"), "1")
           }
         ) ++ commonContent
 

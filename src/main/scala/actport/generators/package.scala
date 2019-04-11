@@ -9,7 +9,7 @@ package object generators {
     * @param block Activate block identifier
     * @return sequence of expressions to create the block in Simulink
     */
-  def dispatch(path: String)(implicit block: ActivateBlock): Seq[Expression] = {
+  def dispatch(path: SimulinkPath)(implicit block: ActivateBlock): Seq[Expression] = {
     block.blockType match {
       case "system/ActivationOperations/SampleClock" => generators.SampleClock(path)
       case "system/Dynamical/Derivative" => generators.Derivative(path)
@@ -35,13 +35,13 @@ package object generators {
     * @param block Activate block
     * @return sequence of expressions
     */
-  def commonProperties(path: String)(implicit block: Block): Seq[Expression] = {
-    val blockPath = s"$path/${block.name}"
+  def commonProperties(path: SimulinkPath)(implicit block: Block): Seq[Expression] = {
+    val blockPath = path / block.name
     Seq(
-      SetParam(blockPath, "BackgroundColor", block.backgroundColor),
-      SetParam(blockPath, "ForegroundColor", block.foregroundColor),
-      SetParam(blockPath, "Position", block.rect),
-      SetParam(blockPath, "Orientation", if (block.flip) "left" else "right")
+      SetParam(blockPath, SimulinkParameterName("BackgroundColor"), block.backgroundColor),
+      SetParam(blockPath, SimulinkParameterName("ForegroundColor"), block.foregroundColor),
+      SetParam(blockPath, SimulinkParameterName("Position"), block.rect),
+      SetParam(blockPath, SimulinkParameterName("Orientation"), if (block.flip) "left" else "right")
     )
   }
 }
