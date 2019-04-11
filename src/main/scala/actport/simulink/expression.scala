@@ -33,12 +33,14 @@ case class DeleteBlock(block: SimulinkPath) extends Expression {
 }
 
 case class SetParam[A](target: SimulinkPath, name: SimulinkParameterName, value: A) extends Expression {
+  import ValueOps._
+
   override def serialize: String = {
     val serializedValue = value match {
-      case v: String => s"'$v'"
-      case v: Boolean => s"'${v.toString}'"
-      case v: Int => s"'${v.toString}'"
-      case v: Double => s"'${v.toString}'"
+      case v: String => s"'${v.escape}'"
+      case v: Boolean => s"'${v.toString.escape}'"
+      case v: Int => s"'${v.toString.escape}'"
+      case v: Double => s"'${v.toString.escape}'"
       case v: Rectangle => s"[${v.x},${-v.y - v.height},${v.x + v.width},${-v.y}]"
       case v: Color =>
         val components = v.getColorComponents(null)
