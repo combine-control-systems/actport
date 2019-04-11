@@ -1,6 +1,6 @@
 package actport.generators
 
-import actport.simulink.{AddBlock, Expression, SetParam}
+import actport.simulink.{AddBlock, Expression, SetParam, Simulink}
 import actport.{ActivateBlock, ActivateStruct}
 
 import scala.collection.JavaConverters._
@@ -12,7 +12,7 @@ object Integral extends Generator[ActivateBlock] {
     val p = block.parameters.asScala
 
     val init = Seq(
-      AddBlock("simulink/Continuous/Integrator", blockPath),
+      AddBlock(Simulink.Continuous.Integrator, blockPath),
       p.get("x0") match {
         case Some(x0: String) => SetParam(blockPath, "InitialCondition", x0)
         case _ => SetParam(blockPath, "InitialCondition", "0")

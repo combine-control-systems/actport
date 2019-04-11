@@ -7,7 +7,7 @@ object InputPort extends Generator[Block] {
   override def apply(path: String)(implicit block: Block): Seq[Expression] = {
     val blockPath = s"$path/${block.name}"
     Seq(
-      AddBlock("simulink/Ports & Subsystems/In1", blockPath)
+      AddBlock(Simulink.PortsAndSubsystems.In1, blockPath)
     ) ++ commonProperties(path)
   }
 }

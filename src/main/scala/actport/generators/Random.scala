@@ -14,11 +14,11 @@ object Random extends Generator[ActivateBlock] {
 
     val wrapper = Seq(
       // We need to wrap the random block in a subsystem to be able to trigger it externally.
-      AddBlock("simulink/Ports & Subsystems/Subsystem", s"$blockPath"),
+      AddBlock(Simulink.PortsAndSubsystems.Subsystem, s"$blockPath"),
       DeleteLine(s"$blockPath", "In1/1", "Out1/1"),
       DeleteBlock(s"$blockPath/In1"),
       DeleteBlock(s"$blockPath/Out1"),
-      AddBlock("simulink/Ports & Subsystems/Trigger", s"$blockPath/Trigger"),
+      AddBlock(Simulink.PortsAndSubsystems.Trigger, s"$blockPath/Trigger"),
       SetParam(s"$blockPath/Trigger", "TriggerType", "either"),
     )
 
@@ -39,8 +39,8 @@ object Random extends Generator[ActivateBlock] {
 
       case Some(d: String) if d == "'Normal'" =>
         Seq(
-          AddBlock("simulink/Sources/Random Number", randomPath),
-          AddBlock("simulink/Ports & Subsystems/Out1", s"$blockPath/Value"),
+          AddBlock(Simulink.Sources.RandomNumber, randomPath),
+          AddBlock(Simulink.PortsAndSubsystems.Out1, s"$blockPath/Value"),
           AddLine(blockPath, "Random/1", "Value/1", SmartAutoRouting),
           // Mean value.
           p.get("A") match {
@@ -56,8 +56,8 @@ object Random extends Generator[ActivateBlock] {
 
       case Some(d: String) if d == "'Uniform'" =>
         Seq(
-          AddBlock("simulink/Sources/Uniform Random Number", randomPath),
-          AddBlock("simulink/Ports & Subsystems/Out1", s"$blockPath/Value"),
+          AddBlock(Simulink.Sources.UniformRandomNumber, randomPath),
+          AddBlock(Simulink.PortsAndSubsystems.Out1, s"$blockPath/Value"),
           AddLine(blockPath, "Random/1", "Value/1", SmartAutoRouting),
           // Lower value.
           p.get("A") match {

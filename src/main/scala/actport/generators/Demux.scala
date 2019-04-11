@@ -8,7 +8,7 @@ object Demux extends Generator[ActivateBlock] {
     val blockPath = s"$path/${block.name}"
 
     Seq(
-      AddBlock("simulink/Signal Routing/Demux", blockPath),
+      AddBlock(Simulink.SignalRouting.Demux, blockPath),
       SetParam(blockPath, "Outputs", block.outputCount)
     ) ++ commonProperties(path)
   }

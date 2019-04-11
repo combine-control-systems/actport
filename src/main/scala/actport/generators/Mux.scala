@@ -8,7 +8,7 @@ object Mux extends Generator[ActivateBlock] {
     val blockPath = s"$path/${block.name}"
 
     Seq(
-      AddBlock("simulink/Signal Routing/Mux", blockPath),
+      AddBlock(Simulink.SignalRouting.Mux, blockPath),
       SetParam(blockPath, "Inputs", block.inputCount)
     ) ++ commonProperties(path)
   }

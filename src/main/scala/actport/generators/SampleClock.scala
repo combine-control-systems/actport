@@ -1,7 +1,7 @@
 package actport.generators
 
 import actport.ActivateBlock
-import actport.simulink.{AddBlock, Expression, SetParam}
+import actport.simulink.{AddBlock, Expression, SetParam, Simulink}
 import fastparse.Parsed.Success
 import sun.reflect.generics.reflectiveObjects.NotImplementedException
 
@@ -72,20 +72,20 @@ object SampleClock extends Generator[ActivateBlock] {
     (frequency match {
       case Parser.ActivatedAtInitialTime =>
         Seq(
-          AddBlock("simulink/Sources/Step", blockPath),
+          AddBlock(Simulink.Sources.Step, blockPath),
           SetParam(blockPath, "Time", offset)
         )
       // TODO: Not sure how to handle this case.
       case Parser.AlwaysActive => throw new NotImplementedException()
       case Parser.Expression(expr) =>
         Seq(
-          AddBlock("simulink/Sources/Counter Limited", blockPath),
+          AddBlock(Simulink.Sources.CounterLimited, blockPath),
           SetParam(blockPath, "uplimit", 1),
           SetParam(blockPath, "tsamp", expr)
         )
       case Parser.SamplePeriod(ts) =>
         Seq(
-          AddBlock("simulink/Sources/Counter Limited", blockPath),
+          AddBlock(Simulink.Sources.CounterLimited, blockPath),
           SetParam(blockPath, "uplimit", 1),
           SetParam(blockPath, "tsamp", ts)
         )

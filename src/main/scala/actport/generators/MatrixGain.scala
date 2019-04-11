@@ -12,7 +12,7 @@ object MatrixGain extends Generator[ActivateBlock] {
     val p = block.parameters.asScala
 
     Seq(
-      AddBlock("simulink/Math Operations/Gain", blockPath),
+      AddBlock(Simulink.MathOperations.Gain, blockPath),
       SetParam(blockPath, "Gain", p.get("gain") match {
         case Some(s: String) => s
         case _ => "1.0"

@@ -1,7 +1,7 @@
 package actport.generators
 
 import actport.ActivateBlock
-import actport.simulink.{AddBlock, Expression, SetParam}
+import actport.simulink.{AddBlock, Expression, SetParam, Simulink}
 
 import scala.collection.JavaConverters._
 
@@ -12,7 +12,7 @@ object Constant extends Generator[ActivateBlock] {
     val p = block.parameters.asScala
 
     Seq(
-      AddBlock("simulink/Sources/Constant", blockPath),
+      AddBlock(Simulink.Sources.Constant, blockPath),
       p.get("C") match {
         case Some(constant: String) => SetParam(blockPath, "Value", constant)
         case _ => SetParam(blockPath, "Value", "1")

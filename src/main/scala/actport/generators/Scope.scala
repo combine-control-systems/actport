@@ -7,7 +7,7 @@ object Scope extends Generator[Block] {
   override def apply(path: String)(implicit block: Block): Seq[Expression] = {
     val blockPath = s"$path/${block.name}"
     Seq(
-      AddBlock("simulink/Sinks/Scope", blockPath),
+      AddBlock(Simulink.Sinks.Scope, blockPath),
       SetParam(blockPath, "NumInputPorts", block.inputCount)
     ) ++ commonProperties(path)
   }

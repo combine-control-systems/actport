@@ -7,11 +7,11 @@ object SuperBlock extends Generator[ActivateSuperBlock] {
     val blockPath = s"$path/${block.name}"
 
     val eventPort = if (block.eventInputCount == 1) {
-      Seq(AddBlock("simulink/Ports & Subsystems/Trigger", s"$blockPath/Trigger"))
+      Seq(AddBlock(Simulink.PortsAndSubsystems.Trigger, s"$blockPath/Trigger"))
     } else Seq.empty[Expression]
 
     Seq(
-      AddBlock("simulink/Ports & Subsystems/Subsystem", blockPath),
+      AddBlock(Simulink.PortsAndSubsystems.Subsystem, blockPath),
 
       // Remove default ports.
       DeleteLine(blockPath, "In1/1", "Out1/1"),

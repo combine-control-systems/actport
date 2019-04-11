@@ -15,7 +15,7 @@ object Sum extends Generator[ActivateBlock] {
     }
 
     Seq(
-      AddBlock("simulink/Math Operations/Add", blockPath),
+      AddBlock(Simulink.MathOperations.Add, blockPath),
       SetParam(blockPath, "Inputs", signs)
     ) ++ commonProperties(path)
   }

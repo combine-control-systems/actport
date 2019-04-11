@@ -1,6 +1,7 @@
 package actport.simulink
 
 import java.awt.{Color, Rectangle}
+import java.util.UUID
 
 sealed trait Expression {
   def serialize: String
@@ -56,4 +57,18 @@ case class AddLine(system: String, out: String, in: String,
                    autoRouting: AutoRouting = DisableAutoRouting) extends Expression {
   override def serialize: String =
     s"add_line('$system', '$out', '$in', 'autorouting', '${autoRouting.value}');"
+}
+
+// https://stackoverflow.com/questions/10335564/load-code-for-a-matlab-function-block-at-simulink-runtime
+case class SetMatlabFunctionScript(path: String, script: String) extends Expression {
+  override def serialize: String = {
+    // Use a type 4 UUID as a suffix to avoid namespace collisions.
+    val uuid = UUID.randomUUID()
+    s"""sf_$uuid = sfroot();
+       |block_$uuid = sf.find('Path', '$path', '-isa', 'Stateflow.EMChart');
+       |block_$uuid.Script = '$script';
+       |clear sf_$uuid;
+       |clear block_$uuid;
+     """.stripMargin
+  }
 }
