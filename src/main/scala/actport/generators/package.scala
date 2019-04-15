@@ -35,6 +35,7 @@ package object generators {
       case "system/Routing/Mux" => generators.Mux(path)
       case "system/SignalGenerators/Constant" => generators.Constant(path)
       case "system/SignalGenerators/Random" => generators.Random(path)
+      case "system/SignalViewers/Display" => generators.Display(path)
       case "system/SignalViewers/Scope" => generators.Scope(path)
       case "TEXT_f" => generators.Annotation(path)
       case _ => generators.Undefined(path)
