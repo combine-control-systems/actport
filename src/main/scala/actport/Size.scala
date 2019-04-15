@@ -1,3 +1,9 @@
 package actport
 
-case class Size(width: Int = 8, height: Int = 8)
+/** Size representation.
+  *
+  * @param width width
+  * @param height height
+  */
+case class Size(width: Int = Configuration.minimumWidth,
+                height: Int = Configuration.minimumHeight)

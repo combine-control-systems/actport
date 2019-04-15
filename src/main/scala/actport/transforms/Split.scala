@@ -4,6 +4,12 @@ import actport.{ActivateBlock, ActivateSuperBlock, Diagram, Link}
 
 import scala.util.chaining._
 
+/** Transform to eliminate all split blocks in Activate model.
+  *
+  * The function [[Split.eliminateSplitBlocks]] removes all split
+  * blocks and replaces them with links instead to match the
+  * representation in Simulink.
+  */
 object Split {
   /** Eliminate all split blocks with links.
     *
@@ -18,7 +24,7 @@ object Split {
         case block: ActivateBlock if block.blockType == "system/Links/Split" =>
           eliminateSplitBlock(diagramState, block)
 
-        // Also do this recursively for super blocks.
+        // Also do this recursively for super block children.
         case superBlock: ActivateSuperBlock =>
           val index = diagramState.children.indexOf(superBlock)
           if (index == -1) throw new RuntimeException("SuperBlock did not exist among children.")
@@ -39,7 +45,7 @@ object Split {
     * There is no equivalent of split blocks in Simulink.
     *
     * @param diagram Diagram object
-    * @param block Split block object
+    * @param block   Split block object
     * @return updated Diagram
     */
   private def eliminateSplitBlock(diagram: Diagram, block: ActivateBlock): Diagram = {
@@ -64,7 +70,7 @@ object Split {
         // Do nothing if there is nothing to do.
         diagram
 
-        // Finally remove the Split block from the children of the diagram.
+      // Finally remove the Split block from the children of the diagram.
     }).pipe { d => d.copy(children = d.children.filter(_ != block)) }
   }
 }

@@ -5,6 +5,7 @@ import actport.simulink.{BuiltIn, Expression, RawExpression, SimulinkPath}
 
 import scala.collection.JavaConverters._
 
+/** Annotation text area. */
 object Annotation extends Generator[ActivateBlock] {
   import actport.simulink.ValueOps._
 

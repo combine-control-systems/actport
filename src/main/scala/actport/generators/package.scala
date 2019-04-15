@@ -10,6 +10,11 @@ package object generators {
     * @return sequence of expressions to create the block in Simulink
     */
   def dispatch(path: SimulinkPath)(implicit block: ActivateBlock): Seq[Expression] = {
+    // Keep these in alphabetical order.
+    // TODO: Break generators out into separate jar-files and use reflection to
+    //       look up matching strings. Contributing with extra functionality
+    //       by just dropping new jar-files into a predefined directory is
+    //       probably desired.
     block.blockType match {
       case "system/ActivationOperations/SampleClock" => generators.SampleClock(path)
       case "system/Dynamical/ContStateSpace" => generators.StateSpace(path)

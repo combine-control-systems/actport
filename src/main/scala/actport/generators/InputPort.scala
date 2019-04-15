@@ -3,6 +3,7 @@ package actport.generators
 import actport.Block
 import actport.simulink._
 
+/** Input port of subsystem. */
 object InputPort extends Generator[Block] {
   override def apply(path: SimulinkPath)(implicit block: Block): Seq[Expression] = {
     val blockPath = path / block.name

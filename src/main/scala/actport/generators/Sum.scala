@@ -3,6 +3,7 @@ package actport.generators
 import actport.simulink._
 import actport.{ActivateBlock, ActivateStruct}
 
+/** Sum of signals. */
 object Sum extends Generator[ActivateBlock] {
   override def apply(path: SimulinkPath)(implicit block: ActivateBlock): Seq[Expression] = {
     val blockPath = path / block.name

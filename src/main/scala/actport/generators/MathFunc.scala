@@ -5,6 +5,7 @@ import actport.simulink._
 
 import scala.collection.JavaConverters._
 
+/** Block for selecting various mathematical functions. */
 object MathFunc extends Generator[ActivateBlock] {
   override def apply(path: SimulinkPath)(implicit block: ActivateBlock): Seq[Expression] = {
     val blockPath = path / block.name

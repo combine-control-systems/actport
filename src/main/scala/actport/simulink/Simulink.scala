@@ -1,5 +1,9 @@
 package actport.simulink
 
+/** Simulink standard block paths.
+  *
+  * Used to avoid repeating and misspelling the paths.
+  */
 object Simulink {
   object Continuous {
     @inline private def expand(s: String): SimulinkSource = SimulinkSource("simulink/Continuous/" + s)

@@ -18,7 +18,7 @@ object ActivateApi {
     * @return Diagram object
     */
   def instantiate_diagram(): Diagram = {
-    Diagram(name = None, path = None)
+    Diagram(name = None)
   }
 
   /** Set background color of diagram.

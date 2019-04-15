@@ -5,6 +5,7 @@ import actport.{ActivateBlock, ActivateStruct}
 
 import scala.collection.JavaConverters._
 
+/** Integrator. */
 object Integral extends Generator[ActivateBlock] {
   override def apply(path: SimulinkPath)(implicit block: ActivateBlock): Seq[Expression] = {
     val blockPath = path / block.name

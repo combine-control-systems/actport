@@ -5,6 +5,7 @@ import actport.simulink._
 
 import scala.collection.JavaConverters._
 
+/** Signal gain. */
 object Gain extends Generator[ActivateBlock] {
   override def apply(path: SimulinkPath)(implicit block: ActivateBlock): Seq[Expression] = {
     val blockPath = path / block.name

@@ -3,6 +3,7 @@ package actport.generators
 import actport.ActivateBlock
 import actport.simulink._
 
+/** Demultiplexer. */
 object Demux extends Generator[ActivateBlock] {
   override def apply(path: SimulinkPath)(implicit block: ActivateBlock): Seq[Expression] = {
     val blockPath = path / block.name

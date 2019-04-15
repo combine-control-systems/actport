@@ -5,6 +5,7 @@ import actport.simulink._
 
 import scala.collection.JavaConverters._
 
+/** Constant signal. */
 object Constant extends Generator[ActivateBlock] {
   override def apply(path: SimulinkPath)(implicit block: ActivateBlock): Seq[Expression] = {
     val blockPath = path / block.name
@@ -18,7 +19,8 @@ object Constant extends Generator[ActivateBlock] {
         case _ => SetParam(blockPath, SimulinkParameterName("Value"), "1")
       }
       // TODO: For matrices and vectors we need to turn off the parameter "VectorParams1D".
-      //       The question is how to identify when to do this.
+      //       The question is how to identify when to do this without parsing the parameter value?
+      //       It gets especially tricky when the value is a variable to be read from the workspace.
       // TODO: We are not handling the datatype of the signal which is specified in p.get("typ").
     ) ++ commonProperties(path)
   }

@@ -7,7 +7,12 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException
 
 import scala.collection.JavaConverters._
 
+/** Sample clock. */
 object SampleClock extends Generator[ActivateBlock] {
+  /** Parser for frequency and offset string parameters.
+    *
+    * @see http://www.lihaoyi.com/fastparse/
+    */
   object Parser {
     import fastparse._
     import SingleLineWhitespace._

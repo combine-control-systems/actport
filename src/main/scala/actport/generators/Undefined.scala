@@ -3,6 +3,7 @@ package actport.generators
 import actport.Block
 import actport.simulink._
 
+/** All blocks not handled by [[actport.generators.dispatch]] become [[Undefined]]. */
 object Undefined extends Generator[Block] {
   override def apply(path: SimulinkPath)(implicit block: Block): Seq[Expression] = {
     val blockPath = path / block.name
@@ -21,11 +22,7 @@ object Undefined extends Generator[Block] {
       Seq(AddBlock(Simulink.PortsAndSubsystems.Out1, blockPath / "Event"))
     } else Seq.empty
 
-    Seq(
-      AddBlock(Simulink.PortsAndSubsystems.Subsystem, blockPath),
-      DeleteLine(blockPath, SimulinkPort("In1/1"), SimulinkPort("Out1/1")),
-      DeleteBlock(blockPath / "In1"),
-      DeleteBlock(blockPath / "Out1")
-    ) ++ inputPorts ++ outputPorts ++ eventInputPort ++ eventOutputPort ++ commonProperties(path)
+    Seq(AddCleanSubsystem(blockPath)) ++
+      inputPorts ++ outputPorts ++ eventInputPort ++ eventOutputPort ++ commonProperties(path)
   }
 }
