@@ -24,6 +24,23 @@ case class AddBlock(source: SimulinkSource, destination: SimulinkPath) extends E
   override def serialize: String = s"add_block('$source', '$destination');"
 }
 
+case class AddCleanSubsystem(destination: SimulinkPath) extends Expression {
+  override def serialize: String = Seq(
+    AddBlock(Simulink.PortsAndSubsystems.Subsystem, destination),
+    DeleteLine(destination, SimulinkPort("In1/1"), SimulinkPort("Out1/1")),
+    DeleteBlock(destination / "In1"),
+    DeleteBlock(destination / "Out1")
+  ).map(_.serialize).mkString("\n")
+}
+
+/** Raw expression for special cases.
+  *
+  * @param expression
+  */
+case class RawExpression(expression: String) extends Expression {
+  override def serialize: String = expression
+}
+
 case class DeleteLine(system: SimulinkPath, outputPort: SimulinkPort, inputPort: SimulinkPort) extends Expression {
   override def serialize: String = s"delete_line('$system', '$outputPort', '$inputPort');"
 }
