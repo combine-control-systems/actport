@@ -7,7 +7,7 @@ import scala.collection.JavaConverters._
 
 /** Matrix gain. */
 object MatrixGain extends Generator[ActivateBlock] {
-  override def apply(path: SimulinkPath)(implicit block: ActivateBlock): Seq[Expression] = {
+  override def generateExpressions(block: ActivateBlock, path: SimulinkPath): Seq[Expression] = {
     val blockPath = path / block.name
 
     val p = block.parameters.asScala
@@ -32,6 +32,6 @@ object MatrixGain extends Generator[ActivateBlock] {
           case Some(s: String) if s == "'u1*Gain'" => "Matrix(u*K)"
           case _ => "Matrix(K*u)"
         })
-    ) ++ commonProperties(path)
+    ) ++ commonProperties(block, path)
   }
 }

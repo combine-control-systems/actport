@@ -1,11 +1,11 @@
 package actport.generators
 
-import actport.Block
+import actport.ActivateBlock
 import actport.simulink._
 
-/** All blocks not handled by [[actport.generators.dispatch]] become [[Undefined]]. */
-object Undefined extends Generator[Block] {
-  override def apply(path: SimulinkPath)(implicit block: Block): Seq[Expression] = {
+/** All blocks not handled by [[actport.generators.getGenerator]] become [[Undefined]]. */
+object Undefined extends Generator[ActivateBlock] {
+  override def generateExpressions(block: ActivateBlock, path: SimulinkPath): Seq[Expression] = {
     val blockPath = path / block.name
 
     val inputPorts = for (i <- 1 to block.inputCount) yield
@@ -23,6 +23,6 @@ object Undefined extends Generator[Block] {
     } else Seq.empty
 
     Seq(AddCleanSubsystem(blockPath)) ++
-      inputPorts ++ outputPorts ++ eventInputPort ++ eventOutputPort ++ commonProperties(path)
+      inputPorts ++ outputPorts ++ eventInputPort ++ eventOutputPort ++ commonProperties(block, path)
   }
 }

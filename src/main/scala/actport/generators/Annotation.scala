@@ -9,7 +9,7 @@ import scala.collection.JavaConverters._
 object Annotation extends Generator[ActivateBlock] {
   import actport.simulink.ValueOps._
 
-  override def apply(path: SimulinkPath)(implicit block: ActivateBlock): Seq[Expression] = {
+  override def generateExpressions(block: ActivateBlock, path: SimulinkPath): Seq[Expression] = {
     val p = block.parameters.asScala
     val text = p.get("txt") match {
       case Some(text: String) => text.escapeAnnotation

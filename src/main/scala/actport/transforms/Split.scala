@@ -1,6 +1,6 @@
 package actport.transforms
 
-import actport.{ActivateBlock, ActivateSuperBlock, Diagram, Link}
+import actport._
 
 import scala.util.chaining._
 
@@ -57,7 +57,7 @@ object Split {
 
     // Create new links.
     val newLinks = incoming.map { i =>
-      outgoing.map { o => Link(i.start, i.startPort, o.destination, o.destinationPort, Vector.empty) }
+      outgoing.map { o => Link(i.start, i.startPort, o.destination, o.destinationPort, ExplicitLink, Vector.empty) }
     }
 
     (newLinks match {

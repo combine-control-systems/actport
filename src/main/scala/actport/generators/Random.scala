@@ -1,19 +1,19 @@
 package actport.generators
 
-import actport.ActivateBlock
 import actport.simulink._
+import actport.{ActivateBlock, EventLink, LinkType}
 
 import scala.collection.JavaConverters._
 
 /** Random number generator. */
 object Random extends Generator[ActivateBlock] {
-  override def apply(path: SimulinkPath)(implicit block: ActivateBlock): Seq[Expression] = {
+  override def generateExpressions(block: ActivateBlock, path: SimulinkPath): Seq[Expression] = {
     val blockPath = path / block.name
     val randomPath = blockPath / "Random"
 
     val p = block.parameters.asScala
 
-    val wrapper = Seq(
+    val wrapper: Seq[Expression] = Seq(
       // We need to wrap the random block in a subsystem to be able to trigger it externally.
       AddBlock(Simulink.PortsAndSubsystems.Subsystem, blockPath),
       DeleteLine(blockPath, SimulinkPort("In1/1"), SimulinkPort("Out1/1")),
@@ -23,7 +23,7 @@ object Random extends Generator[ActivateBlock] {
       SetParam(blockPath / "Trigger", SimulinkParameterName("TriggerType"), "either"),
     )
 
-    val commonContent = Seq(
+    val commonContent: Seq[Expression] = Seq(
       // Seed.
       // TODO: Activate generates different signals for a single seed while Simulink generates identical signals
       //       for one seed. Setting a vector of seeds gives different seeds to each signal.
@@ -36,7 +36,7 @@ object Random extends Generator[ActivateBlock] {
     )
 
     // We need to choose different Simulink blocks based on the random distribution.
-    val content = p.get("distribution") match {
+    val content: Seq[Expression] = p.get("distribution") match {
 
       case Some(d: String) if d == "'Normal'" =>
         Seq(
@@ -73,9 +73,16 @@ object Random extends Generator[ActivateBlock] {
         ) ++ commonContent
 
       // If there is something else we just add an undefined block.
-      case _ => Undefined(blockPath)
+      case _ => Undefined.generateExpressions(block, blockPath)
     }
 
-    wrapper ++ content ++ commonProperties(path)
+    wrapper ++ content ++ commonProperties(block, path)
+  }
+
+  override def inputPortMapping(block: ActivateBlock, activatePort: Int, portType: LinkType): String = {
+    portType match {
+      case EventLink if activatePort == 1 => "Trigger"
+      case _ => activatePort.toString
+    }
   }
 }

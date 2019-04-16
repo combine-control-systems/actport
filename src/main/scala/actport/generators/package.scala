@@ -5,42 +5,43 @@ import actport.simulink._
 package object generators {
   /** Dispatch block to generate expressions.
     *
-    * @param path  path in diagram
     * @param block Activate block identifier
     * @return sequence of expressions to create the block in Simulink
     */
-  def dispatch(path: SimulinkPath)(implicit block: ActivateBlock): Seq[Expression] = {
+  def getGenerator(block: ActivateBlock): Generator[ActivateBlock] = {
     // Keep these in alphabetical order.
     // TODO: Break generators out into separate jar-files and use reflection to
     //       look up matching strings. Contributing with extra functionality
     //       by just dropping new jar-files into a predefined directory is
     //       probably desired.
     block.blockType match {
-      case "system/ActivationOperations/SampleClock" => generators.SampleClock(path)
-      case "system/Dynamical/ContStateSpace" => generators.StateSpace(path)
-      case "system/Dynamical/DiscreteDelay" => generators.DiscreteDelay(path)
-      case "system/Dynamical/DiscrStateSpace" => generators.DiscreteStateSpace(path)
-      case "system/Dynamical/Derivative" => generators.Derivative(path)
-      case "system/Dynamical/Integral" => generators.Integral(path)
-      case "system/MathOperations/Gain" => generators.Gain(path)
-      case "system/MatrixOperations/MatrixConcatenation" => generators.MatrixConcatenation(path)
-      case "system/MathOperations/MathFunc" => generators.MathFunc(path)
-      case "system/MathOperations/Sum" => generators.Sum(path)
-      case "system/MatrixOperations/MatrixGain" => generators.MatrixGain(path)
-      case "system/MatrixOperations/MatrixMultiplication" => generators.MatrixMultiplication(path)
-      case "system/MatrixOperations/Transpose" => generators.Transpose(path)
-      case "system/Ports/Input" => generators.InputPort(path)
-      case "system/Ports/Output" => generators.OutputPort(path)
-      case "system/Routing/Demux" => generators.Demux(path)
-      case "system/Routing/Mux" => generators.Mux(path)
-      case "system/SignalGenerators/Constant" => generators.Constant(path)
-      case "system/SignalGenerators/Random" => generators.Random(path)
-      case "system/SignalViewers/Display" => generators.Display(path)
-      case "system/SignalViewers/Scope" => generators.Scope(path)
-      case "TEXT_f" => generators.Annotation(path)
-      case _ => generators.Undefined(path)
+      case "system/ActivationOperations/SampleClock" => generators.SampleClock
+      case "system/Dynamical/ContStateSpace" => generators.StateSpace
+      case "system/Dynamical/DiscreteDelay" => generators.DiscreteDelay
+      case "system/Dynamical/DiscrStateSpace" => generators.DiscreteStateSpace
+      case "system/Dynamical/Derivative" => generators.Derivative
+      case "system/Dynamical/Integral" => generators.Integral
+      case "system/MathOperations/Gain" => generators.Gain
+      case "system/MatrixOperations/MatrixConcatenation" => generators.MatrixConcatenation
+      case "system/MathOperations/MathFunc" => generators.MathFunc
+      case "system/MathOperations/Sum" => generators.Sum
+      case "system/MatrixOperations/MatrixGain" => generators.MatrixGain
+      case "system/MatrixOperations/MatrixMultiplication" => generators.MatrixMultiplication
+      case "system/MatrixOperations/Transpose" => generators.Transpose
+      case "system/Ports/Input" => generators.InputPort
+      case "system/Ports/Output" => generators.OutputPort
+      case "system/Routing/Demux" => generators.Demux
+      case "system/Routing/Mux" => generators.Mux
+      case "system/SignalGenerators/Constant" => generators.Constant
+      case "system/SignalGenerators/Random" => generators.Random
+      case "system/SignalViewers/Display" => generators.Display
+      case "system/SignalViewers/Scope" => generators.Scope
+      case "TEXT_f" => generators.Annotation
+      case _ => generators.Undefined
     }
   }
+
+  def getGenerator(block: ActivateSuperBlock): Generator[ActivateSuperBlock] = generators.SuperBlock
 
   /** Apply common properties.
     *
@@ -48,7 +49,7 @@ package object generators {
     * @param block Activate block
     * @return sequence of expressions
     */
-  def commonProperties(path: SimulinkPath)(implicit block: Block): Seq[Expression] = {
+  def commonProperties(block: Block, path: SimulinkPath): Seq[Expression] = {
     val blockPath = path / block.name
     Seq(
       SetParam(blockPath, SimulinkParameterName("BackgroundColor"), block.backgroundColor),

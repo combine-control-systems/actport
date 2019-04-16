@@ -7,7 +7,7 @@ import scala.collection.JavaConverters._
 
 /** Constant signal. */
 object Constant extends Generator[ActivateBlock] {
-  override def apply(path: SimulinkPath)(implicit block: ActivateBlock): Seq[Expression] = {
+  override def generateExpressions(block: ActivateBlock, path: SimulinkPath): Seq[Expression] = {
     val blockPath = path / block.name
 
     val p = block.parameters.asScala
@@ -22,6 +22,6 @@ object Constant extends Generator[ActivateBlock] {
       //       The question is how to identify when to do this without parsing the parameter value?
       //       It gets especially tricky when the value is a variable to be read from the workspace.
       // TODO: We are not handling the datatype of the signal which is specified in p.get("typ").
-    ) ++ commonProperties(path)
+    ) ++ commonProperties(block, path)
   }
 }

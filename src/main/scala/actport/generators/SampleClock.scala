@@ -45,7 +45,7 @@ object SampleClock extends Generator[ActivateBlock] {
     }
   }
 
-  override def apply(path: SimulinkPath)(implicit block: ActivateBlock): Seq[Expression] = {
+  override def generateExpressions(block: ActivateBlock, path: SimulinkPath): Seq[Expression] = {
     import fastparse.parse
 
     val blockPath = path / block.name
@@ -94,6 +94,6 @@ object SampleClock extends Generator[ActivateBlock] {
           SetParam(blockPath, SimulinkParameterName("uplimit"), 1),
           SetParam(blockPath, SimulinkParameterName("tsamp"), ts)
         )
-    }) ++ commonProperties(path)
+    }) ++ commonProperties(block, path)
   }
 }

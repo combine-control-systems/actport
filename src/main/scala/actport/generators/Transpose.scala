@@ -7,7 +7,7 @@ import scala.collection.JavaConverters._
 
 /** Transpose of Matrix. */
 object Transpose extends Generator[ActivateBlock] {
-  override def apply(path: SimulinkPath)(implicit block: ActivateBlock): Seq[Expression] = {
+  override def generateExpressions(block: ActivateBlock, path: SimulinkPath): Seq[Expression] = {
     val blockPath = path / block.name
 
     val p = block.parameters.asScala
@@ -22,6 +22,6 @@ object Transpose extends Generator[ActivateBlock] {
         case _ =>
           SetParam(blockPath, SimulinkParameterName("Operator"), "transpose")
       }
-    ) ++ commonProperties(path)
+    ) ++ commonProperties(block, path)
   }
 }

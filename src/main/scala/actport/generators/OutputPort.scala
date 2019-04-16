@@ -1,14 +1,14 @@
 package actport.generators
 
-import actport.Block
+import actport.ActivateBlock
 import actport.simulink._
 
 /** Output port of subsystem. */
-object OutputPort extends Generator[Block] {
-  override def apply(path: SimulinkPath)(implicit block: Block): Seq[Expression] = {
+object OutputPort extends Generator[ActivateBlock] {
+  override def generateExpressions(block: ActivateBlock, path: SimulinkPath): Seq[Expression] = {
     val blockPath = path / block.name
     Seq(
       AddBlock(Simulink.PortsAndSubsystems.Out1, blockPath)
-    ) ++ commonProperties(path)
+    ) ++ commonProperties(block, path)
   }
 }

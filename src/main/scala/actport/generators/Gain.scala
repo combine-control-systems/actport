@@ -7,7 +7,7 @@ import scala.collection.JavaConverters._
 
 /** Signal gain. */
 object Gain extends Generator[ActivateBlock] {
-  override def apply(path: SimulinkPath)(implicit block: ActivateBlock): Seq[Expression] = {
+  override def generateExpressions(block: ActivateBlock, path: SimulinkPath): Seq[Expression] = {
     val blockPath = path / block.name
 
     val p = block.parameters.asScala
@@ -18,6 +18,6 @@ object Gain extends Generator[ActivateBlock] {
         case Some(gain: String) => SetParam(blockPath, SimulinkParameterName("Gain"), gain)
         case _ => SetParam(blockPath, SimulinkParameterName("Gain"), "1")
       }
-    ) ++ commonProperties(path)
+    ) ++ commonProperties(block, path)
   }
 }

@@ -7,7 +7,7 @@ import scala.collection.JavaConverters._
 
 /** Concatenate matrices. */
 object MatrixConcatenation extends Generator[ActivateBlock] {
-  override def apply(path: SimulinkPath)(implicit block: ActivateBlock): Seq[Expression] = {
+  override def generateExpressions(block: ActivateBlock, path: SimulinkPath): Seq[Expression] = {
     val blockPath = path / block.name
 
     val p = block.parameters.asScala
@@ -24,6 +24,6 @@ object MatrixConcatenation extends Generator[ActivateBlock] {
         case Some("'Vertical'") => "1"
         case _ => "1"
       })
-    ) ++ commonProperties(path)
+    ) ++ commonProperties(block, path)
   }
 }

@@ -49,7 +49,7 @@ sealed trait Block {
     *
     * @param path location of block in diagram
     */
-  def toExpression(path: SimulinkPath): Seq[Expression]
+  def toExpression(diagram: Diagram, path: SimulinkPath): Seq[Expression]
 }
 
 /** Instance of block which is not a super block.
@@ -89,9 +89,9 @@ case class ActivateBlock(blockType: String,
     * @param path location of block in diagram
     * @return sequence of expressions to instantiate Activate block equivalent in Simulink
     */
-  def toExpression(path: SimulinkPath): Seq[Expression] = generators.dispatch(path)(this)
+  def toExpression(diagram: Diagram, path: SimulinkPath): Seq[Expression] =
+    generators.getGenerator(this).generateExpressions(this, path)
 }
-
 /** Instance of super block in Activate.
   *
   * @param name             name of super block
@@ -129,7 +129,7 @@ case class ActivateSuperBlock(name: String = "",
     * @param path location of block in diagram
     * @return sequence of expressions to instantiate Activate super block equivalent in Simulink
     */
-  override def toExpression(path: SimulinkPath): Seq[Expression] = {
-    generators.SuperBlock.apply(path)(this)
+  override def toExpression(diagram: Diagram, path: SimulinkPath): Seq[Expression] = {
+    generators.getGenerator(this).generateExpressions(this, path)
   }
 }

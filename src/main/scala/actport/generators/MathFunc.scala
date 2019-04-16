@@ -7,7 +7,7 @@ import scala.collection.JavaConverters._
 
 /** Block for selecting various mathematical functions. */
 object MathFunc extends Generator[ActivateBlock] {
-  override def apply(path: SimulinkPath)(implicit block: ActivateBlock): Seq[Expression] = {
+  override def generateExpressions(block: ActivateBlock, path: SimulinkPath): Seq[Expression] = {
     val blockPath = path / block.name
 
     val p = block.parameters.asScala
@@ -84,7 +84,7 @@ object MathFunc extends Generator[ActivateBlock] {
       )
       // Default value.
       case _ => mathFunc(blockPath, "exp")
-    }) ++ commonProperties(path)
+    }) ++ commonProperties(block, path)
   }
 
   private def mathFunc(path: SimulinkPath, functionName: String): Seq[Expression] = Seq(

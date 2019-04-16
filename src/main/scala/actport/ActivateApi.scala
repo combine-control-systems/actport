@@ -335,7 +335,7 @@ object ActivateApi {
     require(destination.length == 3, "destination must contain (block tag, port number, \"input\"")
     require(destination(2) == "input", "3rd element of start must be \"input\"")
     val optPoints = Option(points)
-    val link = Link(start(0), start(1).toInt, destination(0), destination(1).toInt,
+    val link = Link(start(0), start(1).toInt, destination(0), destination(1).toInt, ExplicitLink,
       optPoints match {
         case Some(p) => p.map { v => Point(v(0).toInt, v(1).toInt) }.toVector
         case _ => Vector.empty
@@ -356,7 +356,7 @@ object ActivateApi {
                      destination: Array[String], points: Array[Array[Double]],
                      unknownFlag: Boolean): Diagram = {
     val optPoints = Option(points)
-    val link = Link(start(0), start(1).toInt, destination(0), destination(1).toInt,
+    val link = Link(start(0), start(1).toInt, destination(0), destination(1).toInt, EventLink,
       optPoints match {
         case Some(p) => p.map { v => Point(v(0).toInt, v(1).toInt) }.toVector
         case _ => Vector.empty
@@ -411,12 +411,13 @@ object ActivateApi {
     */
   def evaluate_model(diagram: Diagram): String = {
     // Apply transforms before exporting diagram.
-    transforms.Split.eliminateSplitBlocks(diagram).pipe { d =>
-      val diagramName = d.name.getOrElse("New Model")
-      (Seq(NewSystem(diagramName), OpenSystem(diagramName)) ++ d.toExpression(SimulinkPath(diagramName)))
-        .map(_.serialize)
-        .tap(_.foreach(println))
-        .mkString("\n")
-    }
+    transforms.Split.eliminateSplitBlocks(diagram)
+      .pipe { d =>
+        val diagramName = d.name.getOrElse("New Model")
+        (Seq(NewSystem(diagramName), OpenSystem(diagramName)) ++ d.toExpression(SimulinkPath(diagramName)))
+          .map(_.serialize)
+          .tap(_.foreach(println))
+          .mkString("\n")
+      }
   }
 }

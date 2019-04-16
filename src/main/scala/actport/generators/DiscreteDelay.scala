@@ -7,7 +7,7 @@ import scala.collection.JavaConverters._
 
 /** Discrete unit-delay. */
 object DiscreteDelay extends Generator[ActivateBlock] {
-  override def apply(path: SimulinkPath)(implicit block: ActivateBlock): Seq[Expression] = {
+  override def generateExpressions(block: ActivateBlock, path: SimulinkPath): Seq[Expression] = {
     val blockPath = path / block.name
 
     val p = block.parameters.asScala
@@ -19,6 +19,6 @@ object DiscreteDelay extends Generator[ActivateBlock] {
         case Some(initialCondition: String) => initialCondition
         case _ => "0"
       })
-    ) ++ commonProperties(path)
+    ) ++ commonProperties(block, path)
   }
 }

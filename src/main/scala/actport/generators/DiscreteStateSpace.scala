@@ -7,7 +7,7 @@ import scala.collection.JavaConverters._
 
 /** Discrete State-Space. */
 object DiscreteStateSpace extends Generator[ActivateBlock] {
-  override def apply(path: SimulinkPath)(implicit block: ActivateBlock): Seq[Expression] = {
+  override def generateExpressions(block: ActivateBlock, path: SimulinkPath): Seq[Expression] = {
     val blockPath = path / block.name
 
     val p = block.parameters.asScala
@@ -34,6 +34,6 @@ object DiscreteStateSpace extends Generator[ActivateBlock] {
         case Some(x0: String) => SetParam(blockPath, SimulinkParameterName("X0"), x0)
         case _ => SetParam(blockPath, SimulinkParameterName("X0"), "0")
       }
-    ) ++ commonProperties(path)
+    ) ++ commonProperties(block, path)
   }
 }

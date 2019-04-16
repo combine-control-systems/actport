@@ -9,7 +9,7 @@ import scala.collection.JavaConverters._
 
 /** Matrix multiplication. */
 object MatrixMultiplication extends Generator[ActivateBlock] {
-  override def apply(path: SimulinkPath)(implicit block: ActivateBlock): Seq[Expression] = {
+  override def generateExpressions(block: ActivateBlock, path: SimulinkPath): Seq[Expression] = {
     val blockPath = path / block.name
 
     val p = block.parameters.asScala.toMap
@@ -30,7 +30,7 @@ object MatrixMultiplication extends Generator[ActivateBlock] {
       normalProduct(blockPath, p)
     }
 
-    product ++ commonProperties(path)
+    product ++ commonProperties(block, path)
   }
 
   private def normalProduct(blockPath: SimulinkPath, p: Map[String, Any]): Seq[Expression] = {

@@ -33,7 +33,8 @@ case class Diagram(name: Option[String] = None,
     * @return expressions
     */
   def toExpression(path: SimulinkPath): Seq[Expression] = {
-    children.flatMap(_.toExpression(path)) ++
-      explicitLinks.flatMap(_.toExpression(path))
+    children.flatMap(_.toExpression(this, path)) ++
+      explicitLinks.flatMap(_.toExpression(this, path)) ++
+      eventLinks.flatMap(_.toExpression(this, path))
   }
 }

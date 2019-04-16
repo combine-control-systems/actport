@@ -7,7 +7,7 @@ import scala.collection.JavaConverters._
 
 /** Integrator. */
 object Integral extends Generator[ActivateBlock] {
-  override def apply(path: SimulinkPath)(implicit block: ActivateBlock): Seq[Expression] = {
+  override def generateExpressions(block: ActivateBlock, path: SimulinkPath): Seq[Expression] = {
     val blockPath = path / block.name
 
     val p = block.parameters.asScala
@@ -50,6 +50,6 @@ object Integral extends Generator[ActivateBlock] {
       case _ => Seq()
     }
 
-    init ++ limits ++ commonProperties(path)
+    init ++ limits ++ commonProperties(block, path)
   }
 }

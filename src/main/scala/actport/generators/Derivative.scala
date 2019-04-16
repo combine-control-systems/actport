@@ -5,9 +5,9 @@ import actport.simulink.{AddBlock, Expression, Simulink, SimulinkPath}
 
 /** Derivative of signal. */
 object Derivative extends Generator[ActivateBlock] {
-  override def apply(path: SimulinkPath)(implicit block: ActivateBlock): Seq[Expression] = {
+  override def generateExpressions(block: ActivateBlock, path: SimulinkPath): Seq[Expression] = {
     val blockPath = path / block.name
 
-    Seq(AddBlock(Simulink.Continuous.Derivative, blockPath)) ++ commonProperties(path)
+    Seq(AddBlock(Simulink.Continuous.Derivative, blockPath)) ++ commonProperties(block, path)
   }
 }

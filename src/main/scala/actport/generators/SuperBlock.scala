@@ -4,7 +4,7 @@ import actport.simulink._
 
 /** Activate Super Block. */
 object SuperBlock extends Generator[ActivateSuperBlock] {
-  override def apply(path: SimulinkPath)(implicit block: ActivateSuperBlock): Seq[Expression] = {
+  override def generateExpressions(block: ActivateSuperBlock, path: SimulinkPath): Seq[Expression] = {
     val blockPath = path / block.name
 
     val eventPort = if (block.eventInputCount == 1) {
@@ -12,6 +12,6 @@ object SuperBlock extends Generator[ActivateSuperBlock] {
     } else Seq.empty[Expression]
 
     Seq(AddCleanSubsystem(blockPath)) ++ block.diagram.map(_.toExpression(blockPath)).getOrElse(Seq.empty) ++
-      eventPort ++ commonProperties(path)
+      eventPort ++ commonProperties(block, path)
   }
 }

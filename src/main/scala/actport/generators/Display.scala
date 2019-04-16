@@ -13,7 +13,7 @@ object Display extends Generator[ActivateBlock] {
     * @param block block instance
     * @return sequence of expressions
     */
-  override def apply(path: SimulinkPath)(implicit block: ActivateBlock): Seq[Expression] = {
+  override def generateExpressions(block: ActivateBlock, path: SimulinkPath): Seq[Expression] = {
     val blockPath = path / block.name
 
     val p = block.parameters.asScala
@@ -38,6 +38,6 @@ object Display extends Generator[ActivateBlock] {
           SetParam(blockPath, SimulinkParameterName("Decimation"), 1)
       }
       // TODO: externalActivation and showatend are not handled.
-    ) ++ commonProperties(path)
+    ) ++ commonProperties(block, path)
   }
 }
