@@ -22,7 +22,10 @@ object Split {
 
         // Eliminate split blocks.
         case block: ActivateBlock if block.blockType == "system/Links/Split" =>
-          eliminateSplitBlock(diagramState, block)
+          eliminateSplitBlock(diagramState, block, ExplicitLink)
+
+        case block: ActivateBlock if block.blockType == "system/Links/EventSplit" =>
+          eliminateSplitBlock(diagramState, block, EventLink)
 
         // Also do this recursively for super block children.
         case superBlock: ActivateSuperBlock =>
@@ -48,24 +51,44 @@ object Split {
     * @param block   Split block object
     * @return updated Diagram
     */
-  private def eliminateSplitBlock(diagram: Diagram, block: ActivateBlock): Diagram = {
-    require(block.blockType == "system/Links/Split", "Can only eliminate splits for Split blocks.")
+  private def eliminateSplitBlock(diagram: Diagram, block: ActivateBlock, linkType: LinkType): Diagram = {
+    require(block.blockType == "system/Links/Split" ||
+      block.blockType == "system/Links/EventSplit", "Can only eliminate splits for Split or EventSplit blocks.")
 
     // There is should be only one link incoming.
-    val incoming = diagram.explicitLinks.find(_.destination == block.name)
-    val outgoing = diagram.explicitLinks.filter(_.start == block.name)
+    val incoming: Option[Link] = linkType match {
+      case ExplicitLink => diagram.explicitLinks.find(_.destination == block.name)
+      case EventLink => diagram.eventLinks.find(_.destination == block.name)
+      case ImplicitLink => throw new NotImplementedError()
+    }
+    val outgoing: Option[Link] = linkType match {
+      case ExplicitLink => diagram.explicitLinks.find(_.start == block.name)
+      case EventLink => diagram.eventLinks.find(_.start == block.name)
+      case ImplicitLink => throw new NotImplementedError()
+    }
 
     // Create new links.
     val newLinks = incoming.map { i =>
-      outgoing.map { o => Link(i.start, i.startPort, o.destination, o.destinationPort, ExplicitLink, Vector.empty) }
+      outgoing.map { o => Link(i.start, i.startPort, o.destination, o.destinationPort, linkType, Vector.empty) }
     }
 
     (newLinks match {
       case Some(links) =>
         // Remove the old links and add the new ones.
-        val filteredLinks = diagram.explicitLinks.filter { l => l.destination != block.name && l.start != block.name }
-        diagram.copy(explicitLinks = filteredLinks ++ links)
+        linkType match {
+          case ExplicitLink =>
+            val filteredLinks = diagram.explicitLinks
+              .filter { l => l.destination != block.name && l.start != block.name }
+            diagram.copy(explicitLinks = filteredLinks ++ links)
 
+          case EventLink =>
+            val filteredLinks = diagram.eventLinks
+              .filter { l => l.destination != block.name && l.start != block.name }
+            diagram.copy(eventLinks = filteredLinks ++ links)
+
+          case ImplicitLink =>
+            throw new NotImplementedError()
+        }
       case None =>
         // Do nothing if there is nothing to do.
         diagram
