@@ -61,9 +61,9 @@ object Split {
       case EventLink => diagram.eventLinks.find(_.destination == block.name)
       case ImplicitLink => throw new NotImplementedError()
     }
-    val outgoing: Option[Link] = linkType match {
-      case ExplicitLink => diagram.explicitLinks.find(_.start == block.name)
-      case EventLink => diagram.eventLinks.find(_.start == block.name)
+    val outgoing: Seq[Link] = linkType match {
+      case ExplicitLink => diagram.explicitLinks.filter(_.start == block.name)
+      case EventLink => diagram.eventLinks.filter(_.start == block.name)
       case ImplicitLink => throw new NotImplementedError()
     }
 
