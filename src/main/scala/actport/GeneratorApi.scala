@@ -2,8 +2,8 @@ package actport
 
 import actport.simulink._
 
-import scala.util.chaining._
 import scala.collection.JavaConverters._
+import scala.util.chaining._
 
 object GeneratorApi {
   def test(s: String*): String = s.mkString("-")
@@ -51,11 +51,23 @@ object GeneratorApi {
     }
   }
 
-  def getParameter(block: ActivateBlock, name: String, default: String): String = {
-    val p = block.parameters.asScala
+  def getParameter(block: ActivateBlock, name: String, default: Any): Any = {
+    val parts = name.split("/").toVector
 
-    p.get(name) match {
-      case Some(value: String) => value
+    def getValue(parts: Vector[String], struct: ActivateStruct): Option[Any] = {
+      val part = parts.headOption
+
+      part.flatMap { value =>
+        struct.asScala.get(value) match {
+          case Some(next: ActivateStruct) => getValue(parts.tail, next)
+          case Some(v) => Some(v)
+          case _ => None
+        }
+      }
+    }
+
+    getValue(parts, block.parameters) match {
+      case Some(v) => v
       case _ => default
     }
   }
