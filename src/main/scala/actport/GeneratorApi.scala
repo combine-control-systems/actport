@@ -3,6 +3,7 @@ package actport
 import actport.simulink._
 
 import scala.util.chaining._
+import scala.collection.JavaConverters._
 
 object GeneratorApi {
   def test(s: String*): String = s.mkString("-")
@@ -48,5 +49,18 @@ object GeneratorApi {
       case b: ActivateBlock => b.copy(expressions = b.expressions ++ expr)
       case b: ActivateSuperBlock => b.copy(expressions = b.expressions ++ expr)
     }
+  }
+
+  def getParameter(block: ActivateBlock, name: String, default: String): String = {
+    val p = block.parameters.asScala
+
+    p.get(name) match {
+      case Some(value: String) => value
+      case _ => default
+    }
+  }
+
+  def setParam (blockName: String, name: String, value: String): Expression = {
+    SetParam(SimulinkPath(blockName), SimulinkParameterName(name), value)
   }
 }
