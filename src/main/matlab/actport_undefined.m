@@ -17,7 +17,7 @@ function out = actport_undefined(diagram, block, blockName)
     % Add a trigger port if we have one event input port.
     if block.eventInputCount == 1
         block = addBlockExpr(block, 'simulink/Ports & Subsystems/Trigger', sprintf('%s/Trigger', block.name));
-        block = mapEventInputPort(block, eventInputPort(1, 'Trigger'));
+        block = mapEventInputPort(block, 1, 'Trigger');
     end
 
     % Add another output port if we have one event output port.

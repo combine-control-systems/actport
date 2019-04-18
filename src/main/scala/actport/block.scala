@@ -45,13 +45,13 @@ sealed trait Block {
   /** Generates a rectangle in Activate coordinates based on [[origin]] and [[size]]. */
   def rect: Rectangle = new Rectangle(origin.x, origin.y, size.width, size.height)
 
-  def expressions: Seq[Expression]
+  def expressions: Vector[Expression]
 
   def portMappings: PortMap
 
-  def addPortMappings(portMappings: PortMap): Block
+  def addPortMapping(portMapping: PortMap): Block
 
-  def addExpressions(expressions: Seq[Expression]): Block
+  def addExpression(expression: Expression): Block
 
   /** Converts block to a collection of expressions which can be serialized to Matlab code.
     *
@@ -91,14 +91,14 @@ case class ActivateBlock(blockType: String,
                          eventInputCount: Int = 0,
                          eventOutputCount: Int = 0,
                          portMappings: PortMap = Map.empty,
-                         expressions: Seq[Expression] = Vector.empty,
+                         expressions: Vector[Expression] = Vector.empty,
                          parameters: ActivateStruct = ActivateStruct.empty) extends Block {
 
-  override def addPortMappings(pm: PortMap): ActivateBlock =
+  override def addPortMapping(pm: PortMap): ActivateBlock =
     this.copy(portMappings = portMappings ++ pm)
 
-  override def addExpressions(expr: Seq[Expression]): ActivateBlock =
-    this.copy(expressions = expressions ++ expr)
+  override def addExpression(expr: Expression): ActivateBlock =
+    this.copy(expressions = expressions :+ expr)
 
   /** Converts Activate block to a sequence of expressions.
     *
@@ -137,17 +137,17 @@ case class ActivateSuperBlock(name: String = "",
                               eventInputCount: Int = 0,
                               eventOutputCount: Int = 0,
                               portMappings: PortMap = Map.empty,
-                              expressions: Seq[Expression] = Vector.empty,
+                              expressions: Vector[Expression] = Vector.empty,
                               diagram: Option[Diagram] = None,
                               atomic: Boolean = false) extends Block {
 
   val blockType = "SuperBlock"
 
-  override def addPortMappings(pm: PortMap): ActivateSuperBlock =
+  override def addPortMapping(pm: PortMap): ActivateSuperBlock =
     this.copy(portMappings = portMappings ++ pm)
 
-  override def addExpressions(expr: Seq[Expression]): ActivateSuperBlock =
-    this.copy(expressions = expressions ++ expr)
+  override def addExpression(expr: Expression): ActivateSuperBlock =
+    this.copy(expressions = expressions :+ expr)
 
   /** Converts Activate super block to a sequence of expressions.
     *

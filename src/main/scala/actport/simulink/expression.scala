@@ -48,6 +48,16 @@ case class AddBlock(source: SimulinkSource, destination: SimulinkPath) extends E
   override def withFullPath(path: SimulinkPath): Expression = this.copy(destination = path / destination.path)
 }
 
+case class AddAnnotation(text: SimulinkPath, position: Rectangle) extends Expression {
+  override def serialize: String = {
+    val v = position
+    s"add_block('built-in/Area', $text, 'Position', [${v.x},${-v.y - v.height},${v.x + v.width},${-v.y}]);"
+  }
+
+  override def withFullPath(path: SimulinkPath): Expression =
+    this.copy(text = SimulinkPath(s"['$path/', ${text.path}]"))
+}
+
 /** Adds a clean subsystem without any ports and internal links.
   *
   * @param destination destination in model including name of subsystem
@@ -62,18 +72,6 @@ case class AddCleanSubsystem(destination: SimulinkPath) extends Expression {
 
   override def withFullPath(path: SimulinkPath): Expression = this.copy(destination = path / destination.path)
 }
-
-///** Raw expression for special cases.
-//  *
-//  * This expression should be used in exceptional cases only.
-//  *
-//  * @param expression raw expression
-//  */
-//case class RawExpression(expression: String) extends Expression {
-//  override def serialize: String = expression
-//
-//  override def withFullpath(path: SimulinkPath): Expression = this
-//}
 
 /** Deletes a line from the model.
   *

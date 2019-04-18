@@ -3,6 +3,7 @@ package actport
 import actport.simulink._
 
 import scala.collection.JavaConverters._
+import scala.util.chaining._
 
 object GeneratorApi {
   def setBlockName(block: Block, name: String): Block = block match {
@@ -12,22 +13,22 @@ object GeneratorApi {
 
   def mapInputPort(block: Block, activatePort: Int, simulinkPort: String): Block = {
     val portMapping = (activatePort, ExplicitLink, InputPort) -> simulinkPort
-    block.addPortMappings(Seq(portMapping).toMap)
+    block.addPortMapping(Map(portMapping))
   }
 
   def mapEventInputPort(block: Block, activatePort: Int, simulinkPort: String): Block = {
     val portMapping = (activatePort, EventLink, InputPort) -> simulinkPort
-    block.addPortMappings(Seq(portMapping).toMap)
+    block.addPortMapping(Map(portMapping))
   }
 
   def mapOutputPort(block: Block, activatePort: Int, simulinkPort: String): Block = {
     val portMapping = (activatePort, ExplicitLink, OutputPort) -> simulinkPort
-    block.addPortMappings(Seq(portMapping).toMap)
+    block.addPortMapping(Map(portMapping))
   }
 
   def mapEventOutputPort(block: Block, activatePort: Int, simulinkPort: String): Block = {
     val portMapping = (activatePort, EventLink, OutputPort) -> simulinkPort
-    block.addPortMappings(Seq(portMapping).toMap)
+    block.addPortMapping(Map(portMapping))
   }
 
   def updateDiagram(diagram: Diagram, block: Block): Diagram =
@@ -41,7 +42,13 @@ object GeneratorApi {
       case Some(v) => v
       case None => block.name
     }
-    block.addExpressions(Seq(AddBlock(simulinkSource, SimulinkPath(name))))
+    block.addExpression(AddBlock(simulinkSource, SimulinkPath(name)))
+  }
+
+  def addAnnotationExpr(block: ActivateBlock, text: String): Block = {
+    import ValueOps._
+    block.copy(name = text.escapeAnnotation)
+      .pipe(b => b.addExpression(AddAnnotation(SimulinkPath(b.name), b.rect)))
   }
 
   def addCleanSubSystemExpr(block: Block): Block = addCleanSubSystemExpr(block, null)
@@ -51,7 +58,7 @@ object GeneratorApi {
       case Some(v) => v
       case None => block.name
     }
-    block.addExpressions(Seq(AddCleanSubsystem(SimulinkPath(name))))
+    block.addExpression(AddCleanSubsystem(SimulinkPath(name)))
   }
 
   def addCommonProperties(block: Block): Block = addCommonProperties(block, null)
@@ -99,6 +106,11 @@ object GeneratorApi {
 
   def setParamExpr(block: Block, parameterName: String, value: String): Block = {
     require(value != null, s"value must not be null for ${block.name} : $parameterName")
-    block.addExpressions(Seq(SetParam(SimulinkPath(block.name), SimulinkParameterName(parameterName), value)))
+    block.addExpression(SetParam(SimulinkPath(block.name), SimulinkParameterName(parameterName), value))
   }
+
+//  def setRawParamExpr(block: Block, parameterName: String, value: String): Block = {
+//    require(value != null, s"Value must not be null for ${block.name} : $parameterName")
+//    block.addExpressions(Seq(SetRawParam(SimulinkPath(block.name), SimulinkParameterName(parameterName), value)))
+//  }
 }
