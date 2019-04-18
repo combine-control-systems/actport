@@ -25,7 +25,8 @@ case class Diagram(name: Option[String] = None,
                    zoom: Double = 1.0,
                    context: Vector[String] = Vector.empty,
                    explicitLinks: Vector[Link] = Vector.empty,
-                   eventLinks: Vector[Link] = Vector.empty) {
+                   eventLinks: Vector[Link] = Vector.empty,
+                   expressions: Seq[Expression] = Vector.empty) {
 
   /** Convert diagram to a sequence of Matlab expressions.
     *

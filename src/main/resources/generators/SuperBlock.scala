@@ -12,6 +12,6 @@ object SuperBlock extends Generator[ActivateSuperBlock] {
     } else Seq.empty[Expression]
 
     Seq(AddCleanSubsystem(blockPath)) ++ block.diagram.map(_.toExpression(blockPath)).getOrElse(Seq.empty) ++
-      eventPort ++ commonProperties(block, path)
+      eventPort ++ commonProperties(block, path) :+ ArrangeSystem(blockPath)
   }
 }

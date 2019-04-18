@@ -1,7 +1,7 @@
 package actport.generators
 
 import actport.ActivateBlock
-import actport.simulink.{BuiltIn, Expression, RawExpression, SimulinkPath}
+import actport.simulink.{BuiltIn, Expression, SimulinkPath}
 
 import scala.collection.JavaConverters._
 

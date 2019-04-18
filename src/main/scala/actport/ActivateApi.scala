@@ -2,7 +2,7 @@ package actport
 
 import java.awt.Color
 
-import actport.simulink.{NewSystem, OpenSystem, SimulinkPath}
+import actport.simulink.{ArrangeSystem, NewSystem, OpenSystem, SimulinkPath}
 
 import scala.util.chaining._
 
@@ -258,18 +258,18 @@ object ActivateApi {
     block.copy(parameters = parameters)
 
 
-  /** Add block to diagram.
-    *
-    * @param diagram   diagram object
-    * @param block     block object
-    * @param blockName name to assign block (must be unique within the diagram)
-    * @return diagram object
-    */
-  def add_block_impl(diagram: Diagram, block: Block, blockName: String): Array[Object] =
-    (block match {
-      case b: ActivateBlock => b.copy(name = blockName)
-      case b: ActivateSuperBlock => b.copy(name = blockName)
-    }).pipe(b => Array(diagram.copy(children = diagram.children :+ b), b.name))
+//  /** Add block to diagram.
+//    *
+//    * @param diagram   diagram object
+//    * @param block     block object
+//    * @param blockName name to assign block (must be unique within the diagram)
+//    * @return diagram object
+//    */
+//  def add_block_impl(diagram: Diagram, block: Block, blockName: String): Array[Object] =
+//    (block match {
+//      case b: ActivateBlock => b.copy(name = blockName)
+//      case b: ActivateSuperBlock => b.copy(name = blockName)
+//    }).pipe(b => Array(diagram.copy(children = diagram.children :+ b), b.name))
 
 
   def set_block_ident(block: Block, identity: String): Block =
@@ -414,7 +414,9 @@ object ActivateApi {
     transforms.Split.eliminateSplitBlocks(diagram)
       .pipe { d =>
         val diagramName = d.name.getOrElse("New Model")
-        (Seq(NewSystem(diagramName), OpenSystem(diagramName)) ++ d.toExpression(SimulinkPath(diagramName)))
+        (Seq(NewSystem(diagramName), OpenSystem(diagramName)) ++
+          d.toExpression(SimulinkPath(diagramName)) :+
+          ArrangeSystem(SimulinkPath(diagramName)))
           .map(_.serialize)
           .tap(_.foreach(println))
           .mkString("\n")

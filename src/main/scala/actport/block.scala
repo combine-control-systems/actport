@@ -45,6 +45,14 @@ sealed trait Block {
   /** Generates a rectangle in Activate coordinates based on [[origin]] and [[size]]. */
   def rect: Rectangle = new Rectangle(origin.x, origin.y, size.width, size.height)
 
+  def expressions: Seq[Expression]
+
+  def portMappings: PortMap
+
+  def addPortMappings(portMappings: PortMap): Block
+
+  def addExpressions(expressions: Seq[Expression]): Block
+
   /** Converts block to a collection of expressions which can be serialized to Matlab code.
     *
     * @param path location of block in diagram
@@ -82,15 +90,22 @@ case class ActivateBlock(blockType: String,
                          outputCount: Int = 0,
                          eventInputCount: Int = 0,
                          eventOutputCount: Int = 0,
+                         portMappings: PortMap = Map.empty,
+                         expressions: Seq[Expression] = Vector.empty,
                          parameters: ActivateStruct = ActivateStruct.empty) extends Block {
+
+  override def addPortMappings(pm: PortMap): ActivateBlock =
+    this.copy(portMappings = portMappings ++ pm)
+
+  override def addExpressions(expr: Seq[Expression]): ActivateBlock =
+    this.copy(expressions = expressions ++ expr)
 
   /** Converts Activate block to a sequence of expressions.
     *
     * @param path location of block in diagram
     * @return sequence of expressions to instantiate Activate block equivalent in Simulink
     */
-  def toExpression(diagram: Diagram, path: SimulinkPath): Seq[Expression] =
-    generators.getGenerator(this).generateExpressions(this, path)
+  def toExpression(diagram: Diagram, path: SimulinkPath): Seq[Expression] = expressions.map(_.withFullPath(path))
 }
 /** Instance of super block in Activate.
   *
@@ -121,15 +136,27 @@ case class ActivateSuperBlock(name: String = "",
                               outputCount: Int = 0,
                               eventInputCount: Int = 0,
                               eventOutputCount: Int = 0,
+                              portMappings: PortMap = Map.empty,
+                              expressions: Seq[Expression] = Vector.empty,
                               diagram: Option[Diagram] = None,
                               atomic: Boolean = false) extends Block {
+
+  val blockType = "SuperBlock"
+
+  override def addPortMappings(pm: PortMap): ActivateSuperBlock =
+    this.copy(portMappings = portMappings ++ pm)
+
+  override def addExpressions(expr: Seq[Expression]): ActivateSuperBlock =
+    this.copy(expressions = expressions ++ expr)
 
   /** Converts Activate super block to a sequence of expressions.
     *
     * @param path location of block in diagram
     * @return sequence of expressions to instantiate Activate super block equivalent in Simulink
     */
-  override def toExpression(diagram: Diagram, path: SimulinkPath): Seq[Expression] = {
-    generators.getGenerator(this).generateExpressions(this, path)
+  override def toExpression(parentDiagram: Diagram, path: SimulinkPath): Seq[Expression] = {
+    assert(name.nonEmpty)
+    val containedDiagramExpressions = diagram.map(_.toExpression(path / name)).getOrElse(Seq.empty)
+    expressions.map(_.withFullPath(path)) ++ containedDiagramExpressions
   }
 }
