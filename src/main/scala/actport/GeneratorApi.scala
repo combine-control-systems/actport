@@ -66,13 +66,16 @@ object GeneratorApi {
       }
     }
 
-    getValue(parts, block.parameters) match {
+    val value = getValue(parts, block.parameters)
+    // Handle "Some(null) -> None".
+    value.flatMap(Option.apply) match {
       case Some(v) => v
       case _ => default
     }
   }
 
   def setParam (blockName: String, name: String, value: String): Expression = {
+    require(value != null, s"value must not be null for $blockName : $name")
     SetParam(SimulinkPath(blockName), SimulinkParameterName(name), value)
   }
 }
