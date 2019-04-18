@@ -3,41 +3,64 @@ package actport
 import actport.simulink._
 
 import scala.collection.JavaConverters._
-import scala.util.chaining._
 
 object GeneratorApi {
-  def test(s: String*): String = s.mkString("-")
+  def setBlockName(block: Block, name: String): Block = block match {
+    case b: ActivateBlock => b.copy(name = name)
+    case b: ActivateSuperBlock => b.copy(name = name)
+  }
 
-  def addExpression(block: Block, expression: Expression): Block = block.addExpressions(Seq(expression))
-  def addExpressions(block: Block, expressions: Array[Expression]): Block = block.addExpressions(expressions)
+  def mapInputPort(block: Block, activatePort: Int, simulinkPort: String): Block = {
+    val portMapping = (activatePort, ExplicitLink, InputPort) -> simulinkPort
+    block.addPortMappings(Seq(portMapping).toMap)
+  }
 
-  def addPortMap(block: Block, portMap: (PortKey, String)): Block = block.addPortMappings(Seq(portMap).toMap)
-  def addPortMaps(block: Block, portMaps: Array[(PortKey, String)]): Block = block.addPortMappings(portMaps.toMap)
+  def mapEventInputPort(block: Block, activatePort: Int, simulinkPort: String): Block = {
+    val portMapping = (activatePort, EventLink, InputPort) -> simulinkPort
+    block.addPortMappings(Seq(portMapping).toMap)
+  }
 
-  def inputPort(activatePort: Int, simulinkPort: String): (PortKey, String) =
-    (activatePort, ExplicitLink, InputPort) -> simulinkPort
+  def mapOutputPort(block: Block, activatePort: Int, simulinkPort: String): Block = {
+    val portMapping = (activatePort, ExplicitLink, OutputPort) -> simulinkPort
+    block.addPortMappings(Seq(portMapping).toMap)
+  }
 
-  def eventInputPort(activatePort: Int, simulinkPort: String): (PortKey, String) =
-    (activatePort, EventLink, InputPort) -> simulinkPort
+  def mapEventOutputPort(block: Block, activatePort: Int, simulinkPort: String): Block = {
+    val portMapping = (activatePort, EventLink, OutputPort) -> simulinkPort
+    block.addPortMappings(Seq(portMapping).toMap)
+  }
 
-  def outputPort(activatePort: Int, simulinkPort: String): (PortKey, String) =
-    (activatePort, ExplicitLink, OutputPort) -> simulinkPort
+  def updateDiagram(diagram: Diagram, block: Block): Diagram =
+    // The name of the block is expected to be updated in Matlab in add_block_2.
+    diagram.copy(children = diagram.children :+ block)
 
-  def eventOutputPort(activatePort: Int, simulinkPort: String): (PortKey, String) =
-    (activatePort, EventLink, OutputPort) -> simulinkPort
+  def addBlockExpr(block: Block, simulinkSource: SimulinkSource): Block = addBlockExpr(block, simulinkSource, null)
 
-  def updateDiagram(diagram: Diagram, block: Block, blockName: String): Diagram =
-    (block match {
-      case b: ActivateBlock => b.copy(name = blockName)
-      case b: ActivateSuperBlock => b.copy(name = blockName)
-    }).pipe(b => diagram.copy(children = diagram.children :+ b))
+  def addBlockExpr(block: Block, simulinkSource: SimulinkSource, blockName: String = null): Block = {
+    val name = Option(blockName) match {
+      case Some(v) => v
+      case None => block.name
+    }
+    block.addExpressions(Seq(AddBlock(simulinkSource, SimulinkPath(name))))
+  }
 
-  def addBlock(simulinkSource: SimulinkSource, blockName: String): Expression =
-    AddBlock(simulinkSource, SimulinkPath(blockName))
+  def addCleanSubSystemExpr(block: Block): Block = addCleanSubSystemExpr(block, null)
 
-  def addCleanSubSystem(blockName: String): Expression = AddCleanSubsystem(SimulinkPath(blockName))
+  def addCleanSubSystemExpr(block: Block, blockName: String): Block = {
+    val name = Option(blockName) match {
+      case Some(v) => v
+      case None => block.name
+    }
+    block.addExpressions(Seq(AddCleanSubsystem(SimulinkPath(name))))
+  }
 
-  def addCommonProperties(block: Block, name: String): Block = {
+  def addCommonProperties(block: Block): Block = addCommonProperties(block, null)
+
+  def addCommonProperties(block: Block, blockName: String): Block = {
+    val name = Option(blockName) match {
+      case Some(v) => v
+      case None => block.name
+    }
     val expr = Array(
       SetParam(SimulinkPath(name), SimulinkParameterName("BackgroundColor"), block.backgroundColor),
       SetParam(SimulinkPath(name), SimulinkParameterName("ForegroundColor"), block.foregroundColor),
@@ -74,8 +97,8 @@ object GeneratorApi {
     }
   }
 
-  def setParam (blockName: String, name: String, value: String): Expression = {
-    require(value != null, s"value must not be null for $blockName : $name")
-    SetParam(SimulinkPath(blockName), SimulinkParameterName(name), value)
+  def setParamExpr(block: Block, parameterName: String, value: String): Block = {
+    require(value != null, s"value must not be null for ${block.name} : $parameterName")
+    block.addExpressions(Seq(SetParam(SimulinkPath(block.name), SimulinkParameterName(parameterName), value)))
   }
 }

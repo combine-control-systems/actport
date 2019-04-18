@@ -1,11 +1,11 @@
 % activate = 'system/Dynamical/Integral'
-function out = activate_integrator(diagram, block, blockName)
+function out = activate_integrator(diagram, block)
     import actport.GeneratorApi.*
 
-    block = addExpression(block, addBlock('simulink/Continuous/Integrator', blockName));
+    block = addBlockExpr(block, 'simulink/Continuous/Integrator');
 
     x0 = getParameter(block, 'x0', '0');
-    block = addExpression(block, setParam(blockName, 'InitialCondition', x0));
+    block = setParamExpr(block, 'InitialCondition', x0);
 
     reinit = getParameter(block, 'reinit', '1');
     if reinit == '1'
@@ -13,7 +13,7 @@ function out = activate_integrator(diagram, block, blockName)
     else
         reinit = 'internal';
     end
-    block = addExpression(block, setParam(blockName, 'InitialConditionSource', reinit));
+    block = setParamExpr(block, 'InitialConditionSource', reinit);
 
     satur = getParameter(block, 'satur', '1');
     if satur == '1'
@@ -21,17 +21,17 @@ function out = activate_integrator(diagram, block, blockName)
     else
         satur = 'off';
     end
-    block = addExpression(block, setParam(blockName, 'LimitOutput', satur));
+    block = setParamExpr(block, 'LimitOutput', satur);
 
     maxLimit = getParameter(block, 'limit/max', 'inf');
-    block = addExpression(block, setParam(blockName, 'UpperSaturationLimit', maxLimit));
+    block = setParamExpr(block, 'UpperSaturationLimit', maxLimit);
 
     minLimit = getParameter(block, 'limit/min', '-inf');
-    block = addExpression(block, setParam(blockName, 'LowerSaturationLimit', minLimit));
+    block = setParamExpr(block, 'LowerSaturationLimit', minLimit);
 
     zcross = getParameter(block, 'zcross', 'off');
-    block = addExpression(block, setParam(blockName, 'ZeroCross', zcross));
+    block = setParamExpr(block, 'ZeroCross', zcross);
 
-    block = addCommonProperties(block, blockName);
-    out = updateDiagram(diagram, block, blockName);
+    block = addCommonProperties(block);
+    out = updateDiagram(diagram, block);
 end

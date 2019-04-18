@@ -1,8 +1,8 @@
 % activate = 'system/Ports/Output'
-function out = actport_outputport(diagram, block, blockName)
+function out = actport_outputport(diagram, block)
     import actport.GeneratorApi.*
 
-    block = addExpression(block, addBlock('simulink/Ports & Subsystems/Out1', blockName));
-    block = addCommonProperties(block, blockName);
-    out = updateDiagram(diagram, block, blockName);
+    block = addBlockExpr(block, 'simulink/Ports & Subsystems/Out1');
+    block = addCommonProperties(block);
+    out = updateDiagram(diagram, block);
 end

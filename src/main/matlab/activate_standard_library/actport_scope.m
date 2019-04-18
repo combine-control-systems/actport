@@ -1,9 +1,9 @@
 % activate = 'system/SignalViewers/Scope'
-function out = actport_scope(diagram, block, blockName)
+function out = actport_scope(diagram, block)
     import actport.GeneratorApi.*
 
-    block = addExpression(block, addBlock('simulink/Sinks/Scope', blockName));
-    block = addExpression(block, setParam(blockName, 'NumInputPorts', sprintf('%d', block.inputCount)));
-    block = addCommonProperties(block, blockName);
-    out = updateDiagram(diagram, block, blockName);
+    block = addBlockExpr(block, 'simulink/Sinks/Scope');
+    block = setParamExpr(block, 'NumInputPorts', sprintf('%d', block.inputCount));
+    block = addCommonProperties(block);
+    out = updateDiagram(diagram, block);
 end
