@@ -104,9 +104,19 @@ object GeneratorApi {
     }
   }
 
+  def setParamExpr(block: Block, blockName: String, parameterName: String, value: String): Block = {
+    require(value != null, s"value must not be null for ${block.name} : $parameterName")
+    block.addExpression(SetParam(SimulinkPath(blockName), SimulinkParameterName(parameterName), value))
+  }
+
   def setParamExpr(block: Block, parameterName: String, value: String): Block = {
     require(value != null, s"value must not be null for ${block.name} : $parameterName")
     block.addExpression(SetParam(SimulinkPath(block.name), SimulinkParameterName(parameterName), value))
+  }
+
+  def addLineExpr(block: Block, system: String, startPort: String, destinationPort: String): Block = {
+    block.addExpression(AddLine(SimulinkPath(system), SimulinkPort(startPort),
+      SimulinkPort(destinationPort), SmartAutoRouting))
   }
 
 //  def setRawParamExpr(block: Block, parameterName: String, value: String): Block = {
