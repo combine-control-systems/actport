@@ -2,7 +2,7 @@ package actport
 
 import java.awt.Color
 
-import actport.simulink.{Expression, SimulinkPath}
+import actport.simulink.{Expression, SimPath}
 
 /** Activate diagram.
   *
@@ -33,9 +33,11 @@ case class Diagram(name: Option[String] = None,
     * @param path location of diagram in model
     * @return expressions
     */
-  def toExpression(path: SimulinkPath): Seq[Expression] = {
-    children.flatMap(_.toExpression(this, path)) ++
-      explicitLinks.flatMap(_.toExpression(this, path)) ++
-      eventLinks.flatMap(_.toExpression(this, path))
+  def toExpression(path: SimPath): Seq[Expression] = {
+    val childExpressions = children.flatMap(_.toExpression(this, path))
+    val explicitLinkExpressions = explicitLinks.flatMap(_.toExpression(this, path))
+    val eventLinkExpressions = eventLinks.flatMap(_.toExpression(this, path))
+
+    childExpressions ++ explicitLinkExpressions ++ eventLinkExpressions
   }
 }

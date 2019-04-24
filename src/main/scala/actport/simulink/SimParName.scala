@@ -4,6 +4,6 @@ package actport.simulink
   *
   * @param parameterName name of parameter
   */
-case class SimulinkParameterName(parameterName: String) extends AnyVal {
+case class SimParName(parameterName: String) extends AnyVal {
   override def toString: String = parameterName
 }

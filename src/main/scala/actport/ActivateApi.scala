@@ -2,12 +2,16 @@ package actport
 
 import java.awt.Color
 
-import actport.simulink.{ArrangeSystem, NewSystem, OpenSystem, SimulinkPath}
+import actport.simulink.{ArrangeSystem, NewSystem, OpenSystem, SimPath}
 
 import scala.util.chaining._
 
 object ActivateApi {
-  def test(a: Object): Unit = {
+  /** Utility function to show type of input from Matlab call.
+    *
+    * @param a anything
+    */
+  def showType(a: Object): Unit = {
     println(a.getClass.getCanonicalName)
   }
 
@@ -36,8 +40,10 @@ object ActivateApi {
 
   /** NOT SURE WHAT THIS IS
     *
+    * Could this be z-order?
+    *
     * @param diagram diagram object
-    * @param value   0 = off, 1 = on
+    * @param value   0 = off, 1 = on ???
     * @return diagram object
     */
   def set_diagram_3d(diagram: Diagram, value: Int): Diagram = {
@@ -52,7 +58,7 @@ object ActivateApi {
     * @return diagram object
     */
   def set_diagram_zoom(diagram: Diagram, zoom: Double): Diagram = {
-    require(zoom > 0.0, "Value must be larger than 0.0.")
+    require(zoom > 0.0, "Value must be larger than 0.")
     diagram.copy(zoom = zoom)
   }
 
@@ -257,28 +263,25 @@ object ActivateApi {
   def set_block_parameters_impl(block: ActivateBlock, parameters: ActivateStruct): ActivateBlock =
     block.copy(parameters = parameters)
 
-
-//  /** Add block to diagram.
-//    *
-//    * @param diagram   diagram object
-//    * @param block     block object
-//    * @param blockName name to assign block (must be unique within the diagram)
-//    * @return diagram object
-//    */
-//  def add_block_impl(diagram: Diagram, block: Block, blockName: String): Array[Object] =
-//    (block match {
-//      case b: ActivateBlock => b.copy(name = blockName)
-//      case b: ActivateSuperBlock => b.copy(name = blockName)
-//    }).pipe(b => Array(diagram.copy(children = diagram.children :+ b), b.name))
-
-
+  /** Set block identity.
+    *
+    * @param block    block object
+    * @param identity identity of object
+    * @return block object
+    */
   def set_block_ident(block: Block, identity: String): Block =
     block match {
       case b: ActivateBlock => b.copy(identity = identity)
       case b: ActivateSuperBlock => b.copy(identity = identity)
     }
 
-
+  /** Set block mask.
+    *
+    * @param block      block object
+    * @param parameters block parameters
+    * @param label      block label
+    * @return block object
+    */
   def set_block_mask_impl(block: Block, parameters: ActivateStruct, label: String): Block = {
     System.err.println("set_block_mask_impl not implemented yet")
     block
@@ -312,6 +315,13 @@ object ActivateApi {
     block.copy(atomic = atomic == 1)
   }
 
+  /** Set icon text of super block.
+    *
+    * @param block block object
+    * @param text1 text 1 ???
+    * @param text2 text 2 ???
+    * @return block object
+    */
   def set_block_icon_text(block: ActivateSuperBlock, text1: String, text2: String): ActivateSuperBlock = {
     block
   }
@@ -399,6 +409,12 @@ object ActivateApi {
     diagram
   }
 
+  /** Set solver parameters.
+    *
+    * @param diagram    diagram object
+    * @param parameters solver parameters
+    * @return diagram
+    */
   def set_solver_parameters(diagram: Diagram, parameters: Array[String]): Diagram = {
     System.err.println("set_solver_parameters is not implemented yet")
     diagram
@@ -406,20 +422,30 @@ object ActivateApi {
 
   /** Evaluates the model and generates Matlab commands to generate Simulink model.
     *
-    * @param diagram
-    * @return
+    * @param diagram diagram object
+    * @return serialized expressions
     */
   def evaluate_model(diagram: Diagram): String = {
     // Apply transforms before exporting diagram.
     transforms.Split.eliminateSplitBlocks(diagram)
       .pipe { d =>
         val diagramName = d.name.getOrElse("New Model")
-        (Seq(NewSystem(diagramName), OpenSystem(diagramName)) ++
-          d.toExpression(SimulinkPath(diagramName)) :+
-          ArrangeSystem(SimulinkPath(diagramName)))
-          .map(_.serialize)
-          .tap(_.foreach(println))
-          .mkString("\n")
+
+        val prelude = Seq(
+          NewSystem(diagramName),   // Create a new system as a first thing.
+          OpenSystem(diagramName)   // Open it immediately.
+        )
+
+        // Convert the content of the root system into expressions.
+        val rootSystem = d.toExpression(SimPath(diagramName))
+
+        // Add an expression to arrange the root system.
+        val arrangeSystem = Seq(ArrangeSystem(SimPath(diagramName)))
+
+        (prelude ++ rootSystem ++ arrangeSystem)
+          .map(_.serialize)          // serialize the expressions
+          .tap(_.foreach(println))   // print serialized expressions to the terminal
+          .mkString("\n")            // join expressions with a new line.
       }
   }
 }

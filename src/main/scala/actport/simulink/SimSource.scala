@@ -6,10 +6,8 @@ package actport.simulink
   * For example, the path to the Gain block in Simulink is
   * `simulink/Math Operations/Gain`.
   *
-  * @see [[actport.simulink.Simulink]]
-  *
   * @param name name of Simulink Source
   */
-case class SimulinkSource(name: String) extends AnyVal {
+case class SimSource(name: String) extends AnyVal {
   override def toString: String = name
 }

@@ -6,8 +6,8 @@ package actport.simulink
   *
   * @param path string representation of the path
   */
-case class SimulinkPath(path: String) extends AnyVal {
-  /** Appends an extra component to a [[actport.simulink.SimulinkPath]].
+case class SimPath(path: String) extends AnyVal {
+  /** Appends an extra component to a [[actport.simulink.SimPath]].
     *
     * Usage:
     * {{{
@@ -18,7 +18,7 @@ case class SimulinkPath(path: String) extends AnyVal {
     * @param next next path component
     * @return joined components
     */
-  def /(next: String): SimulinkPath = SimulinkPath(path + "/" + next)
+  def /(next: String): SimPath = SimPath(path + "/" + next)
 
   override def toString: String = path
 }

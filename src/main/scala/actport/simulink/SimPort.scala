@@ -4,6 +4,6 @@ package actport.simulink
   *
   * @param port port name according to "blockname/portnumber"
   */
-case class SimulinkPort(port: String) extends AnyVal {
+case class SimPort(port: String) extends AnyVal {
   override def toString: String = port
 }

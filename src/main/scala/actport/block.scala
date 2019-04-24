@@ -2,7 +2,7 @@ package actport
 
 import java.awt.{Color, Rectangle}
 
-import actport.simulink.{Expression, SimulinkPath}
+import actport.simulink.{Expression, SimPath}
 
 /** Common properties of blocks in Activate. */
 sealed trait Block {
@@ -57,7 +57,7 @@ sealed trait Block {
     *
     * @param path location of block in diagram
     */
-  def toExpression(diagram: Diagram, path: SimulinkPath): Seq[Expression]
+  def toExpression(diagram: Diagram, path: SimPath): Seq[Expression]
 }
 
 /** Instance of block which is not a super block.
@@ -105,7 +105,7 @@ case class ActivateBlock(blockType: String,
     * @param path location of block in diagram
     * @return sequence of expressions to instantiate Activate block equivalent in Simulink
     */
-  def toExpression(diagram: Diagram, path: SimulinkPath): Seq[Expression] = expressions.map(_.withFullPath(path))
+  def toExpression(diagram: Diagram, path: SimPath): Seq[Expression] = expressions.map(_.withFullPath(path))
 }
 /** Instance of super block in Activate.
   *
@@ -154,9 +154,11 @@ case class ActivateSuperBlock(name: String = "",
     * @param path location of block in diagram
     * @return sequence of expressions to instantiate Activate super block equivalent in Simulink
     */
-  override def toExpression(parentDiagram: Diagram, path: SimulinkPath): Seq[Expression] = {
+  override def toExpression(parentDiagram: Diagram, path: SimPath): Seq[Expression] = {
     assert(name.nonEmpty)
-    val containedDiagramExpressions = diagram.map(_.toExpression(path / name)).getOrElse(Seq.empty)
+    // Expressions part of the diagram itself.
+    val containedDiagramExpressions = diagram.map(_.toExpression(path / name)).getOrElse(Vector.empty)
+    // Add full path to all block expressions.
     expressions.map(_.withFullPath(path)) ++ containedDiagramExpressions
   }
 }
