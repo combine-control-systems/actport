@@ -11,7 +11,7 @@ class ValueOps(val s: String) {
     */
   def escape: String = s.replace("'", "''")
 
-  /** Escapes strings for [[actport.generators.Annotation]].
+  /** Escapes strings for Annotations.
     *
     * Makes sure that multiline strings can be serialized to Matlab
     * script commands.

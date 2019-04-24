@@ -24,6 +24,7 @@ object Split {
         case block: ActivateBlock if block.blockType == "system/Links/Split" =>
           eliminateSplitBlock(diagramState, block, ExplicitLink)
 
+        // Eliminate event split blocks.
         case block: ActivateBlock if block.blockType == "system/Links/EventSplit" =>
           eliminateSplitBlock(diagramState, block, EventLink)
 
@@ -61,15 +62,16 @@ object Split {
       case EventLink => diagram.eventLinks.find(_.destination == block.name)
       case ImplicitLink => throw new NotImplementedError()
     }
+    // But there may be several outgoing links.
     val outgoing: Seq[Link] = linkType match {
       case ExplicitLink => diagram.explicitLinks.filter(_.start == block.name)
       case EventLink => diagram.eventLinks.filter(_.start == block.name)
       case ImplicitLink => throw new NotImplementedError()
     }
 
-    // Create new links.
-    val newLinks = incoming.map { i =>
-      outgoing.map { o => Link(i.start, i.startPort, o.destination, o.destinationPort, linkType, Vector.empty) }
+    // Create new links between the incoming start port and all of the outgoing destination ports.
+    val newLinks = incoming.map { i: Link =>
+      outgoing.map { o: Link => Link(i.start, i.startPort, o.destination, o.destinationPort, linkType, Vector.empty) }
     }
 
     (newLinks match {
@@ -77,13 +79,16 @@ object Split {
         // Remove the old links and add the new ones.
         linkType match {
           case ExplicitLink =>
+            // Remove old links.
             val filteredLinks = diagram.explicitLinks
-              .filter { l => l.destination != block.name && l.start != block.name }
+              .filter { l: Link => l.destination != block.name && l.start != block.name }
+            // Set diagram links to filtered links and the new links replacing the old ones.
             diagram.copy(explicitLinks = filteredLinks ++ links)
 
+          // Same procedure for event links.
           case EventLink =>
             val filteredLinks = diagram.eventLinks
-              .filter { l => l.destination != block.name && l.start != block.name }
+              .filter { l: Link => l.destination != block.name && l.start != block.name }
             diagram.copy(eventLinks = filteredLinks ++ links)
 
           case ImplicitLink =>
@@ -94,6 +99,6 @@ object Split {
         diagram
 
       // Finally remove the Split block from the children of the diagram.
-    }).pipe { d => d.copy(children = d.children.filter(_ != block)) }
+    }).pipe { d: Diagram => d.copy(children = d.children.filter(_ != block)) }
   }
 }

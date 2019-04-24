@@ -2,7 +2,7 @@ package actport
 
 import java.awt.{Color, Rectangle}
 
-import actport.simulink.{Expression, SimulinkPath}
+import actport.simulink.{Expression, SimPath}
 
 /** Common properties of blocks in Activate. */
 sealed trait Block {
@@ -45,11 +45,19 @@ sealed trait Block {
   /** Generates a rectangle in Activate coordinates based on [[origin]] and [[size]]. */
   def rect: Rectangle = new Rectangle(origin.x, origin.y, size.width, size.height)
 
+  def expressions: Vector[Expression]
+
+  def portMappings: PortMap
+
+  def addPortMapping(portMapping: PortMap): Block
+
+  def addExpression(expression: Expression): Block
+
   /** Converts block to a collection of expressions which can be serialized to Matlab code.
     *
     * @param path location of block in diagram
     */
-  def toExpression(diagram: Diagram, path: SimulinkPath): Seq[Expression]
+  def toExpression(diagram: Diagram, path: SimPath): Seq[Expression]
 }
 
 /** Instance of block which is not a super block.
@@ -82,15 +90,22 @@ case class ActivateBlock(blockType: String,
                          outputCount: Int = 0,
                          eventInputCount: Int = 0,
                          eventOutputCount: Int = 0,
+                         portMappings: PortMap = Map.empty,
+                         expressions: Vector[Expression] = Vector.empty,
                          parameters: ActivateStruct = ActivateStruct.empty) extends Block {
+
+  override def addPortMapping(pm: PortMap): ActivateBlock =
+    this.copy(portMappings = portMappings ++ pm)
+
+  override def addExpression(expr: Expression): ActivateBlock =
+    this.copy(expressions = expressions :+ expr)
 
   /** Converts Activate block to a sequence of expressions.
     *
     * @param path location of block in diagram
     * @return sequence of expressions to instantiate Activate block equivalent in Simulink
     */
-  def toExpression(diagram: Diagram, path: SimulinkPath): Seq[Expression] =
-    generators.getGenerator(this).generateExpressions(this, path)
+  def toExpression(diagram: Diagram, path: SimPath): Seq[Expression] = expressions.map(_.withFullPath(path))
 }
 /** Instance of super block in Activate.
   *
@@ -121,15 +136,29 @@ case class ActivateSuperBlock(name: String = "",
                               outputCount: Int = 0,
                               eventInputCount: Int = 0,
                               eventOutputCount: Int = 0,
+                              portMappings: PortMap = Map.empty,
+                              expressions: Vector[Expression] = Vector.empty,
                               diagram: Option[Diagram] = None,
                               atomic: Boolean = false) extends Block {
+
+  val blockType = "SuperBlock"
+
+  override def addPortMapping(pm: PortMap): ActivateSuperBlock =
+    this.copy(portMappings = portMappings ++ pm)
+
+  override def addExpression(expr: Expression): ActivateSuperBlock =
+    this.copy(expressions = expressions :+ expr)
 
   /** Converts Activate super block to a sequence of expressions.
     *
     * @param path location of block in diagram
     * @return sequence of expressions to instantiate Activate super block equivalent in Simulink
     */
-  override def toExpression(diagram: Diagram, path: SimulinkPath): Seq[Expression] = {
-    generators.getGenerator(this).generateExpressions(this, path)
+  override def toExpression(parentDiagram: Diagram, path: SimPath): Seq[Expression] = {
+    assert(name.nonEmpty)
+    // Expressions part of the diagram itself.
+    val containedDiagramExpressions = diagram.map(_.toExpression(path / name)).getOrElse(Vector.empty)
+    // Add full path to all block expressions.
+    expressions.map(_.withFullPath(path)) ++ containedDiagramExpressions
   }
 }

@@ -1,8 +1,14 @@
 function import_activate_oml(filename)
     %IMPORTACTIVATEOML Import OML-code exported from Activate to Simulink
     %   Detailed explanation goes here
+    import actport.GeneratorLibrary.scanLibrary
+
+    global ACTPORT_LIBRARY;
+
+    ACTPORT_LIBRARY = scanLibrary('activate_standard_library');
 
     addpath(pwd);
+    addpath(fullfile(pwd, 'activate_standard_library'));
 
     % We need to wrap the code in a function in order to make Matlab
     % want to read the source code at all.

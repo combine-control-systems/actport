@@ -7,6 +7,8 @@ import java.util.UUID
 sealed trait Expression {
   /** Serialize expression to a string executable in Matlab. */
   def serialize: String
+
+  def withFullPath(path: SimPath): Expression
 }
 
 /** Creates a new system using the `new_system` command in Matlab.
@@ -21,6 +23,8 @@ case class NewSystem(name: String, errorIfShadowed: Boolean = false) extends Exp
     } else {
       s"new_system('$name');"
     }
+
+  override def withFullPath(path: SimPath): Expression = this
 }
 
 /** Opens a system.
@@ -29,6 +33,8 @@ case class NewSystem(name: String, errorIfShadowed: Boolean = false) extends Exp
   */
 case class OpenSystem(name: String) extends Expression {
   override def serialize: String = s"open_system('$name');"
+
+  override def withFullPath(path: SimPath): Expression = this
 }
 
 /** Adds a new Simulink block.
@@ -36,31 +42,35 @@ case class OpenSystem(name: String) extends Expression {
   * @param source      Simulink source block
   * @param destination destination in model including name of block
   */
-case class AddBlock(source: SimulinkSource, destination: SimulinkPath) extends Expression {
+case class AddBlock(source: SimSource, destination: SimPath) extends Expression {
   override def serialize: String = s"add_block('$source', '$destination');"
+
+  override def withFullPath(path: SimPath): Expression = this.copy(destination = path / destination.path)
+}
+
+case class AddAnnotation(text: SimPath, position: Rectangle) extends Expression {
+  override def serialize: String = {
+    val v = position
+    s"add_block('built-in/Area', $text, 'Position', [${v.x},${-v.y - v.height},${v.x + v.width},${-v.y}]);"
+  }
+
+  override def withFullPath(path: SimPath): Expression =
+    this.copy(text = SimPath(s"['$path/', ${text.path}]"))
 }
 
 /** Adds a clean subsystem without any ports and internal links.
   *
   * @param destination destination in model including name of subsystem
   */
-case class AddCleanSubsystem(destination: SimulinkPath) extends Expression {
+case class AddCleanSubsystem(destination: SimPath) extends Expression {
   override def serialize: String = Seq(
     AddBlock(Simulink.PortsAndSubsystems.Subsystem, destination),
-    DeleteLine(destination, SimulinkPort("In1/1"), SimulinkPort("Out1/1")),
+    DeleteLine(destination, SimPort("In1/1"), SimPort("Out1/1")),
     DeleteBlock(destination / "In1"),
     DeleteBlock(destination / "Out1")
   ).map(_.serialize).mkString("\n")
-}
 
-/** Raw expression for special cases.
-  *
-  * This expression should be used in exceptional cases only.
-  *
-  * @param expression raw expression
-  */
-case class RawExpression(expression: String) extends Expression {
-  override def serialize: String = expression
+  override def withFullPath(path: SimPath): Expression = this.copy(destination = path / destination.path)
 }
 
 /** Deletes a line from the model.
@@ -69,16 +79,20 @@ case class RawExpression(expression: String) extends Expression {
   * @param outputPort start port of line
   * @param inputPort  end port of line
   */
-case class DeleteLine(system: SimulinkPath, outputPort: SimulinkPort, inputPort: SimulinkPort) extends Expression {
+case class DeleteLine(system: SimPath, outputPort: SimPort, inputPort: SimPort) extends Expression {
   override def serialize: String = s"delete_line('$system', '$outputPort', '$inputPort');"
+
+  override def withFullPath(path: SimPath): Expression = this.copy(system = path / system.path)
 }
 
 /** Deletes a block from the model.
   *
   * @param block path to block to delete
   */
-case class DeleteBlock(block: SimulinkPath) extends Expression {
+case class DeleteBlock(block: SimPath) extends Expression {
   override def serialize: String = s"delete_block('$block');"
+
+  override def withFullPath(path: SimPath): Expression = this.copy(block = path / block.path)
 }
 
 /** Sets a parameter of a Simulink block.
@@ -88,7 +102,7 @@ case class DeleteBlock(block: SimulinkPath) extends Expression {
   * @param value  value to set
   * @tparam A type of value
   */
-case class SetParam[A](target: SimulinkPath, name: SimulinkParameterName, value: A) extends Expression {
+case class SetParam[A](target: SimPath, name: SimParName, value: A) extends Expression {
 
   import ValueOps._
 
@@ -111,6 +125,8 @@ case class SetParam[A](target: SimulinkPath, name: SimulinkParameterName, value:
     }
     s"set_param('$target', '$name', $serializedValue);"
   }
+
+  override def withFullPath(path: SimPath): Expression = this.copy(target = path / target.path)
 }
 
 /** Adds a line to the model.
@@ -120,10 +136,12 @@ case class SetParam[A](target: SimulinkPath, name: SimulinkParameterName, value:
   * @param in          end port of line
   * @param autoRouting type of auto routing
   */
-case class AddLine(system: SimulinkPath, out: SimulinkPort, in: SimulinkPort,
+case class AddLine(system: SimPath, out: SimPort, in: SimPort,
                    autoRouting: AutoRouting = DisableAutoRouting) extends Expression {
   override def serialize: String =
     s"add_line('$system', '$out', '$in', 'autorouting', '${autoRouting.value}');"
+
+  override def withFullPath(path: SimPath): Expression = this.copy(system = path / system.path)
 }
 
 /** Sets script of a Matlab function block.
@@ -131,7 +149,7 @@ case class AddLine(system: SimulinkPath, out: SimulinkPort, in: SimulinkPort,
   * @param path   location of block
   * @param script Matlab script to assign to the block
   */
-case class SetMatlabFunctionScript(path: SimulinkPath, script: MatlabScript) extends Expression {
+case class SetMatlabFunctionScript(path: SimPath, script: MatlabScript) extends Expression {
   override def serialize: String = {
     // Use a type 4 UUID as a suffix to avoid namespace collisions.
     val uuid = UUID.randomUUID().toString.replace("-", "")
@@ -144,4 +162,16 @@ case class SetMatlabFunctionScript(path: SimulinkPath, script: MatlabScript) ext
        |clear block_$uuid;
      """.stripMargin
   }
+
+  override def withFullPath(p: SimPath): Expression = this.copy(path = p / path.path)
+}
+
+/** Use Simulink's automatic model arrangement functionality.
+  *
+  * @param path system to arrange
+  */
+case class ArrangeSystem(path: SimPath = SimPath("")) extends Expression {
+  override def serialize: String = s"Simulink.BlockDiagram.arrangeSystem('$path');"
+
+  override def withFullPath(p: SimPath): Expression = this.copy(path = p / path.path)
 }
