@@ -64,7 +64,7 @@ case class AddAnnotation(text: SimPath, position: Rectangle) extends Expression 
   */
 case class AddCleanSubsystem(destination: SimPath) extends Expression {
   override def serialize: String = Seq(
-    AddBlock(Simulink.PortsAndSubsystems.Subsystem, destination),
+    AddBlock(SimSource("simulink/Ports & Subsystems/Subsystem"), destination),
     DeleteLine(destination, SimPort("In1/1"), SimPort("Out1/1")),
     DeleteBlock(destination / "In1"),
     DeleteBlock(destination / "Out1")
@@ -95,35 +95,43 @@ case class DeleteBlock(block: SimPath) extends Expression {
   override def withFullPath(path: SimPath): Expression = this.copy(block = path / block.path)
 }
 
-/** Sets a parameter of a Simulink block.
+/** Sets a parameters of a Simulink block.
   *
   * @param target block to set parameter on
   * @param name   name of parameter
   * @param value  value to set
   * @tparam A type of value
   */
-case class SetParam[A](target: SimPath, name: SimParName, value: A) extends Expression {
+case class SetParam[A](target: SimPath, args: Seq[(SimParName, A)]) extends Expression {
 
   import ValueOps._
 
   override def serialize: String = {
-    val serializedValue = value match {
-      case v: String => s"'${v.escape}'"
-      case v: Boolean => s"'${v.toString.escape}'"
-      case v: Int => s"'${v.toString.escape}'"
-      case v: Double => s"'${v.toString.escape}'"
-      // The Simulink coordinate system has a reverse sign on the vertical axis compared to Activate.
-      case v: Rectangle => s"[${v.x},${-v.y - v.height},${v.x + v.width},${-v.y}]"
-      case v: Color =>
-        val components = v.getColorComponents(null)
-        components.length match {
-          case 3 => s"'[${components(0)},${components(1)},${components(2)}]'"
-          case 4 => s"'[${components(0)},${components(1)},${components(2)},${components(3)}]'"
-          // Default to white.
-          case _ => s"'[1.0,1.0,1.0]'"
-        }
+    val parameterNames = args.map(_._1.toString)
+    val serializedValues = args.map { arg =>
+      arg._2 match {
+        case v: String => s"'${v.escape}'"
+        case v: Boolean => s"'${v.toString.escape}'"
+        case v: Int => s"'${v.toString.escape}'"
+        case v: Double => s"'${v.toString.escape}'"
+        // The Simulink coordinate system has a reverse sign on the vertical axis compared to Activate.
+        case v: Rectangle => s"[${v.x},${-v.y - v.height},${v.x + v.width},${-v.y}]"
+        case v: Color =>
+          val components = v.getColorComponents(null)
+          components.length match {
+            case 3 => s"'[${components(0)},${components(1)},${components(2)}]'"
+            case 4 => s"'[${components(0)},${components(1)},${components(2)},${components(3)}]'"
+            // Default to white.
+            case _ => s"'[1.0,1.0,1.0]'"
+          }
+      }
     }
-    s"set_param('$target', '$name', $serializedValue);"
+
+    val pairs = parameterNames.zip(serializedValues).foldLeft(Vector.empty[String]) {
+      case (v, (name, value)) => v ++ Vector(s"'$name'", value)
+    }
+
+    s"set_param('$target', ${pairs.mkString(", ")});"
   }
 
   override def withFullPath(path: SimPath): Expression = this.copy(target = path / target.path)

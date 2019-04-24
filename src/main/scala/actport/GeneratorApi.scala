@@ -73,9 +73,10 @@ object GeneratorApi {
     * @param block   [[Block]] to add.
     * @return updated [[Diagram]] object.
     */
-  def updateDiagram(diagram: Diagram, block: Block): Diagram =
-  // The name of the block is expected to be updated in Matlab in add_block_2.
+  def updateDiagram(diagram: Diagram, block: Block): Diagram = {
+    // The name of the block is expected to be updated in Matlab in add_block_2.
     diagram.copy(children = diagram.children :+ block)
+  }
 
   /** Create expression for add_block.
     *
@@ -172,10 +173,10 @@ object GeneratorApi {
       case None => block.name
     }
     val expr = Array(
-      SetParam(SimPath(name), SimParName("BackgroundColor"), block.backgroundColor),
-      SetParam(SimPath(name), SimParName("ForegroundColor"), block.foregroundColor),
-      SetParam(SimPath(name), SimParName("Position"), block.rect),
-      SetParam(SimPath(name), SimParName("Orientation"), if (block.flip) "left" else "right")
+      SetParam(SimPath(name), Vector((SimParName("BackgroundColor"), block.backgroundColor))),
+      SetParam(SimPath(name), Vector((SimParName("ForegroundColor"), block.foregroundColor))),
+      SetParam(SimPath(name), Vector((SimParName("Position"), block.rect))),
+      SetParam(SimPath(name), Vector((SimParName("Orientation"), if (block.flip) "left" else "right")))
     )
 
     block match {
@@ -234,7 +235,7 @@ object GeneratorApi {
     */
   def setParamExpr(block: Block, blockName: String, parameterName: String, value: String): Block = {
     require(value != null, s"value must not be null for ${block.name} : $parameterName")
-    block.addExpression(SetParam(SimPath(blockName), SimParName(parameterName), value))
+    block.addExpression(SetParam(SimPath(blockName), Vector((SimParName(parameterName), value))))
   }
 
   /** Create expression to set block parameter.
@@ -246,7 +247,27 @@ object GeneratorApi {
     */
   def setParamExpr(block: Block, parameterName: String, value: String): Block = {
     require(value != null, s"value must not be null for ${block.name} : $parameterName")
-    block.addExpression(SetParam(SimPath(block.name), SimParName(parameterName), value))
+    block.addExpression(SetParam(SimPath(block.name), Vector((SimParName(parameterName), value))))
+  }
+
+  /** Create expression to set multiple block parameters at the same time.
+    *
+    * This is required to be able to set the parameters for e.g. simulink/Signal Routing/Selector
+    *
+    * Calling this from Matlab would be something like:
+    * {{{
+    *   setParamExpr(block, 'par1', 'val1', 'par2', 'val2');
+    * }}}
+    *
+    * @param block          block object
+    * @param namesAndValues parameter names and values
+    * @return updated block with expression
+    */
+  def setParamExpr(block: Block, namesAndValues: String*): Block = {
+    require(namesAndValues.size % 2 == 0, "There must be an even number of names and values, otherwise they will " +
+      "not be complete pairs.")
+    val pairs = namesAndValues.grouped(2).map(v => (SimParName(v.head), v(1))).toVector
+    block.addExpression(SetParam(SimPath(block.name), pairs))
   }
 
   /** Create expression to add a line in a block.
