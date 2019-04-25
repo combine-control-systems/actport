@@ -261,13 +261,14 @@ object GeneratorApi {
     *
     * @param block          block object
     * @param namesAndValues parameter names and values
+    * @param quoted         values must be explicitly quoted
     * @return updated block with expression
     */
-  def setParamExpr(block: Block, namesAndValues: String*): Block = {
-    require(namesAndValues.size % 2 == 0, "There must be an even number of names and values, otherwise they will " +
+  def setParamExpr(block: Block, namesAndValues: Array[String], quoted: Boolean = true): Block = {
+    require(namesAndValues.length % 2 == 0, "There must be an even number of names and values, otherwise they will " +
       "not be complete pairs.")
     val pairs = namesAndValues.grouped(2).map(v => (SimParName(v.head), v(1))).toVector
-    block.addExpression(SetParam(SimPath(block.name), pairs))
+    block.addExpression(SetParam(SimPath(block.name), pairs, quoted))
   }
 
   /** Create expression to add a line in a block.

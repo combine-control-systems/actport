@@ -97,12 +97,13 @@ case class DeleteBlock(block: SimPath) extends Expression {
 
 /** Sets a parameters of a Simulink block.
   *
-  * @param target block to set parameter on
-  * @param name   name of parameter
-  * @param value  value to set
+  * @param target                block to set parameter on
+  * @param args                  array of name of parameter and values
+  * @param putQuotesAroundString if false not quotes nor escaping of values will take place
   * @tparam A type of value
   */
-case class SetParam[A](target: SimPath, args: Seq[(SimParName, A)]) extends Expression {
+case class SetParam[A](target: SimPath, args: Seq[(SimParName, A)],
+                       putQuotesAroundString: Boolean = true) extends Expression {
 
   import ValueOps._
 
@@ -110,7 +111,8 @@ case class SetParam[A](target: SimPath, args: Seq[(SimParName, A)]) extends Expr
     val parameterNames = args.map(_._1.toString)
     val serializedValues = args.map { arg =>
       arg._2 match {
-        case v: String => s"'${v.escape}'"
+        case v: String if putQuotesAroundString => s"'${v.escape}'"
+        case v: String if !putQuotesAroundString => v // No escaping of quotes needed.
         case v: Boolean => s"'${v.toString.escape}'"
         case v: Int => s"'${v.toString.escape}'"
         case v: Double => s"'${v.toString.escape}'"
