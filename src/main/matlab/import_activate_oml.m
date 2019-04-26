@@ -29,7 +29,8 @@ function import_activate_oml(filename)
     % Add import of API.
     src = sprintf('import actport.ActivateApi.*\n%s', src);
 
-    filename = sprintf('oml_import_%10.0f.m', posixtime(datetime));
+    [~, filename] = fileparts(filename);
+    filename = sprintf('oml_import_%s_%10.0f.m', filename, posixtime(datetime));
 
     fullpath = fullfile(tempdir, filename);
 
