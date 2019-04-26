@@ -4,7 +4,7 @@ function out = actport_sign(diagram, block)
 
     block = addBlockExpr(block, 'simulink/Math Operations/Sign');
 
-    zcross = strcmp(getParameter(block, 'zcross', '0'), '0');
+    zcross = strcmp(getParameter(block, 'nzc', '0'), '0');
     if zcross
         block = setParamExpr(block, 'ZeroCross', 'off');
     else
