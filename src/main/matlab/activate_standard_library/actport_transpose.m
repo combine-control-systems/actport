@@ -1,5 +1,5 @@
 % activate = 'system/MatrixOperations/Transpose'
-function out = actport_transpose(diagram, block)
+function out = actport_transpose(system, block)
     import actport.GeneratorApi.*
 
     block = addBlockExpr(block, 'simulink/Math Operations/Math Function');
@@ -13,5 +13,5 @@ function out = actport_transpose(diagram, block)
     end
 
     block = addCommonProperties(block);
-    out = updateDiagram(diagram, block);
+    out = updateSystem(system, block);
 end

@@ -1,5 +1,5 @@
 % activate = 'system/Dynamical/Integral'
-function out = activate_integrator(diagram, block)
+function out = activate_integrator(system, block)
     import actport.GeneratorApi.*
 
     block = addBlockExpr(block, 'simulink/Continuous/Integrator');
@@ -33,5 +33,5 @@ function out = activate_integrator(diagram, block)
     block = setParamExpr(block, 'ZeroCross', zcross);
 
     block = addCommonProperties(block);
-    out = updateDiagram(diagram, block);
+    out = updateSystem(system, block);
 end

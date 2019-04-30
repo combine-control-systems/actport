@@ -1,5 +1,5 @@
 % activate = 'system/SignalViewers/Display'
-function out = actport_display(diagram, block)
+function out = actport_display(system, block)
     import actport.GeneratorApi.*
 
     block = addBlockExpr(block, 'simulink/Sinks/Display');
@@ -12,5 +12,5 @@ function out = actport_display(diagram, block)
     block = setParamExpr(block, 'Decimation', '1');
 
     block = addCommonProperties(block);
-    out = updateDiagram(diagram, block);
+    out = updateSystem(system, block);
 end

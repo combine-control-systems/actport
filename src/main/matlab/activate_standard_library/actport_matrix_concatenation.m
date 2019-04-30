@@ -1,5 +1,5 @@
 % activate = 'system/MatrixOperations/MatrixConcatenation'
-function out = actport_matrix_concatenation(diagram, block)
+function out = actport_matrix_concatenation(system, block)
     import actport.GeneratorApi.*
 
     block = addBlockExpr(block, 'simulink/Math Operations/Matrix Concatenate');
@@ -12,5 +12,5 @@ function out = actport_matrix_concatenation(diagram, block)
     end
 
     block = addCommonProperties(block);
-    out = updateDiagram(diagram, block);
+    out = updateSystem(system, block);
 end

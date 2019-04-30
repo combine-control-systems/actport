@@ -1,5 +1,5 @@
 % activate = 'system/Dynamical/DiscrStateSpace'
-function out = actport_discrete_state_space(diagram, block)
+function out = actport_discrete_state_space(system, block)
     import actport.GeneratorApi.*
 
     block = addBlockExpr(block, 'simulink/Discrete/Discrete State-Space');
@@ -10,5 +10,5 @@ function out = actport_discrete_state_space(diagram, block)
     block = setParamExpr(block, 'x0', getParameter(block, 'X0', '0'));
 
     block = addCommonProperties(block);
-    out = updateDiagram(diagram, block);
+    out = updateSystem(system, block);
 end

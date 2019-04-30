@@ -1,5 +1,5 @@
 % activate = 'system/SignalGenerators/Random'
-function out = actport_random(diagram, block)
+function out = actport_random(system, block)
     import actport.GeneratorApi.*
 
     block = addCleanSubSystemExpr(block, "Random");
@@ -34,5 +34,5 @@ function out = actport_random(diagram, block)
     block = mapEventInputPort(block, 1, 'Trigger');
 
     block = addCommonProperties(block);
-    out = updateDiagram(diagram, block);
+    out = updateSystem(system, block);
 end

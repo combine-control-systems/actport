@@ -1,5 +1,5 @@
 % activate = 'system/MatrixOperations/MatrixExtractor'
-function out = actport_matrix_extractor(diagram, block)
+function out = actport_matrix_extractor(system, block)
     import actport.GeneratorApi.*
 
     block = addBlockExpr(block, 'simulink/Signal Routing/Selector');
@@ -20,7 +20,7 @@ function out = actport_matrix_extractor(diagram, block)
         false);  % Turn off automatic quotation and escaping of quotes for strings.
 
     block = addCommonProperties(block);
-    out = updateDiagram(diagram, block);
+    out = updateSystem(system, block);
 end
 
 function [mode, index, size] = parseDimension(block, dimension)

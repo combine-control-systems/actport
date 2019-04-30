@@ -1,5 +1,5 @@
 % activate = 'system/Dynamical/Integral'
-function out = actport_integral(diagram, block)
+function out = actport_integral(system, block)
     import actport.GeneratorApi.*
 
     block = addBlockExpr(block, 'simulink/Continuous/Integrator');
@@ -23,5 +23,5 @@ function out = actport_integral(diagram, block)
     block = setParamExpr(block, 'ZeroCross', getParameter(block, 'zcross', 'off'));
 
     block = addCommonProperties(block);
-    out = updateDiagram(diagram, block);
+    out = updateSystem(system, block);
 end

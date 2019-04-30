@@ -1,5 +1,5 @@
 % activate = 'system/ActivationOperations/SampleClock'
-function out = actport_sample_clock(diagram, block)
+function out = actport_sample_clock(system, block)
     import actport.GeneratorApi.*
 
     freq = string(getParameter(block, 'frequ', '1.0'));
@@ -32,5 +32,5 @@ function out = actport_sample_clock(diagram, block)
     end
 
     block = addCommonProperties(block);
-    out = updateDiagram(diagram, block);
+    out = updateSystem(system, block);
 end

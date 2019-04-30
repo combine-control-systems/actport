@@ -1,5 +1,5 @@
 % activate = 'system/MatrixOperations/MatrixGain'
-function out = actport_matrix_gain(diagram, block)
+function out = actport_matrix_gain(system, block)
     import actport.GeneratorApi.*
 
     block = addBlockExpr(block, 'simulink/Math Operations/Gain');
@@ -29,5 +29,5 @@ function out = actport_matrix_gain(diagram, block)
     end
 
     block = addCommonProperties(block);
-    out = updateDiagram(diagram, block);
+    out = updateSystem(system, block);
 end

@@ -1,5 +1,5 @@
 % activate = 'system/MathOperations/Gain'
-function out = actport_gain(diagram, block)
+function out = actport_gain(system, block)
     import actport.GeneratorApi.*
 
     gain = getParameter(block, 'gain', '1');
@@ -8,5 +8,5 @@ function out = actport_gain(diagram, block)
     block = setParamExpr(block, 'Gain', gain);
 
     block = addCommonProperties(block);
-    out = updateDiagram(diagram, block);
+    out = updateSystem(system, block);
 end

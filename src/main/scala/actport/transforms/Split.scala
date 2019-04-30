@@ -13,33 +13,33 @@ import scala.util.chaining._
 object Split {
   /** Eliminate all split blocks with links.
     *
-    * @param diagram Diagram object
+    * @param subsystem Diagram object
     * @return updated Diagram
     */
-  def eliminateSplitBlocks(diagram: Diagram): Diagram = {
-    diagram.children.foldLeft(diagram) { (diagramState, child) =>
+  def eliminateSplitBlocks(subsystem: System): System = {
+    subsystem.children.foldLeft(subsystem) { (ss, child) =>
       child match {
 
         // Eliminate split blocks.
-        case block: ActivateBlock if block.blockType == "system/Links/Split" =>
-          eliminateSplitBlock(diagramState, block, ExplicitLink)
+        case block: Block if block.blockType == "system/Links/Split" =>
+          eliminateSplitBlock(ss, block, ExplicitLink)
 
         // Eliminate event split blocks.
-        case block: ActivateBlock if block.blockType == "system/Links/EventSplit" =>
-          eliminateSplitBlock(diagramState, block, EventLink)
+        case block: Block if block.blockType == "system/Links/EventSplit" =>
+          eliminateSplitBlock(ss, block, EventLink)
 
         // Also do this recursively for super block children.
-        case superBlock: ActivateSuperBlock =>
-          val index = diagramState.children.indexOf(superBlock)
+        case superBlock: System =>
+          val index = ss.children.indexOf(superBlock)
           if (index == -1) throw new RuntimeException("SuperBlock did not exist among children.")
-          val updatedChildren = diagramState.children
+          val updatedChildren = ss.children
             // Update the SuperBlock with a new Diagram with all Split blocks eliminated.
-            .updated(index, superBlock.copy(diagram = superBlock.diagram.map(eliminateSplitBlocks)))
+            .updated(index, eliminateSplitBlocks(superBlock))
           // Update the list of children.
-          diagramState.copy(children = updatedChildren)
+          ss.copy(children = updatedChildren)
 
         // Do nothing.
-        case _ => diagramState
+        case _ => ss
       }
     }
   }
@@ -48,24 +48,24 @@ object Split {
     *
     * There is no equivalent of split blocks in Simulink.
     *
-    * @param diagram Diagram object
-    * @param block   Split block object
+    * @param subsystem Subsystem object
+    * @param block     Split block object
     * @return updated Diagram
     */
-  private def eliminateSplitBlock(diagram: Diagram, block: ActivateBlock, linkType: LinkType): Diagram = {
+  private def eliminateSplitBlock(subsystem: System, block: Block, linkType: LinkType): System = {
     require(block.blockType == "system/Links/Split" ||
       block.blockType == "system/Links/EventSplit", "Can only eliminate splits for Split or EventSplit blocks.")
 
     // There is should be only one link incoming.
     val incoming: Option[Link] = linkType match {
-      case ExplicitLink => diagram.explicitLinks.find(_.destination == block.name)
-      case EventLink => diagram.eventLinks.find(_.destination == block.name)
+      case ExplicitLink => subsystem.explicitLinks.find(_.destination == block.name)
+      case EventLink => subsystem.eventLinks.find(_.destination == block.name)
       case ImplicitLink => throw new NotImplementedError()
     }
     // But there may be several outgoing links.
     val outgoing: Seq[Link] = linkType match {
-      case ExplicitLink => diagram.explicitLinks.filter(_.start == block.name)
-      case EventLink => diagram.eventLinks.filter(_.start == block.name)
+      case ExplicitLink => subsystem.explicitLinks.filter(_.start == block.name)
+      case EventLink => subsystem.eventLinks.filter(_.start == block.name)
       case ImplicitLink => throw new NotImplementedError()
     }
 
@@ -80,25 +80,25 @@ object Split {
         linkType match {
           case ExplicitLink =>
             // Remove old links.
-            val filteredLinks = diagram.explicitLinks
+            val filteredLinks = subsystem.explicitLinks
               .filter { l: Link => l.destination != block.name && l.start != block.name }
-            // Set diagram links to filtered links and the new links replacing the old ones.
-            diagram.copy(explicitLinks = filteredLinks ++ links)
+            // Set subsystem links to filtered links and the new links replacing the old ones.
+            subsystem.copy(explicitLinks = filteredLinks ++ links)
 
           // Same procedure for event links.
           case EventLink =>
-            val filteredLinks = diagram.eventLinks
+            val filteredLinks = subsystem.eventLinks
               .filter { l: Link => l.destination != block.name && l.start != block.name }
-            diagram.copy(eventLinks = filteredLinks ++ links)
+            subsystem.copy(eventLinks = filteredLinks ++ links)
 
           case ImplicitLink =>
             throw new NotImplementedError()
         }
       case None =>
         // Do nothing if there is nothing to do.
-        diagram
+        subsystem
 
-      // Finally remove the Split block from the children of the diagram.
-    }).pipe { d: Diagram => d.copy(children = d.children.filter(_ != block)) }
+      // Finally remove the Split block from the children of the subsystem.
+    }).pipe { ss => ss.copy(children = ss.children.filter(_ != block)) }
   }
 }

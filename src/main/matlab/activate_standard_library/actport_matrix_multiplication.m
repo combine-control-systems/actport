@@ -1,5 +1,5 @@
 % activate = 'system/MatrixOperations/MatrixMultiplication'
-function out = actport_matrix_multiplication(diagram, block)
+function out = actport_matrix_multiplication(system, block)
     import actport.GeneratorApi.*
 
     signs = getParameter(block, 'in_ports/sgn', {'''*''', '''/'''});
@@ -46,5 +46,5 @@ function out = actport_matrix_multiplication(diagram, block)
     end
 
     block = addCommonProperties(block);
-    out = updateDiagram(diagram, block);
+    out = updateSystem(system, block);
 end

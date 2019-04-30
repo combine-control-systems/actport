@@ -1,22 +1,22 @@
 package actport
 
 import actport.simulink._
+import monocle.macros.syntax.lens._
 
 import scala.collection.JavaConverters._
 import scala.util.chaining._
 
 object GeneratorApi {
   /** Set the name of the block.
-    * *
     *
     * @param block block object
     * @param name  name of the block
     * @return block with name
     */
-  def setBlockName(block: Block, name: String): Block = block match {
+  def setBlockName(block: Entity, name: String): Entity = block match {
     // TODO: Maybe move to an internal API since add_block_2 is the only function to call this.
-    case b: ActivateBlock => b.copy(name = name)
-    case b: ActivateSuperBlock => b.copy(name = name)
+    case b: Block => b.lens(_.name).set(name)
+    case b: System => b.lens(_.name).set(name)
   }
 
   /** Map Activate input port to an equivalent Simulink port.
@@ -26,7 +26,7 @@ object GeneratorApi {
     * @param simulinkPort name of Simulink port
     * @return updated block object
     */
-  def mapInputPort(block: Block, activatePort: Int, simulinkPort: String): Block = {
+  def mapInputPort(block: Entity, activatePort: Int, simulinkPort: String): Entity = {
     val portMapping = (activatePort, ExplicitLink, InputPort) -> simulinkPort
     block.addPortMapping(Map(portMapping))
   }
@@ -38,7 +38,7 @@ object GeneratorApi {
     * @param simulinkPort name of Simulink port
     * @return updated block object
     */
-  def mapEventInputPort(block: Block, activatePort: Int, simulinkPort: String): Block = {
+  def mapEventInputPort(block: Entity, activatePort: Int, simulinkPort: String): Entity = {
     val portMapping = (activatePort, EventLink, InputPort) -> simulinkPort
     block.addPortMapping(Map(portMapping))
   }
@@ -50,7 +50,7 @@ object GeneratorApi {
     * @param simulinkPort name of Simulink port
     * @return updated block object
     */
-  def mapOutputPort(block: Block, activatePort: Int, simulinkPort: String): Block = {
+  def mapOutputPort(block: Entity, activatePort: Int, simulinkPort: String): Entity = {
     val portMapping = (activatePort, ExplicitLink, OutputPort) -> simulinkPort
     block.addPortMapping(Map(portMapping))
   }
@@ -62,20 +62,20 @@ object GeneratorApi {
     * @param simulinkPort name of Simulink port
     * @return updated block object
     */
-  def mapEventOutputPort(block: Block, activatePort: Int, simulinkPort: String): Block = {
+  def mapEventOutputPort(block: Entity, activatePort: Int, simulinkPort: String): Entity = {
     val portMapping = (activatePort, EventLink, OutputPort) -> simulinkPort
     block.addPortMapping(Map(portMapping))
   }
 
-  /** Update diagram by adding the block as a child.
+  /** Update system by adding the block as a child.
     *
-    * @param diagram [[Diagram]] object
-    * @param block   [[Block]] to add.
-    * @return updated [[Diagram]] object.
+    * @param system [[System]] object
+    * @param block  [[Entity]] to add.
+    * @return updated [[System]] object.
     */
-  def updateDiagram(diagram: Diagram, block: Block): Diagram = {
+  def updateSystem(system: System, block: Entity): System = {
     // The name of the block is expected to be updated in Matlab in add_block_2.
-    diagram.copy(children = diagram.children :+ block)
+    system.lens(_.children).modify(_ :+ block)
   }
 
   /** Create expression for add_block.
@@ -84,7 +84,7 @@ object GeneratorApi {
     * @param simulinkSource source of Simulink block, e.g. `simulink.Continuous.Derivate`
     * @return expression
     */
-  def addBlockExpr(block: Block, simulinkSource: SimSource): Block = addBlockExpr(block, simulinkSource, null)
+  def addBlockExpr(block: Entity, simulinkSource: SimSource): Entity = addBlockExpr(block, simulinkSource, null)
 
   /** Create expression for add_block with a block name.
     *
@@ -105,7 +105,7 @@ object GeneratorApi {
     * @param blockName      name of block to add
     * @return updated block with expressions
     */
-  def addBlockExpr(block: Block, simulinkSource: SimSource, blockName: String = null): Block = {
+  def addBlockExpr(block: Entity, simulinkSource: SimSource, blockName: String = null): Entity = {
     val name = Option(blockName) match {
       case Some(v) => v
       case None => block.name
@@ -119,7 +119,7 @@ object GeneratorApi {
     * @param text  annotation text
     * @return expression
     */
-  def addAnnotationExpr(block: ActivateBlock, text: String): Block = {
+  def addAnnotationExpr(block: Block, text: String): Entity = {
     import ValueOps._
     block.copy(name = text.escapeAnnotation)
       .pipe(b => b.addExpression(AddAnnotation(SimPath(b.name), b.rect)))
@@ -133,7 +133,7 @@ object GeneratorApi {
     * @param block block object
     * @return updated block with expressions
     */
-  def addCleanSubSystemExpr(block: Block): Block = addCleanSubSystemExpr(block, null)
+  def addCleanSubSystemExpr(block: Entity): Entity = addCleanSubSystemExpr(block, null)
 
   /** Create expressions for a clean subsystem without any content.
     *
@@ -145,7 +145,7 @@ object GeneratorApi {
     * @param blockName name of block to add
     * @return updated block with expressions
     */
-  def addCleanSubSystemExpr(block: Block, blockName: String): Block = {
+  def addCleanSubSystemExpr(block: Entity, blockName: String): Entity = {
     val name = Option(blockName) match {
       case Some(v) => v
       case None => block.name
@@ -158,7 +158,7 @@ object GeneratorApi {
     * @param block block object
     * @return updated block with expressions
     */
-  def addCommonProperties(block: Block): Block = addCommonProperties(block, null)
+  def addCommonProperties(block: Entity): Entity = addCommonProperties(block, null)
 
   /** Add common property expressions to the block.
     *
@@ -167,7 +167,7 @@ object GeneratorApi {
     * @param blockName block name
     * @return updated block with expressions
     */
-  def addCommonProperties(block: Block, blockName: String): Block = {
+  def addCommonProperties(block: Entity, blockName: String): Entity = {
     val name = Option(blockName) match {
       case Some(v) => v
       case None => block.name
@@ -180,8 +180,8 @@ object GeneratorApi {
     )
 
     block match {
-      case b: ActivateBlock => b.copy(expressions = b.expressions ++ expr)
-      case b: ActivateSuperBlock => b.copy(expressions = b.expressions ++ expr)
+      case b: Block => b.lens(_.expressions).modify(_ ++ expr)
+      case b: System => b.lens(_.expressions).modify(_ ++ expr)
     }
   }
 
@@ -198,7 +198,7 @@ object GeneratorApi {
     * @param default default value if parameter is not found
     * @return parameter value
     */
-  def getParameter(block: ActivateBlock, name: String, default: Any): Any = {
+  def getParameter(block: Block, name: String, default: Any): Any = {
     val parts = name.split("/").toVector
 
     // Search structure recursively until we find a value or not.
@@ -233,7 +233,7 @@ object GeneratorApi {
     * @param value         value to set
     * @return update block with expression
     */
-  def setParamExpr(block: Block, blockName: String, parameterName: String, value: String): Block = {
+  def setParamExpr(block: Entity, blockName: String, parameterName: String, value: String): Entity = {
     require(value != null, s"value must not be null for ${block.name} : $parameterName")
     block.addExpression(SetParam(SimPath(blockName), Vector((SimParName(parameterName), value))))
   }
@@ -245,7 +245,7 @@ object GeneratorApi {
     * @param value         value to set
     * @return update block with expression
     */
-  def setParamExpr(block: Block, parameterName: String, value: String): Block = {
+  def setParamExpr(block: Entity, parameterName: String, value: String): Entity = {
     require(value != null, s"value must not be null for ${block.name} : $parameterName")
     block.addExpression(SetParam(SimPath(block.name), Vector((SimParName(parameterName), value))))
   }
@@ -264,7 +264,7 @@ object GeneratorApi {
     * @param quoted         values must be explicitly quoted
     * @return updated block with expression
     */
-  def setParamExpr(block: Block, namesAndValues: Array[String], quoted: Boolean = true): Block = {
+  def setParamExpr(block: Entity, namesAndValues: Array[String], quoted: Boolean = true): Entity = {
     require(namesAndValues.length % 2 == 0, "There must be an even number of names and values, otherwise they will " +
       "not be complete pairs.")
     val pairs = namesAndValues.grouped(2).map(v => (SimParName(v.head), v(1))).toVector
@@ -284,7 +284,7 @@ object GeneratorApi {
     * @param destinationPort Simlunk syntax `block name/port number`, e.g. `Random/1`
     * @return updated block with expression
     */
-  def addLineExpr(block: Block, system: String, startPort: String, destinationPort: String): Block = {
+  def addLineExpr(block: Entity, system: String, startPort: String, destinationPort: String): Entity = {
     block.addExpression(AddLine(SimPath(system), SimPort(startPort),
       SimPort(destinationPort), SmartAutoRouting))
   }

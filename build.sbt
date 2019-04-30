@@ -11,6 +11,9 @@ lazy val actport = (project in file(".")).
     libraryDependencies ++= Seq(
       "com.github.bigwheel" %% "util-backports" % Settings.backportsVersion,
       "com.lihaoyi" %% "fastparse" % Settings.fastparseVersion,
+      "com.github.julien-truffaut" %% "monocle-core" % Settings.monocleVersion,
+      "com.github.julien-truffaut" %% "monocle-macro" % Settings.monocleVersion,
+      "com.github.julien-truffaut" %% "monocle-law" % Settings.monocleVersion,
       "org.scalatest" %% "scalatest" % Settings.scalaTestVersion % Test,
       "org.scalacheck" %% "scalacheck" % Settings.scalaCheckVersion % Test
     ))

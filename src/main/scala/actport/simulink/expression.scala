@@ -3,6 +3,8 @@ package actport.simulink
 import java.awt.{Color, Rectangle}
 import java.util.UUID
 
+import monocle.macros.syntax.lens._
+
 /** Matlab expression. */
 sealed trait Expression {
   /** Serialize expression to a string executable in Matlab. */
@@ -45,7 +47,7 @@ case class OpenSystem(name: String) extends Expression {
 case class AddBlock(source: SimSource, destination: SimPath) extends Expression {
   override def serialize: String = s"add_block('$source', '$destination');"
 
-  override def withFullPath(path: SimPath): Expression = this.copy(destination = path / destination.path)
+  override def withFullPath(path: SimPath): Expression = this.lens(_.destination).set(path / destination.path)
 }
 
 case class AddAnnotation(text: SimPath, position: Rectangle) extends Expression {
@@ -55,7 +57,7 @@ case class AddAnnotation(text: SimPath, position: Rectangle) extends Expression 
   }
 
   override def withFullPath(path: SimPath): Expression =
-    this.copy(text = SimPath(s"['$path/', ${text.path}]"))
+    this.lens(_.text).set(SimPath(s"['$path/', ${text.path}]"))
 }
 
 /** Adds a clean subsystem without any ports and internal links.
@@ -70,7 +72,7 @@ case class AddCleanSubsystem(destination: SimPath) extends Expression {
     DeleteBlock(destination / "Out1")
   ).map(_.serialize).mkString("\n")
 
-  override def withFullPath(path: SimPath): Expression = this.copy(destination = path / destination.path)
+  override def withFullPath(path: SimPath): Expression = this.lens(_.destination).set(path / destination.path)
 }
 
 /** Deletes a line from the model.
@@ -82,7 +84,7 @@ case class AddCleanSubsystem(destination: SimPath) extends Expression {
 case class DeleteLine(system: SimPath, outputPort: SimPort, inputPort: SimPort) extends Expression {
   override def serialize: String = s"delete_line('$system', '$outputPort', '$inputPort');"
 
-  override def withFullPath(path: SimPath): Expression = this.copy(system = path / system.path)
+  override def withFullPath(path: SimPath): Expression = this.lens(_.system).set(path / system.path)
 }
 
 /** Deletes a block from the model.
@@ -92,7 +94,7 @@ case class DeleteLine(system: SimPath, outputPort: SimPort, inputPort: SimPort) 
 case class DeleteBlock(block: SimPath) extends Expression {
   override def serialize: String = s"delete_block('$block');"
 
-  override def withFullPath(path: SimPath): Expression = this.copy(block = path / block.path)
+  override def withFullPath(path: SimPath): Expression = this.lens(_.block).set(path / block.path)
 }
 
 /** Sets a parameters of a Simulink block.
@@ -136,7 +138,7 @@ case class SetParam[A](target: SimPath, args: Seq[(SimParName, A)],
     s"set_param('$target', ${pairs.mkString(", ")});"
   }
 
-  override def withFullPath(path: SimPath): Expression = this.copy(target = path / target.path)
+  override def withFullPath(path: SimPath): Expression = this.lens(_.target).set(path / target.path)
 }
 
 /** Adds a line to the model.
@@ -151,7 +153,7 @@ case class AddLine(system: SimPath, out: SimPort, in: SimPort,
   override def serialize: String =
     s"add_line('$system', '$out', '$in', 'autorouting', '${autoRouting.value}');"
 
-  override def withFullPath(path: SimPath): Expression = this.copy(system = path / system.path)
+  override def withFullPath(path: SimPath): Expression = this.lens(_.system).set(path / system.path)
 }
 
 /** Sets script of a Matlab function block.
@@ -173,7 +175,7 @@ case class SetMatlabFunctionScript(path: SimPath, script: MatlabScript) extends 
      """.stripMargin
   }
 
-  override def withFullPath(p: SimPath): Expression = this.copy(path = p / path.path)
+  override def withFullPath(p: SimPath): Expression = this.lens(_.path).set(p / path.path)
 }
 
 /** Use Simulink's automatic model arrangement functionality.
@@ -183,5 +185,5 @@ case class SetMatlabFunctionScript(path: SimPath, script: MatlabScript) extends 
 case class ArrangeSystem(path: SimPath = SimPath("")) extends Expression {
   override def serialize: String = s"Simulink.BlockDiagram.arrangeSystem('$path');"
 
-  override def withFullPath(p: SimPath): Expression = this.copy(path = p / path.path)
+  override def withFullPath(p: SimPath): Expression = this.lens(_.path).set(p / path.path)
 }

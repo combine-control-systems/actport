@@ -1,5 +1,5 @@
 % activate = 'system/MathOperations/Sum'
-function out = actport_sum(diagram, block)
+function out = actport_sum(system, block)
     import actport.GeneratorApi.*
 
     block = addBlockExpr(block, 'simulink/Math Operations/Add');
@@ -14,5 +14,5 @@ function out = actport_sum(diagram, block)
     block = setParamExpr(block, 'Inputs', inputs);
 
     block = addCommonProperties(block);
-    out = updateDiagram(diagram, block);
+    out = updateSystem(system, block);
 end

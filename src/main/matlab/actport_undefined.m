@@ -1,4 +1,4 @@
-function out = actport_undefined(diagram, block, blockName)
+function out = actport_undefined(system, block, blockName)
     import actport.GeneratorApi.*
 
     % Add an empty sub system.
@@ -27,5 +27,5 @@ function out = actport_undefined(diagram, block, blockName)
     end
 
     block = addCommonProperties(block);
-    out = updateDiagram(diagram, block);
+    out = updateSystem(system, block);
 end

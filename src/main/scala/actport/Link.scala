@@ -22,29 +22,29 @@ case class Link(start: String,
     * @param path location of link in diagram
     * @return sequence of expressions to create the link
     */
-  def toExpression(diagram: Diagram, path: SimPath): Seq[Expression] = {
+  def toExpression(system: System, path: SimPath): Seq[Expression] = {
     // Port mapping for start port.
     // The default value is to use the same port identifier as Activate does.
-    val startBlock = diagram.children.find(_.name == start)
+    val startBlock = system.children.find(_.name == start)
     val mappedStartPort = startBlock.map {
 
-      case block: ActivateBlock =>
+      case block: Block =>
         block.portMappings.getOrElse((startPort, linkType, OutputPort), startPort.toString)
 
-      case block: ActivateSuperBlock =>
+      case block: System =>
         block.portMappings.getOrElse((startPort, linkType, OutputPort), startPort.toString)
 
     }.getOrElse(startPort.toString)
 
     // Port mapping for end port.
     // The default value is to use the same port identifier as Activate does.
-    val destinationBlock = diagram.children.find(_.name == destination)
+    val destinationBlock = system.children.find(_.name == destination)
     val mappedDestinationPort = destinationBlock.map {
 
-      case block: ActivateBlock  =>
+      case block: Block  =>
         block.portMappings.getOrElse((destinationPort, linkType, InputPort), destinationPort.toString)
 
-      case block: ActivateSuperBlock  =>
+      case block: System  =>
         block.portMappings.getOrElse((destinationPort, linkType, InputPort), destinationPort.toString)
 
     }.getOrElse(destinationPort.toString)

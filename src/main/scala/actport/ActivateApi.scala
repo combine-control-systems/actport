@@ -3,6 +3,7 @@ package actport
 import java.awt.Color
 
 import actport.simulink.{ArrangeSystem, NewSystem, OpenSystem, SimPath}
+import monocle.macros.syntax.lens._
 
 import scala.util.chaining._
 
@@ -19,69 +20,68 @@ object ActivateApi {
 
   /** Create a new diagram object.
     *
-    * @return Diagram object
+    * @return Subsystem object
     */
-  def instantiate_diagram(): Diagram = {
-    Diagram(name = None)
+  def instantiate_diagram(): System = {
+    System()
   }
 
   /** Set background color of diagram.
     *
-    * @param diagram the diagram to change background color of
+    * @param subsystem the subsystem to change background color of
     * @return Diagram object
     */
-  def set_diagram_bg_color(diagram: Diagram, color: Array[Double]): Diagram = {
+  def set_diagram_bg_color(subsystem: System, color: Array[Double]): System = {
     require(color.length == 3, "Color must be specified as RGB with three elements.")
     require(color.foldLeft(false) { (s, v) => s || (v >= 0.0 && v <= 1.0) },
       "Color intensities must be specified as a value between 0.0 and 1.0.")
-    diagram.copy(backgroundColor = new Color(
-      color(0).toFloat, color(1).toFloat, color(2).toFloat, 1.0f))
+    subsystem.lens(_.backgroundColor).set(new Color(color(0).toFloat, color(1).toFloat, color(2).toFloat, 1.0f))
   }
 
   /** NOT SURE WHAT THIS IS
     *
     * Could this be z-order?
     *
-    * @param diagram diagram object
-    * @param value   0 = off, 1 = on ???
+    * @param subsystem subsystem object
+    * @param value     0 = off, 1 = on ???
     * @return diagram object
     */
-  def set_diagram_3d(diagram: Diagram, value: Int): Diagram = {
+  def set_diagram_3d(subsystem: System, value: Int): System = {
     require(value == 0 || value == 1, "Value must be either 0 or 1.")
-    diagram.copy(diagram3d = value == 1)
+    subsystem.lens(_.diagram3d).set(value == 1)
   }
 
   /** Zoom level.
     *
-    * @param diagram diagram object
-    * @param zoom    zoom level > 0
+    * @param subsystem subsystem object
+    * @param zoom      zoom level > 0
     * @return diagram object
     */
-  def set_diagram_zoom(diagram: Diagram, zoom: Double): Diagram = {
+  def set_diagram_zoom(subsystem: System, zoom: Double): System = {
     require(zoom > 0.0, "Value must be larger than 0.")
-    diagram.copy(zoom = zoom)
+    subsystem.lens(_.zoom).set(zoom)
   }
 
   /** Set name of diagram.
     *
-    * @param diagram diagram object
-    * @param name    name of diagram
+    * @param subsystem subsystem object
+    * @param name      name of diagram
     * @return diagram object
     */
-  def set_diagram_name(diagram: Diagram, name: String): Diagram = {
-    diagram.copy(name = Some(name))
+  def set_diagram_name(subsystem: System, name: String): System = {
+    subsystem.lens(_.name).set(name)
   }
 
   /** Set diagram context.
     *
     * The context contains OML-code setting values related to the diagram.
     *
-    * @param diagram diagram object
-    * @param context context
+    * @param subsystem Subsystem object
+    * @param context   context
     * @return diagram object
     */
-  def set_diagram_context(diagram: Diagram, context: Array[String]): Diagram = {
-    diagram.copy(context = context.toVector)
+  def set_diagram_context(subsystem: System, context: Array[String]): System = {
+    subsystem.lens(_.context).set(context.toVector)
   }
 
   // -------------------- Blocks
@@ -91,8 +91,8 @@ object ActivateApi {
     * @param blockType Activate block type string
     * @return block instance
     */
-  def instantiate_block(blockType: String): ActivateBlock = {
-    ActivateBlock(blockType = blockType)
+  def instantiate_block(blockType: String): Block = {
+    Block(blockType = blockType)
   }
 
   /** Set block coordinate origin.
@@ -101,12 +101,12 @@ object ActivateApi {
     * @param origin 2-element array of doubles representing a coordinate
     * @return block object
     */
-  def set_block_origin(block: Block, origin: Array[Double]): Block = {
+  def set_block_origin(block: Entity, origin: Array[Double]): Entity = {
     require(origin.length == 2, "Origin array must contain exactly two elements.")
     val point = Point(origin(0).toInt, origin(1).toInt)
     block match {
-      case b: ActivateBlock => b.copy(origin = point)
-      case b: ActivateSuperBlock => b.copy(origin = point)
+      case b: Block => b.lens(_.origin).set(point)
+      case b: System => b.lens(_.origin).set(point)
     }
   }
 
@@ -116,7 +116,7 @@ object ActivateApi {
     * @param blockSize 2-element array of doubles representing width and height
     * @return block object
     */
-  def set_block_size(block: Block, blockSize: Array[Double]): Block = {
+  def set_block_size(block: Entity, blockSize: Array[Double]): Entity = {
     require(blockSize.length == 2, "Size array must contain exactly two elements.")
     require(blockSize.foldLeft(false) { (s, v) => s || v >= 0.0 }, "Size cannot be negative.")
 
@@ -132,8 +132,8 @@ object ActivateApi {
 
     val size = Size(width, height)
     block match {
-      case b: ActivateBlock => b.copy(size = size)
-      case b: ActivateSuperBlock => b.copy(size = size)
+      case b: Block => b.lens(_.size).set(size)
+      case b: System => b.lens(_.size).set(size)
     }
   }
 
@@ -143,11 +143,11 @@ object ActivateApi {
     * @param flip  0 = no flip, 1 = flip
     * @return block object
     */
-  def set_block_flip(block: Block, flip: Int): Block = {
+  def set_block_flip(block: Entity, flip: Int): Entity = {
     require(flip == 0 || flip == 1, "Flip must be either 0 or 1.")
     block match {
-      case b: ActivateBlock => b.copy(flip = flip == 1)
-      case b: ActivateSuperBlock => b.copy(flip = flip == 1)
+      case b: Block => b.lens(_.flip).set(flip == 1)
+      case b: System => b.lens(_.flip).set(flip == 1)
     }
   }
 
@@ -157,10 +157,10 @@ object ActivateApi {
     * @param theta rotation angle
     * @return block object
     */
-  def set_block_theta(block: Block, theta: Double): Block = {
+  def set_block_theta(block: Entity, theta: Double): Entity = {
     block match {
-      case b: ActivateBlock => b.copy(theta = theta)
-      case b: ActivateSuperBlock => b.copy(theta = theta)
+      case b: Block => b.lens(_.theta).set(theta)
+      case b: System => b.lens(_.theta).set(theta)
     }
   }
 
@@ -170,14 +170,14 @@ object ActivateApi {
     * @param color 4-element array of RGBA values between 0.0 and 1.0
     * @return block object
     */
-  def set_block_bg_color(block: Block, color: Array[Double]): Block = {
+  def set_block_bg_color(block: Entity, color: Array[Double]): Entity = {
     require(color.length == 4, "Color must be specified as RGBA with four elements.")
     require(color.foldLeft(false) { (s, v) => s || (v >= 0.0 && v <= 1.0) },
       "Color intensities must be specified as a value between 0.0 and 1.0.")
     val c = new Color(color(0).toFloat, color(1).toFloat, color(2).toFloat, color(3).toFloat)
     block match {
-      case b: ActivateBlock => b.copy(backgroundColor = c)
-      case b: ActivateSuperBlock => b.copy(backgroundColor = c)
+      case b: Block => b.lens(_.backgroundColor).set(c)
+      case b: System => b.lens(_.backgroundColor).set(c)
     }
   }
 
@@ -187,14 +187,14 @@ object ActivateApi {
     * @param color 4-element array of RGBA values between 0.0 and 1.0
     * @return block object
     */
-  def set_block_fg_color(block: Block, color: Array[Double]): Block = {
+  def set_block_fg_color(block: Entity, color: Array[Double]): Entity = {
     require(color.length == 4, "Color must be specified as RGBA with four elements.")
     require(color.foldLeft(false) { (s, v) => s || (v >= 0.0 && v <= 1.0) },
       "Color intensities must be specified as a value between 0.0 and 1.0.")
     val c = new Color(color(0).toFloat, color(1).toFloat, color(2).toFloat, color(3).toFloat)
     block match {
-      case b: ActivateBlock => b.copy(foregroundColor = c)
-      case b: ActivateSuperBlock => b.copy(foregroundColor = c)
+      case b: Block => b.lens(_.foregroundColor).set(c)
+      case b: System => b.lens(_.foregroundColor).set(c)
     }
   }
 
@@ -204,11 +204,11 @@ object ActivateApi {
     * @param inputCount number of inputs
     * @return block object
     */
-  def set_block_nin(block: Block, inputCount: Int): Block = {
+  def set_block_nin(block: Entity, inputCount: Int): Entity = {
     require(inputCount >= 0, "Input count must be positive.")
     block match {
-      case b: ActivateBlock => b.copy(inputCount = inputCount)
-      case b: ActivateSuperBlock => b.copy(inputCount = inputCount)
+      case b: Block => b.lens(_.inputCount).set(inputCount)
+      case b: System => b.lens(_.inputCount).set(inputCount)
     }
   }
 
@@ -218,11 +218,11 @@ object ActivateApi {
     * @param outputCount number of outputs
     * @return block object
     */
-  def set_block_nout(block: Block, outputCount: Int): Block = {
+  def set_block_nout(block: Entity, outputCount: Int): Entity = {
     require(outputCount >= 0, "Output count must be positive.")
     block match {
-      case b: ActivateBlock => b.copy(outputCount = outputCount)
-      case b: ActivateSuperBlock => b.copy(outputCount = outputCount)
+      case b: Block => b.lens(_.outputCount).set(outputCount)
+      case b: System => b.lens(_.outputCount).set(outputCount)
     }
   }
 
@@ -232,11 +232,11 @@ object ActivateApi {
     * @param eventInputCount number of event inputs
     * @return block object
     */
-  def set_block_evtnin(block: Block, eventInputCount: Int): Block = {
+  def set_block_evtnin(block: Entity, eventInputCount: Int): Entity = {
     require(eventInputCount >= 0, "Event input count must be positive.")
     block match {
-      case b: ActivateBlock => b.copy(eventInputCount = eventInputCount)
-      case b: ActivateSuperBlock => b.copy(eventInputCount = eventInputCount)
+      case b: Block => b.lens(_.eventInputCount).set(eventInputCount)
+      case b: System => b.lens(_.eventInputCount).set(eventInputCount)
     }
   }
 
@@ -246,11 +246,11 @@ object ActivateApi {
     * @param eventOutputCount number of event outputs
     * @return block object
     */
-  def set_block_evtnout(block: Block, eventOutputCount: Int): Block = {
+  def set_block_evtnout(block: Entity, eventOutputCount: Int): Entity = {
     require(eventOutputCount >= 0, "Event output count must be positive.")
     block match {
-      case b: ActivateBlock => b.copy(eventOutputCount = eventOutputCount)
-      case b: ActivateSuperBlock => b.copy(eventOutputCount = eventOutputCount)
+      case b: Block => b.lens(_.eventOutputCount).set(eventOutputCount)
+      case b: System => b.lens(_.eventOutputCount).set(eventOutputCount)
     }
   }
 
@@ -260,8 +260,8 @@ object ActivateApi {
     * @param parameters block parameters
     * @return block object
     */
-  def set_block_parameters_impl(block: ActivateBlock, parameters: ActivateStruct): ActivateBlock =
-    block.copy(parameters = parameters)
+  def set_block_parameters_impl(block: Block, parameters: ActivateStruct): Block =
+    block.lens(_.parameters).set(parameters)
 
   /** Set block identity.
     *
@@ -269,10 +269,10 @@ object ActivateApi {
     * @param identity identity of object
     * @return block object
     */
-  def set_block_ident(block: Block, identity: String): Block =
+  def set_block_ident(block: Entity, identity: String): Entity =
     block match {
-      case b: ActivateBlock => b.copy(identity = identity)
-      case b: ActivateSuperBlock => b.copy(identity = identity)
+      case b: Block => b.lens(_.identity).set(identity)
+      case b: System => b.lens(_.identity).set(identity)
     }
 
   /** Set block mask.
@@ -282,8 +282,8 @@ object ActivateApi {
     * @param label      block label
     * @return block object
     */
-  def set_block_mask_impl(block: Block, parameters: ActivateStruct, label: String): Block = {
-    System.err.println("set_block_mask_impl not implemented yet")
+  def set_block_mask_impl(block: Entity, parameters: ActivateStruct, label: String): Entity = {
+    java.lang.System.err.println("set_block_mask_impl not implemented yet")
     block
   }
 
@@ -291,18 +291,21 @@ object ActivateApi {
 
   /** Instantiate a new Activate super block.
     *
+    * Don't do anything special here.
+    *
     * @return empty super block
     */
-  def instantiate_super_block(): ActivateSuperBlock = ActivateSuperBlock()
+  def instantiate_super_block(): Any = null
 
   /** Add diagram to super block.
     *
-    * @param block   super block
-    * @param diagram diagram to add
+    * We are just returning the subsystem here.
+    *
+    * @param block     super block (usually null)
+    * @param subsystem Subsystem to add
     * @return super block
     */
-  def fill_super_block(block: ActivateSuperBlock, diagram: Diagram): ActivateSuperBlock =
-    block.copy(diagram = Some(diagram))
+  def fill_super_block(block: Any, subsystem: System): System = subsystem
 
   /** Make super block atomic or not.
     *
@@ -310,9 +313,9 @@ object ActivateApi {
     * @param atomic 0 = not atomic, 1 = atomic
     * @return super block
     */
-  def set_atomic_property(block: ActivateSuperBlock, atomic: Int): ActivateSuperBlock = {
+  def set_atomic_property(block: System, atomic: Int): System = {
     require(atomic == 0 || atomic == 1, "Atomic must be either 0 or 1.")
-    block.copy(atomic = atomic == 1)
+    block.lens(_.atomic).set(atomic == 1)
   }
 
   /** Set icon text of super block.
@@ -322,7 +325,7 @@ object ActivateApi {
     * @param text2 text 2 ???
     * @return block object
     */
-  def set_block_icon_text(block: ActivateSuperBlock, text1: String, text2: String): ActivateSuperBlock = {
+  def set_block_icon_text(block: System, text1: String, text2: String): System = {
     block
   }
 
@@ -330,16 +333,16 @@ object ActivateApi {
 
   /** Add an explicit link to diagram.
     *
-    * @param diagram     diagram object
+    * @param system      diagram object
     * @param start       start port, array of [block, string with port number, "output"]
     * @param destination destination port, array of [block, string with port number, "input"]
     * @param points      array of points for routing of the link
     * @param unknownFlag NOT SURE WHAT THIS IS
     * @return diagram object
     */
-  def add_explicit_link(diagram: Diagram, start: Array[String],
+  def add_explicit_link(system: System, start: Array[String],
                         destination: Array[String], points: Array[Array[Double]],
-                        unknownFlag: Boolean): Diagram = {
+                        unknownFlag: Boolean): System = {
     require(start.length == 3, "start must contain (block tag, port number, \"output\"")
     require(start(2) == "output", "3rd element of start must be \"output\"")
     require(destination.length == 3, "destination must contain (block tag, port number, \"input\"")
@@ -350,102 +353,107 @@ object ActivateApi {
         case Some(p) => p.map { v => Point(v(0).toInt, v(1).toInt) }.toVector
         case _ => Vector.empty
       })
-    diagram.copy(explicitLinks = diagram.explicitLinks :+ link)
+    system.lens(_.explicitLinks).modify(_ :+ link)
   }
 
   /** Add event link to diagram.
     *
-    * @param diagram     diagram object.
+    * @param system      diagram object.
     * @param start       start port, array of [block, string with event port number, "output"]
     * @param destination destination port, array of [block, string with event port number, "input"]
     * @param points      array of points for routing of the link
     * @param unknownFlag NOT SURE WHAT THIS IS
     * @return diagram object
     */
-  def add_event_link(diagram: Diagram, start: Array[String],
+  def add_event_link(system: System, start: Array[String],
                      destination: Array[String], points: Array[Array[Double]],
-                     unknownFlag: Boolean): Diagram = {
+                     unknownFlag: Boolean): System = {
     val optPoints = Option(points)
     val link = Link(start(0), start(1).toInt, destination(0), destination(1).toInt, EventLink,
       optPoints match {
         case Some(p) => p.map { v => Point(v(0).toInt, v(1).toInt) }.toVector
         case _ => Vector.empty
       })
-    diagram.copy(eventLinks = diagram.eventLinks :+ link)
+    system.lens(_.eventLinks).modify(_ :+ link)
   }
 
   // -------------------- Model specific details
 
   /** Set workspace for model.
     *
-    * @param diagram   diagram object
+    * @param system    diagram object
     * @param workspace workspace
     * @return diagram object
     */
-  def set_model_workspace(diagram: Diagram, workspace: Array[String]): Diagram = {
-    System.err.println("set_model_workspace is not implemented yet")
-    diagram
+  def set_model_workspace(system: System, workspace: Array[String]): System = {
+    java.lang.System.err.println("set_model_workspace is not implemented yet")
+    system
   }
 
   /** Set initial time of simulation.
     *
-    * @param diagram     diagram object
+    * @param system      diagram object
     * @param initialTime initial time as a string
     * @return diagram object
     */
-  def set_initial_time(diagram: Diagram, initialTime: String): Diagram = {
-    System.err.println("set_initial_time is not implemented yet")
-    diagram
+  def set_initial_time(system: System, initialTime: String): System = {
+    java.lang.System.err.println("set_initial_time is not implemented yet")
+    system
   }
 
   /** Set final time of simulation.
     *
-    * @param diagram   diagram object
+    * @param system    diagram object
     * @param finalTime final time as a string
     * @return diagram object
     */
-  def set_final_time(diagram: Diagram, finalTime: String): Diagram = {
-    System.err.println("set_final_time is not implemented yet")
-    diagram
+  def set_final_time(system: System, finalTime: String): System = {
+    java.lang.System.err.println("set_final_time is not implemented yet")
+    system
   }
 
   /** Set solver parameters.
     *
-    * @param diagram    diagram object
+    * @param system     diagram object
     * @param parameters solver parameters
     * @return diagram
     */
-  def set_solver_parameters(diagram: Diagram, parameters: Array[String]): Diagram = {
-    System.err.println("set_solver_parameters is not implemented yet")
-    diagram
+  def set_solver_parameters(system: System, parameters: Array[String]): System = {
+    java.lang.System.err.println("set_solver_parameters is not implemented yet")
+    system
   }
 
   /** Evaluates the model and generates Matlab commands to generate Simulink model.
     *
-    * @param diagram diagram object
+    * @param system diagram object
     * @return serialized expressions
     */
-  def evaluate_model(diagram: Diagram): String = {
+  def evaluate_model(system: System): String = {
     // Apply transforms before exporting diagram.
-    transforms.Split.eliminateSplitBlocks(diagram)
-      .pipe { d =>
-        val diagramName = d.name.getOrElse("New Model")
+
+    system
+      // Transforms are added here in the order they are supposed to be applied.
+      .pipe(transforms.Split.eliminateSplitBlocks)
+      .pipe(transforms.EventPortIndex.updatePortIndices)
+      // Serialize model to Matlab commands.
+      .pipe { s =>
+        val systemName = if (s.name.isEmpty) "New Model" else s.name
 
         val prelude = Seq(
-          NewSystem(diagramName),   // Create a new system as a first thing.
-          OpenSystem(diagramName)   // Open it immediately.
+          NewSystem(systemName), // Create a new system as a first thing.
+          OpenSystem(systemName) // Open it immediately.
         )
 
         // Convert the content of the root system into expressions.
-        val rootSystem = d.toExpression(SimPath(diagramName))
+        val rootSystem = s.toExpression(SimPath(""))
 
         // Add an expression to arrange the root system.
-        val arrangeSystem = Seq(ArrangeSystem(SimPath(diagramName)))
+        val arrangeSystem = Seq(ArrangeSystem(SimPath(systemName)))
 
         (prelude ++ rootSystem ++ arrangeSystem)
-          .map(_.serialize)          // serialize the expressions
-          .tap(_.foreach(println))   // print serialized expressions to the terminal
-          .mkString("\n")            // join expressions with a new line.
+          .map(_.serialize) // serialize the expressions
+          .tap(_.foreach(println)) // print serialized expressions to the terminal
+          .mkString("\n") // join expressions with a new line.
       }
   }
 }

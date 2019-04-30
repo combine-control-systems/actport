@@ -15,10 +15,12 @@ case class SimPath(path: String) extends AnyVal {
     *   val blockPath = path / "block" // points at "block" in subsystem
     * }}}
     *
+    * If the leading path is empty the slash is omitted.
+    * 
     * @param next next path component
     * @return joined components
     */
-  def /(next: String): SimPath = SimPath(path + "/" + next)
+  def /(next: String): SimPath = if (path.nonEmpty) SimPath(path + "/" + next) else SimPath(next)
 
   override def toString: String = path
 }

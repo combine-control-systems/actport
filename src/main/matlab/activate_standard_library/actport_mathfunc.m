@@ -1,5 +1,5 @@
 % activate = 'system/MathOperations/MathFunc'
-function out = actport_mathfunc(diagram, block)
+function out = actport_mathfunc(system, block)
     import actport.GeneratorApi.*
 
     func = strrep(getParameter(block, 'func', 'exp'), '''', '');
@@ -83,5 +83,5 @@ function out = actport_mathfunc(diagram, block)
     end
 
     block = addCommonProperties(block);
-    out = updateDiagram(diagram, block);
+    out = updateSystem(system, block);
 end

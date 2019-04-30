@@ -1,5 +1,5 @@
 % activate = 'system/Dynamical/ContStateSpace'
-function out = actport_state_space(diagram, block)
+function out = actport_state_space(system, block)
     import actport.GeneratorApi.*
 
     block = addBlockExpr(block, 'simulink/Continuous/State-Space');
@@ -10,5 +10,5 @@ function out = actport_state_space(diagram, block)
     block = setParamExpr(block, 'X0', getParameter(block, 'x0', '0'));
 
     block = addCommonProperties(block);
-    out = updateDiagram(diagram, block);
+    out = updateSystem(system, block);
 end
