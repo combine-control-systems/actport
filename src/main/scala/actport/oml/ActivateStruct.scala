@@ -1,4 +1,4 @@
-package actport
+package actport.oml
 
 class ActivateStruct extends java.util.HashMap[String, Any]
 

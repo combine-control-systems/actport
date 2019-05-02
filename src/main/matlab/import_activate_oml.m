@@ -1,9 +1,11 @@
 function import_activate_oml(filename)
     %IMPORTACTIVATEOML Import OML-code exported from Activate to Simulink
     %   Detailed explanation goes here
-    import actport.GeneratorLibrary.scanLibrary
+    import actport.GeneratorLibrary.scanLibrary;
 
     global ACTPORT_LIBRARY;
+
+    clc;
 
     ACTPORT_LIBRARY = scanLibrary('activate_standard_library');
 
@@ -17,17 +19,17 @@ function import_activate_oml(filename)
     fclose(fid);
 
     % We must import the API from the JAR-file in every function.
-    src = regexprep(src, 'function[^\n]+', '$0\nimport actport.ActivateApi.*');
+    src = regexprep(src, 'function[^\n]+', '$0\nimport actport.oml.Matlab.*');
 
     % Rename all add_block calls to avoid shadowing add_block from the Simulink API.
     src = regexprep(src, 'add_block', 'add_block_2');
 
     % Matlab must have script code at the beginning of the file in order to be able to
     % embed functions as well.
-    src = regexprep(src, '(.*end)(.*)', '$2\neval(scsm);\n$1');
+    src = regexprep(src, '(.*end)(.*)', '$2\n$1');
 
     % Add import of API.
-    src = sprintf('import actport.ActivateApi.*\n%s', src);
+    src = sprintf('import actport.oml.Matlab.*\n%s', src);
 
     filename = sprintf('oml_import_%10.0f.m', posixtime(datetime));
 

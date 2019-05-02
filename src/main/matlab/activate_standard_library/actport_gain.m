@@ -1,12 +1,14 @@
 % activate = 'system/MathOperations/Gain'
-function out = actport_gain(system, block)
-    import actport.GeneratorApi.*
+function model = actport_gain(model, block_id, model_path)
+    import actport.model.Matlab.*
 
-    gain = getParameter(block, 'gain', '1');
+    name = get_name(model, block_id);
+    block_path = sprintf('%s/%s', model_path, name);
 
-    block = addBlockExpr(block, 'simulink/Math Operations/Gain');
-    block = setParamExpr(block, 'Gain', gain);
+    add_block('simulink/Math Operations/Gain', block_path);
 
-    block = addCommonProperties(block);
-    out = updateSystem(system, block);
+    gain = get_parameter(model, block_id, 'gain', '1');
+    set_param(block_path, 'Gain', gain);
+
+    set_common_parameters(model, block_id, model_path);
 end

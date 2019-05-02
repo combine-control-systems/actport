@@ -1,4 +1,6 @@
-package actport
+package actport.oml
+
+import actport.Configuration
 
 /** Size representation.
   *

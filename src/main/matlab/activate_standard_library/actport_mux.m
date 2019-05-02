@@ -1,10 +1,14 @@
 % activate = 'system/Routing/Mux'
-function out = actport_mux(system, block)
-    import actport.GeneratorApi.*
+function model = actport_mux(model, block_id, model_path)
+    import actport.model.Matlab.*
 
-    block = addBlockExpr(block, 'simulink/Signal Routing/Mux');
-    block = setParamExpr(block, 'Inputs', sprintf('%d', block.inputCount));
+    name = get_name(model, block_id);
+    block_path = sprintf('%s/%s', model_path, name);
 
-    block = addCommonProperties(block);
-    out = updateSystem(system, block);
+    add_block('simulink/Signal Routing/Mux', block_path);
+
+    inputs = get_input_count(model, block_id);
+    set_param(block_path, 'Inputs', sprintf('%d', inputs));
+
+    set_common_parameters(model, block_id, model_path);
 end

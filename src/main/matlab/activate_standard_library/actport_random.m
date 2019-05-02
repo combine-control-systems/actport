@@ -1,38 +1,43 @@
 % activate = 'system/SignalGenerators/Random'
-function out = actport_random(system, block)
-    import actport.GeneratorApi.*
+function model = actport_random(model, block_id, model_path)
+    import actport.model.Matlab.*
 
-    block = addCleanSubSystemExpr(block, "Random");
-    block = addBlockExpr(block, 'simulink/Ports & Subsystems/Trigger', sprintf('%s/Trigger', block.name));
-    block = setParamExpr(block, sprintf('%s/Trigger', block.name), 'TriggerType', 'either');
+    name = get_name(model, block_id);
+    block_path = sprintf('%s/%s', model_path, name);
 
-    distribution = getParameter(block, 'distribution', '''Normal''');
+    add_clean_subsystem(block_path);
+    add_block('simulink/Ports & Subsystems/Trigger', sprintf('%s/Trigger', block_path), ...
+        'TriggerType', 'either');
+
+    distribution = get_parameter(model, block_id, 'distribution', '''Normal''');
+
+    random_path = sprintf('%s/Random', block_path);
+
     switch distribution
         case '''Normal'''
-            block = addBlockExpr(block, 'simulink/Sources/Random Number', sprintf('%s/Random', block.name));
-            block = addBlockExpr(block, 'simulink/Ports & Subsystems/Out1', sprintf('%s/Value', block.name));
-            block = addLineExpr(block, block.name, 'Random/1', 'Value/1');
+            add_block('simulink/Sources/Random Number', random_path);
+            add_block('simulink/Ports & Subsystems/Out1', sprintf('%s/Value', block_path));
+            add_line(block_path, 'Random/1', 'Value/1');
             % Mean value.
-            block = setParamExpr(block, sprintf('%s/Random', block.name), 'Mean', getParameter(block, 'A', '0'));
+            set_param(random_path, 'Mean', get_parameter(model, block_id, 'A', '0'));
             % Variance.
-            block = setParamExpr(block, sprintf('%s/Random', block.name), 'Variance', getParameter(block, 'B', '1'));
+            set_param(random_path, 'Variance', get_parameter(model, block_id, 'B', '1'));
         case '''Uniform'''
-            block = addBlockExpr(block, 'simulink/Sources/Uniform Random Number', sprintf('%s/Random', block.name));
-            block = addBlockExpr(block, 'simulink/Ports & Subsystems/Out1', sprintf('%s/Value', block.name));
-            block = addLineExpr(block, block.name, 'Random/1', 'Value/1');
+            add_block('simulink/Sources/Uniform Random Number', random_path);
+            add_block('simulink/Ports & Subsystems/Out1', sprintf('%s/Value', block_path));
+            add_line(block_path, 'Random/1', 'Value/1');
             % Lower value.
-            block = setParamExpr(block, sprintf('%s/Random', block.name), 'Minimum', getParameter(block, 'A', '0'));
+            set_param(random_path, 'Minimum', get_parameter(model, block_id, 'A', '0'));
             % Range value.
-            block = setParamExpr(block, sprintf('%s/Random', block.name), 'Maximum', getParameter(block, 'B', '1'));
+            set_param(random_path, 'Maximum', get_parameter(model, block_id, 'B', '1'));
         otherwise
             error(sprintf('Unknown distribution %s', distribution));
     end
 
-    block = setParamExpr(block, sprintf('%s/Random', block.name), 'Seed', getParameter(block, 'seed', '0'));
-    block = setParamExpr(block, sprintf('%s/Random', block.name), 'SampleTime', '-1');
+    set_param(random_path, 'Seed', get_parameter(model, block_id, 'seed', '0'));
+    set_param(random_path, 'SampleTime', '-1');
 
-    block = mapEventInputPort(block, 1, 'Trigger');
+    model = map_event_input_port(model, block_id, 1, 'Trigger');
 
-    block = addCommonProperties(block);
-    out = updateSystem(system, block);
+    set_common_parameters(model, block_id, model_path);
 end

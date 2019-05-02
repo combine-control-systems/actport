@@ -1,33 +1,35 @@
 % activate = 'system/MatrixOperations/MatrixGain'
-function out = actport_matrix_gain(system, block)
-    import actport.GeneratorApi.*
+function model = actport_matrix_gain(model, block_id, model_path)
+    import actport.model.Matlab.*
 
-    block = addBlockExpr(block, 'simulink/Math Operations/Gain');
-    block = setParamExpr(block, 'Gain', getParameter(block, 'gain', '1.0'));
+    name = get_name(model, block_id);
+    block_path = sprintf('%s/%s', model_path, name);
 
-    switch getParameter(block, 'overflow', '''Nothing''')
+    add_block('simulink/Math Operations/Gain', block_path);
+    set_param(block_path, 'Gain', get_parameter(model, block_id, 'gain', '1.0'));
+
+    switch get_parameter(model, block_id, 'overflow', '''Nothing''')
         case '''Saturate'''
-            block = setParamExpr(block, 'SaturateOnIntegerOverflow', 'on');
+            set_param(block_path, 'SaturateOnIntegerOverflow', 'on');
         case '''Nothing'''
-            block = setParamExpr(block, 'SaturateOnIntegerOverflow', 'off');
+            set_param(block_path, 'SaturateOnIntegerOverflow', 'off');
         % TODO: Handle "Error" case properly.
         case '''Error'''
-            block = setParamExpr(block, 'SaturateOnIntegerOverflow', 'off');
+            set_param(block_path, 'SaturateOnIntegerOverflow', 'off');
         otherwise
-            block = setParamExpr(block, 'SaturateOnIntegerOverflow', 'off');
+            set_param(block_path, 'SaturateOnIntegerOverflow', 'off');
     end
 
-    switch getParameter(block, 'mulmethod', '''Gain*u1''')
+    switch get_parameter(model, block_id, 'mulmethod', '''Gain*u1''')
         case '''Gain.*u1'''
-            block = setParamExpr(block, 'Multiplication', 'Element-wise(K.*u)');
+            set_param(block_path, 'Multiplication', 'Element-wise(K.*u)');
         case '''Gain*u1'''
-            block = setParamExpr(block, 'Multiplication', 'Matrix(K*u)');
+            set_param(block_path, 'Multiplication', 'Matrix(K*u)');
         case '''u1*Gain'''
-            block = setParamExpr(block, 'Multiplication', 'Matrix(u*K)');
+            set_param(block_path, 'Multiplication', 'Matrix(u*K)');
         otherwise
-            block = setParamExpr(block, 'Multiplication', 'Matrix(K*u)');
+            set_param(block_path, 'Multiplication', 'Matrix(K*u)');
     end
 
-    block = addCommonProperties(block);
-    out = updateSystem(system, block);
+    set_common_parameters(model, block_id, model_path);
 end

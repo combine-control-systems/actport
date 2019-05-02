@@ -1,7 +1,5 @@
-function [diagram, blockTag] = add_block_2(diagram, block, blockName)
-    import actport.GeneratorApi.setBlockName;
-    block = setBlockName(block, blockName);
-    f = find_generator(block);
-    diagram = f(diagram, block);
+function [system, blockTag] = add_block_2(system, block, blockName)
+    import actport.oml.Matlab.add_block_impl;
+    system = add_block_impl(system, block, blockName);
     blockTag = blockName;
 end

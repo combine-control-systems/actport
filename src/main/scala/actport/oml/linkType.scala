@@ -1,4 +1,4 @@
-package actport
+package actport.oml
 
 /** Link type ADT. */
 sealed trait LinkType

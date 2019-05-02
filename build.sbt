@@ -8,6 +8,7 @@ lazy val commonSettings = Seq(
 lazy val actport = (project in file(".")).
   settings(commonSettings: _*).
   settings(
+    scalacOptions += "-Ypartial-unification",
     libraryDependencies ++= Seq(
       "com.github.bigwheel" %% "util-backports" % Settings.backportsVersion,
       "com.lihaoyi" %% "fastparse" % Settings.fastparseVersion,

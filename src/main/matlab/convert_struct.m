@@ -1,5 +1,5 @@
 function struct_out = convert_struct(struct_in)
-    struct_out = actport.ActivateStruct();
+    struct_out = actport.oml.ActivateStruct();
     keys = fieldnames(struct_in);
     for i = 1:length(keys)
         % Single character strings, e.g. 'A', becomes Char and not String by default.

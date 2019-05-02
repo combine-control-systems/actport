@@ -1,16 +1,19 @@
 % activate = 'system/MatrixOperations/MatrixConcatenation'
-function out = actport_matrix_concatenation(system, block)
-    import actport.GeneratorApi.*
+function model = actport_matrix_concatenation(model, block_id, model_path)
+    import actport.model.Matlab.*
 
-    block = addBlockExpr(block, 'simulink/Math Operations/Matrix Concatenate');
-    block = setParamExpr(block, 'NumInputs', getParameter(block, 'nin', '2'));
-    block = setParamExpr(block, 'Mode', 'Multidimensional array');
-    if strcmp(getParameter(block, 'method', '''Horizontal'''), '''Horizontal''')
-        block = setParamExpr(block, 'ConcatenateDimension', '2');
+    name = get_name(model, block_id);
+    block_path = sprintf('%s/%s', model_path, name);
+
+    add_block('simulink/Math Operations/Matrix Concatenate', block_path);
+    set_param(block_path, 'NumInputs', get_parameter(model, block_id, 'nin', '2'));
+    set_param(block_path, 'Mode', 'Multidimensional array');
+
+    if strcmp(get_parameter(model, block_id, 'method', '''Horizontal'''), '''Horizontal''')
+        set_param(block_path, 'ConcatenateDimension', '2');
     else
-        block = setParamExpr(block, 'ConcatenateDimension', '1');
+        set_param(block_path, 'ConcatenateDimension', '1');
     end
 
-    block = addCommonProperties(block);
-    out = updateSystem(system, block);
+    set_common_parameters(model, block_id, model_path);
 end

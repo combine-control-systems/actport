@@ -1,21 +1,22 @@
 % activate = 'system/Ports/EventInput'
-function out = actport_event_input(system, block)
-    import actport.GeneratorApi.*
+function model = actport_event_input(model, block_id, model_path)
+    import actport.model.Matlab.*
+
+    name = get_name(model, block_id);
+
+    block_path = sprintf('%s/%s', model_path, name);
 
     % TODO: We might need better logic to decide if the port should be an ordinary port or a trigger port, see
     %       EventPortIndex.scala#processPort.
-    if system.eventLinks.size() == 1
-        block = addBlockExpr(block, 'simulink/Ports & Subsystems/Trigger');
-        system = system.mapEventInputPort(system, getParameter(block, 'portNumber', '1'), 'Trigger');
+    if get_event_input_count(model, block_id) == 1
+        add_block('simulink/Ports & Subsystems/Trigger', block_path);
+        model = map_event_input_port(model, block_id, get_parameter(model, block_id, 'portNumber', 1), 'Trigger');
     else
-        block = addBlockExpr(block, 'simulink/Ports & Subsystems/In1');
+        add_block('simulink/Ports & Subsystems/In1', block_path);
+        % We assume that all port numbers have been corrected in an earlier model transformation step.
+        % Hence, we do not need to calculate a new port number here.
+        set_param(block_path, 'Port', get_parameter(model, block_id, 'portNumber', '1'));
     end
-    % The port number is updated in the EventPortIndex transform
-    % and the expression is added at that moment.
-    % It is not possible to set a proper port number at this moment
-    % since it is not known how many explicit input ports there
-    % are until the entire model has been parsed.
 
-    block = addCommonProperties(block);
-    out = updateSystem(system, block);
+    set_common_parameters(model, block_id, model_path);
 end

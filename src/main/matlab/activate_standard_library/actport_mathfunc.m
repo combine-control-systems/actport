@@ -1,87 +1,92 @@
 % activate = 'system/MathOperations/MathFunc'
-function out = actport_mathfunc(system, block)
-    import actport.GeneratorApi.*
+function model = actport_mathfunc(model, block_id, model_path)
+    import actport.model.Matlab.*
 
-    func = strrep(getParameter(block, 'func', 'exp'), '''', '');
+    name = get_name(model, block_id);
+    block_path = sprintf('%s/%s', model_path, name);
+
+    func = strrep(get_parameter(model, block_id, 'func', 'exp'), '''', '');
 
     switch func
         case 'exp'
-            block = addBlockExpr(block, 'simulink/Math Operations/Math Function');
-            block = setParamExpr(block, 'Operator', 'exp');
+            add_block('simulink/Math Operations/Math Function', block_path);
+            set_param(block_path, 'Operator', 'exp');
         case 'log'
-            block = addBlockExpr(block, 'simulink/Math Operations/Math Function');
-            block = setParamExpr(block, 'Operator', 'log');
+            add_block('simulink/Math Operations/Math Function', block_path);
+            set_param(block_path, 'Operator', 'log');
         case '10^u'
-            block = addBlockExpr(block, 'simulink/Math Operations/Math Function');
-            block = setParamExpr(block, 'Operator', '10^u');
+            add_block('simulink/Math Operations/Math Function', block_path);
+            set_param(block_path, 'Operator', '10^u');
         case '|u|'
-            block = addBlockExpr(block, 'simulink/Math Operations/Abs');
+            add_block('simulink/Math Operations/Abs', block_path);
         case 'u^2'
-            block = addBlockExpr(block, 'simulink/Math Operations/Math Function');
-            block = setParamExpr(block, 'Operator', 'square');
+            add_block('simulink/Math Operations/Math Function', block_path);
+            set_param(block_path, 'Operator', 'square');
         case 'sqrt'
-            block = addBlockExpr(block, 'simulink/Math Operations/Sqrt');
+            add_block('simulink/Math Operations/Sqrt', block_path);
         case '1/u'
-            block = addBlockExpr(block, 'simulink/Math Operations/Math Function');
-            block = setParamExpr(block, 'Operator', 'reciprocal');
+            add_block('simulink/Math Operations/Math Function', block_path);
+            set_param(block_path, 'Operator', 'reciprocal');
         case 'conj'
-            block = addBlockExpr(block, 'simulink/Math Operations/Math Function');
-            block = setParamExpr(block, 'Operator', 'conj');
+            add_block('simulink/Math Operations/Math Function', block_path);
+            set_param(block_path, 'Operator', 'conj');
         case '|u|^2'
-            block = addBlockExpr(block, 'simulink/Math Operations/Math Function');
-            block = setParamExpr(block, 'Operator', 'magnitude^2');
+            add_block('simulink/Math Operations/Math Function', block_path);
+            set_param(block_path, 'Operator', 'magnitude^2');
         case 'log2'
             % There is no log2 available, so we calculate using log(x)/log(2)
-            block = addBlockExpr(block, 'simulink/User-Defined Functions/MATLAB Function');
-            block = setMatlabFunctionScriptExpr(block, sprintf([...
+            add_block('simulink/User-Defined Functions/MATLAB Function', block_path);
+            block = sf.find('Path', block_path, '-isa', 'Stateflow.EMChart');
+            block.Script = sprintf([...
                 'function y = f(x)\n'...
                 '%#codegen\n'...
                 'y = log(x)/log(2);'...
                 'end\n'...
-            ]));
+            ]);
         case 'erf'
             % There is no erf in Simulink and we have to resort to Matlab.
-            block = addBlockExpr(block, 'simulink/User-Defined Functions/MATLAB Function');
-            block = setMatlabFunctionScriptExpr(block, sprintf([...
+            add_block('simulink/User-Defined Functions/MATLAB Function', block_path);
+            block = sf.find('Path', block_path, '-isa', 'Stateflow.EMChart');
+            block.Script = sprintf([...
                 'function y = f(x)\n'...
                 '%#codegen\n'...
                 'y = erf(x);\n'...
                 'end\n'...
-            ]));
+            ]);
         case 'erfc'
             % There is no erfc in Simulink and we have to resort to Matlab.
-            block = addBlockExpr(block, 'simulink/User-Defined Functions/MATLAB Function');
-            block = setMatlabFunctionScriptExpr(block, sprintf([...
+            add_block('simulink/User-Defined Functions/MATLAB Function', block_path);
+            block = sf.find('Path', block_path, '-isa', 'Stateflow.EMChart');
+            block.Script = sprintf([...
                 'function y = f(x)\n'...
                 '%#codegen\n'...
-                'y = erfc(x);\n'...
+                'y = erf(x);\n'...
                 'end\n'...
-            ]));
+            ]);
         case '2^u'
-            block = addBlockExpr(block, 'simulink/User-Defined Functions/MATLAB Function');
-            block = setMatlabFunctionScriptExpr(block, sprintf([...
+            add_block('simulink/User-Defined Functions/MATLAB Function', block_path);
+            block = sf.find('Path', block_path, '-isa', 'Stateflow.EMChart');
+            block.Script = sprintf([...
                 'function y = f(x)\n'...
                 '%#codegen\n'...
                 'y = 2.^x;\n'...
                 'end\n'...
-            ]));
+            ]);
         case 'round'
-            block = addBlockExpr(block, 'simulink/Math Operations/Rounding Function');
-            block = setParamExpr(block, 'Operator', 'round');
+            add_block('simulink/Math Operations/Rounding Function', block_path);
+            set_param(block_path, 'Operator', 'round');[]
         case 'floor'
-            block = addBlockExpr(block, 'simulink/Math Operations/Rounding Function');
-            block = setParamExpr(block, 'Operator', 'floor');
+            add_block('simulink/Math Operations/Rounding Function', block_path);
+            set_param(block_path, 'Operator', 'floor');
         case 'ceil'
-            block = addBlockExpr(block, 'simulink/Math Operations/Rounding Function');
-            block = setParamExpr(block, 'Operator', 'ceil');
+            add_block('simulink/Math Operations/Rounding Function', block_path);
+            set_param(block_path, 'Operator', 'ceil');
         case 'int'
-            block = addBlockExpr(block, 'simulink/Math Operations/Rounding Function');
-            block = setParamExpr(block, 'Operator', 'fix');
+            add_block('simulink/Math Operations/Rounding Function', block_path);
+            set_param(block_path, 'Operator', 'fix');
         otherwise
-            block = addBlockExpr(block, 'simulink/Math Operations/Math Function');
-            block = setParamExpr(block, 'Operator', 'exp');
+            model = actport_undefined(model, block_id, model_path);
     end
 
-    block = addCommonProperties(block);
-    out = updateSystem(system, block);
+    set_common_parameters(model, block_id, model_path);
 end
