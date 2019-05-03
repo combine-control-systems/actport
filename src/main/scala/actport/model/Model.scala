@@ -7,7 +7,8 @@ import monocle.macros.syntax.lens._
 import scala.util.chaining._
 
 case class Model(blocks: Map[BlockId, Block] = Map.empty,
-                 links: Map[LinkId, Link] = Map.empty)
+                 links: Map[LinkId, Link] = Map.empty,
+                 portMap: Map[(BlockId, ActivatePort, PortType, LinkType), SimulinkPort] = Map.empty)
 
 object Model {
   /** Convert a system to a model.

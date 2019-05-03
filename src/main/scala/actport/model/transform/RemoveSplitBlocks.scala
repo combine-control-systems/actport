@@ -15,7 +15,7 @@ object RemoveSplitBlocks {
     model.blocks.values.foldLeft(model) { (m, block) =>
       block.activateId match {
         case ActivateId("system/Links/Split") => removeSplitBlock(m, block)
-        case ActivateId("system/Links/EventSplit") => removeSplitBlock(m, block)
+        case ActivateId("system/Links/ActivationSplit") => removeSplitBlock(m, block)
         case _ => m
       }
     }

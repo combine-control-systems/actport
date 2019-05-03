@@ -10,5 +10,8 @@ function model = actport_discrete_delay(model, block_id, model_path)
     initial_condition = get_parameter(model, block_id, 'init_cond', '0');
     set_param(block_path, 'InitialCondition', initial_condition);
 
+    % We cannot trigger this block.
+    model = set_event_input_port_illegal(model, block_id, 1);
+
     set_common_parameters(model, block_id, model_path);
 end

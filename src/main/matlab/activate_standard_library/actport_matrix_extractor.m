@@ -8,18 +8,18 @@ function model = actport_matrix_extractor(model, block_id, model_path)
     add_block('simulink/Signal Routing/Selector', block_path);
     % When 1, matrix indices start with 1, otherwise 0.
     if strcmp(get_parameter(model, block_id, 'onebased', '1'), '1')
-        block = setParamExpr(block, 'IndexMode', 'One-based');
+        set_param(block_path, 'IndexMode', 'One-based');
     else
-        block = setParamExpr(block, 'IndexMode', 'Zero-based');
+        set_param(block_path, 'IndexMode', 'Zero-based');
     end
 
     [xMode, xIndex, xSize] = parseDimension(model, block_id, 'x');
     [yMode, yIndex, ySize] = parseDimension(model, block_id, 'y');
 
-    set_param(block_path, 'NumberOfDimensions', '''2''', ...
-        'IndexOptionArray', sprintf('{''%s'', ''%s''}', xMode, yMode), ...
-        'IndexParamArray', sprintf('{''%s'', ''%s''}', xIndex, yIndex), ...
-        'OutputSizeArray', sprintf('{''%s'', ''%s''}', xSize, ySize));
+    set_param(block_path, 'NumberOfDimensions', '2', ...
+        'IndexOptionArray', {xMode, yMode}, ...
+        'IndexParamArray', {xIndex, yIndex}, ...
+        'OutputSizeArray', {num2str(xSize), num2str(ySize)});
 
     set_common_parameters(model, block_id, model_path);
 end
@@ -47,7 +47,7 @@ function [mode, index, size] = parseDimension(model, block_id, dimension)
     % Possible values: 0, 1.
     if strcmp(get_parameter(model, block_id, sprintf('extract%c/%c_vectorindex', dimension, dimension), '0'), '1')
         mode = 'Index vector (dialog)';
-        index = char(get_parameter(mode, block_id, sprintf('%c_vector_index/%c_vi', dimension, dimension), '1'));
+        index = char(get_parameter(model, block_id, sprintf('%c_vector_index/%c_vi', dimension, dimension), '1'));
     end
     if strcmp(get_parameter(model, block_id, sprintf('extract%c/%c_startingindex', dimension, dimension), '0'), '1')
         mode = 'Starting index (dialog)';
