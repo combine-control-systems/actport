@@ -1,4 +1,4 @@
-package actport.model.transforms
+package actport.model.transform
 
 import actport.model.{ActivateId, Block, Model}
 import monocle.macros.syntax.lens._
