@@ -1,9 +1,12 @@
 package actport.model
 
+import java.awt.Rectangle
+
 import actport.oml.ParsedSystem
 import monocle.macros.syntax.lens._
 
 import scala.annotation.tailrec
+import scala.util.chaining._
 
 /** Matlab interface to database. */
 object Matlab {
@@ -514,5 +517,39 @@ object Matlab {
       case Some(InvalidPort) => null
       case Some(MappedPort(port)) => port
       case None => activatePort.toString
+    }
+
+  /** Rotate block 90 degrees clockwise.
+    *
+    * @param model   data model
+    * @param blockId block id
+    * @throws NoSuchElementException if block does not exist
+    * @return updated model
+    */
+  @throws[NoSuchElementException]("if block does not exist")
+  def rotate_clockwise(model: Model, blockId: Long): Model =
+    model.blocks.get(BlockId(blockId)) match {
+      case Some(block) =>
+        block.lens(_.appearance.rotation).modify(r => (r + 90) % 360)
+            .pipe(b => model.lens(_.blocks).modify(_ + (b.id -> b)))
+      case None => throw new NoSuchElementException(s"could not find block with id $blockId")
+    }
+
+  /** Swap width and height fields of block.
+    *
+    * @see rotate_clockwise - use together with 90 degree rotation.
+    *
+    * @param model   data model
+    * @param blockId block id
+    * @throws NoSuchElementException if block does not exist
+    * @return updated model
+    */
+  @throws[NoSuchElementException]("if block does not exist")
+  def swap_width_and_height(model: Model, blockId: Long): Model =
+    model.blocks.get(BlockId(blockId)) match {
+      case Some(block) =>
+        block.lens(_.appearance.position).modify(p => new Rectangle(p.x, p.y, p.height, p.width))
+          .pipe(b => model.lens(_.blocks).modify(_ + (b.id -> b)))
+      case None => throw new NoSuchElementException(s"could not find block with id $blockId")
     }
 }

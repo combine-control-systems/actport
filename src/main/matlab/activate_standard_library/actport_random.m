@@ -27,6 +27,7 @@ function model = actport_random(model, block_id, model_path)
     set_param(block_path, 'Seed', get_parameter(model, block_id, 'seed', '0'));
     set_param(block_path, 'SampleTime', '-1');
 
+    % Do not allow any external event links to connect to this block.
     model = set_event_input_port_illegal(model, block_id, 1);
 
     set_common_parameters(model, block_id, model_path);

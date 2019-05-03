@@ -34,5 +34,8 @@ function model = actport_sample_clock(model, block_id, model_path)
         set_param(block_path, 'tsamp', freq);
     end
 
+    model = swap_width_and_height(model, block_id);
+    model = rotate_clockwise(model, block_id);
+
     set_common_parameters(model, block_id, model_path);
 end
