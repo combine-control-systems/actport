@@ -1,18 +1,20 @@
 % activate = 'system/MathOperations/Sum'
-function out = actport_sum(diagram, block)
-    import actport.GeneratorApi.*
+function model = actport_sum(model, block_id, model_path)
+    import actport.model.Matlab.*
 
-    block = addBlockExpr(block, 'simulink/Math Operations/Add');
+    name = get_name(model, block_id);
+    block_path = sprintf('%s/%s', model_path, name);
 
-    signs = getParameter(block, 'in_ports/sgn', {'+', '+'});
+    add_block('simulink/Math Operations/Add', block_path);
+
+    signs = get_parameter(model, block_id, 'in_ports/sgn', {'+', '+'});
 
     inputs = '';
     for i = 1:length(signs)
         inputs = strcat(inputs, strrep(string(signs(i)), '''', ''));
     end
 
-    block = setParamExpr(block, 'Inputs', inputs);
+    set_param(block_path, 'Inputs', inputs);
 
-    block = addCommonProperties(block);
-    out = updateDiagram(diagram, block);
+    set_common_parameters(model, block_id, model_path);
 end

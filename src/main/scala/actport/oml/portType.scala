@@ -1,4 +1,4 @@
-package actport
+package actport.oml
 
 /** Port type ADT. */
 sealed trait PortType

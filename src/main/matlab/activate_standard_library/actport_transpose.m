@@ -1,17 +1,21 @@
 % activate = 'system/MatrixOperations/Transpose'
-function out = actport_transpose(diagram, block)
-    import actport.GeneratorApi.*
+function model = actport_transpose(model, block_id, model_path)
+    import actport.model.Matlab.*
 
-    block = addBlockExpr(block, 'simulink/Math Operations/Math Function');
-    switch getParameter(block, 'rule', '''transpose''')
+    name = get_name(model, block_id);
+    block_path = sprintf('%s/%s', model_path, name);
+
+    add_block('simulink/Math Operations/Math Function', block_path);
+
+    rule = get_parameter(model, block_id, 'rule', '''transpose''');
+    switch rule
         case '''Transpose'''
-            block = setParamExpr(block, 'Operator', 'transpose');
+            set_param(block_path, 'Operator', 'transpose');
         case '''Hermitian(Transpose-Conjugate)'''
-            block = setParamExpr(block, 'Operator', 'hermitian');
+            set_param(block_path, 'Operator', 'hermitian');
         otherwise
-            block = setParamExpr(block, 'Operator', 'transpose');
+            error(sprintf('unsupported transpose rule %s', rule));
     end
 
-    block = addCommonProperties(block);
-    out = updateDiagram(diagram, block);
+    set_common_parameters(model, block_id, model_path);
 end

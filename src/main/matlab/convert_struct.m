@@ -1,5 +1,5 @@
 function struct_out = convert_struct(struct_in)
-    struct_out = actport.ActivateStruct();
+    struct_out = actport.oml.ActivateStruct();
     keys = fieldnames(struct_in);
     for i = 1:length(keys)
         % Single character strings, e.g. 'A', becomes Char and not String by default.
@@ -9,7 +9,7 @@ function struct_out = convert_struct(struct_in)
             value = convert_struct(value);
         end
         % Same for values as for keys. We want Strings and not Chars.
-        if ischar(value) && length(value) <= 1
+        if ischar(value)
             value = string(value);
         end
         struct_out.put(key, value);

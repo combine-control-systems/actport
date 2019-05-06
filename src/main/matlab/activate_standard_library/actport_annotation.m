@@ -1,8 +1,10 @@
 % activate = 'TEXT_f'
-function out = actport_annotation(diagram, block)
-    import actport.GeneratorApi.*
+function model = actport_annotation(model, block_id, model_path)
+    import actport.model.Matlab.*
 
-    text = getParameter(block, 'txt', 'No text...');
-    block = addAnnotationExpr(block, text);
-    out = updateDiagram(diagram, block);
+
+    text = get_parameter(model, block_id, 'txt', 'No text...');
+    block_path = sprintf('%s/%s', model_path, text);
+
+    add_block('built-in/Area', block_path, 'Position', get_position(model, block_id));
 end

@@ -23,6 +23,10 @@ class GeneratorLibrary(library: Map[String, String]) {
     * @return name of Matlab generator function
     */
   def get(name: String, default: String): String = library.getOrElse(name, default)
+
+  def show(): Unit = {
+    library.foreach { case (k, v) => println(s"$k -> $v") }
+  }
 }
 
 object GeneratorLibrary {

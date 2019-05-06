@@ -1,37 +1,31 @@
 % activate = 'system/Dynamical/Integral'
-function out = activate_integrator(diagram, block)
-    import actport.GeneratorApi.*
+function model = actport_integrator(model, block_id, model_path)
+    import actport.model.Matlab.*
 
-    block = addBlockExpr(block, 'simulink/Continuous/Integrator');
+    name = get_name(model, block_id);
+    block_path = sprintf('%s/%s', model_path, name);
 
-    x0 = getParameter(block, 'x0', '0');
-    block = setParamExpr(block, 'InitialCondition', x0);
+    add_block('simulink/Continuous/Integrator', block_path);
 
-    reinit = getParameter(block, 'reinit', '1');
-    if reinit == '1'
-        reinit = 'external';
+    x0 = get_parameter(model, block_id, 'x0', '0');
+    set_param(block_path, 'InitialCondition', x0);
+
+    % TODO: Also set how the external signal re-initializes the integrator (see "ExternalReset").
+    if strcmp(get_parameter(model, block_id, 'reinit', '0'), '1')
+        set_param(block_path, 'InitialConditionSource', 'external');
     else
-        reinit = 'internal';
+        set_param(block_path, 'InitialConditionSource', 'internal');
     end
-    block = setParamExpr(block, 'InitialConditionSource', reinit);
 
-    satur = getParameter(block, 'satur', '1');
-    if satur == '1'
-        satur = 'on';
+    if strcmp(get_parameter(model, block_id, 'satur', '0'), '1')
+        set_param(block_path, 'LimitOutput', 'on');
     else
-        satur = 'off';
+        set_param(block_path, 'LimitOutput', 'off');
     end
-    block = setParamExpr(block, 'LimitOutput', satur);
 
-    maxLimit = getParameter(block, 'limit/max', 'inf');
-    block = setParamExpr(block, 'UpperSaturationLimit', maxLimit);
+    set_param(block_path, 'UpperSaturationLimit', get_parameter(model, block_id, 'max', 'inf'));
+    set_param(block_path, 'LowerSaturationLimit', get_parameter(model, block_id, 'min', '-inf'));
+    set_param(block_path, 'ZeroCross', get_parameter(model, block_id, 'zcross', 'off'));
 
-    minLimit = getParameter(block, 'limit/min', '-inf');
-    block = setParamExpr(block, 'LowerSaturationLimit', minLimit);
-
-    zcross = getParameter(block, 'zcross', 'off');
-    block = setParamExpr(block, 'ZeroCross', zcross);
-
-    block = addCommonProperties(block);
-    out = updateDiagram(diagram, block);
+    set_common_parameters(model, block_id, model_path);
 end
