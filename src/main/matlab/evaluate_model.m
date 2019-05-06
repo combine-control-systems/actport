@@ -35,6 +35,8 @@ function model = apply_transformations(model)
     import actport.model.transform.Matlab.*
     fprintf('\t* Remove split blocks.\n');
     model = remove_split_blocks(model);
+    fprintf('\t* Eliminating SampleClock blocks.\n');
+    model = eliminate_sample_clock_blocks(model);
     fprintf('\t* Map event ports.\n');
     model = map_event_ports(model);
 end

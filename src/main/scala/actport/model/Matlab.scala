@@ -552,4 +552,18 @@ object Matlab {
           .pipe(b => model.lens(_.blocks).modify(_ + (b.id -> b)))
       case None => throw new NoSuchElementException(s"could not find block with id $blockId")
     }
+
+  /** Get sample rate of block.
+    *
+    * @param model   data model
+    * @param blockId block id
+    * @throws NoSuchElementException if block does not exist
+    * @return sample time or empty string if no sample time is defined
+    */
+  @throws[NoSuchElementException]("if block does not exist")
+  def get_sample_rate(model: Model, blockId: Long): String =
+    model.blocks.get(BlockId(blockId)) match {
+      case Some(block) => block.sampleRate.getOrElse("")
+      case None => throw new NoSuchElementException(s"could not find block with id $blockId")
+    }
 }

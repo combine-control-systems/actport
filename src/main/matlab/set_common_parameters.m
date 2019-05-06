@@ -16,4 +16,9 @@ function set_common_parameters(model, block_id, model_path)
 
     orientation = get_orientation(model, block_id);
     set_param(block_path, 'Orientation', char(orientation));
+
+    sample_rate = char(get_sample_rate(model, block_id));
+    if ~isempty(sample_rate)
+        set_param(block_path, 'SampleTime', sample_rate);
+    end
 end
