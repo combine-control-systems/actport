@@ -8,6 +8,7 @@ function model = actport_matrix_multiplication(model, block_id, model_path)
     signs = get_parameter(model, block_id, 'in_ports/sgn', {'''*''', '''/'''});
     signs = strjoin(string(signs), '');
     signs = strrep(signs, '''', '');
+    signs = char(signs);
 
     % Handle "H" which is a conjugate-transposed input which is multiplied. Simulink
     % only has "*" and "/". We need to add transpose blocks before each input.
@@ -37,7 +38,6 @@ function model = actport_matrix_multiplication(model, block_id, model_path)
                     add_line(block_path, sprintf('Transpose%d/1', i), sprintf('Product/%d', i));
                 case {'*', '/'}
                     % Input port.
-                    block = addBlockExpr(block, 'simulink/Ports & Subsystems/In1', sprintf('%s/In%d', block.name, i));
                     add_block('simulink/Ports & Subsystems/In1', sprintf('%s/In%d', block_path, i));
                     % Connect port with product.
                     add_line(block_path, sprintf('In%d/1', 1), sprintf('Product/%d', i));
