@@ -1,10 +1,12 @@
 % activate = 'system/MathOperations/Hypot'
-function out = actport_hypot(diagram, block)
-    import actport.GeneratorApi.*
+function model = actport_hypot(model, block_id, model_path)
+    import actport.model.Matlab.*
 
-    block = addBlockExpr(block, 'simulink/Math Operations/Math Function');
-    block = setParamExpr(block, 'Operator', 'hypot');
+    name = get_name(model, block_id);
+    block_path = sprintf('%s/%s', model_path, name);
 
-    block = addCommonProperties(block);
-    out = updateDiagram(diagram, block);
+    add_block('simulink/Math Operations/Math Function');
+    set_param(block_path, 'Operator', 'hypot');
+
+    set_common_parameters(model, block_id, model_path);
 end

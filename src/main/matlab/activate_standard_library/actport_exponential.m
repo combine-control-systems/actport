@@ -1,30 +1,34 @@
 % activate = 'system/MathOperations/Exponential'
-function out = actport_exponential(diagram, block)
-    import actport.GeneratorApi.*
+function model = actport_exponential(model, block_id, model_path)
+    import actport.model.Matlab.*
 
-    base = getParameter(block, 'base', 'exp(1)');
+    name = get_name(model, block_id);
+    block_path = sprintf('%s/%s', model_path, name);
+
+    base = get_parameter(model, block_id, 'base', 'exp(1)');
     if strcmp(base, 'exp(1)')
-        block = addBlockExpr(block, 'simulink/Math Operations/Math Func');
-        block = setParamExrp(block, 'Operator', 'exp');
+        add_block('simulink/Math Operations/Math Func', block_path);
+        set_param(block_path, 'Operator', 'exp');
     else
         % There isn't a block in Simulink able to select the base; use subblock and constant
-        block = addCleanSubSystemExpr(block);
-
-        block = addBlockExpr(block, 'simulink/Math Operations/Math Func', sprintf('%s/Power', block.name));
-        block = setParamExpr(block, sprintf('%s/Power', block.name), 'Operator', 'pow');
+        add_clean_subsystem(block_path);
+        % Add exponential block
+        exp_block_path = sprintf('%s/Power', block_path);
+        add_block('simulink/Math Operations/Math Func', exp_block_path);
+        set_param(exp_block_path, 'Operator', 'pow');
         % Add output port.
-        block = addBlockExpr(block, 'simulink/Ports & Subsystems/Out1', sprintf('%s/Out1', block.name));
+        add_block('simulink/Ports & Subsystems/Out1', sprintf('%s/Out1', block_path));
         % Connect exponential block and output port.
-        block = addLineExpr(block, block.name, 'Power/1', 'Out1/1');
+        add_line(block_path, 'Power/1', 'Out1/1');
         % Add constant block and connect to exponential block
-        block = addBlockExpr(block, 'simulink/Sources/Constant', sprintf('%s/Base', block.name));
-        block = setParamExpr(block, sprintf('%s/Base', block.name), 'Value', base);
-        block = setLineExpr(block, block.name, 'Base/1', 'Power/1');
+        const_block_path = sprintf('%s/Base', block_path);
+        add_block('simulink/Sources/Constant', const_block_path);
+        set_param(const_block_path, 'Value', base);
+        add_line(block_path, 'Base/1', 'Power/1');
         % Add input port and connect to power block
-        block = addBlockExpr(block, 'simulink/Ports & Subsystems/In1', sprintf('%s/In1', block.name));
-        block = addLineExpr(block, block.name, 'In1/1', 'Power/2');
+        add_block('simulink/Ports & Subsystems/In1', sprintf('%s/In1', block_path));
+        add_line(block_path, 'In1/1', 'Power/2');
     end
 
-    block = addCommonProperties(block);
-    out = updateDiagram(diagram, block);
+    set_common_parameters(model, block_id, model_path);
 end

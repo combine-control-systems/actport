@@ -1,11 +1,12 @@
 % activate = 'system/MathOperations/Atan2
-function out = actport_atan2(diagram, block)
-    import actport.GeneratorApi.*
+function model = actport_atan2(model, block_id, model_path)
+    import actport.model.Matlab.*
 
+    name = get_name(model, block_id);
+    block_path = sprintf('%s/%s', model_path, name);
 
-    block = addBlockExpr(block, 'simulink/Math Operations/Trigonometric Function');
-    block = setParamExpr(block, 'Operator', 'atan2');
+    add_block('simulink/Math Operations/Trigonometric Function', block_path);
+    set_param(block_path, 'Operator', 'atan2');
 
-    block = addCommonProperties(block);
-    out = updateDiagram(diagram, block);
+    set_common_parameters(model, block_id, model_path);
 end

@@ -1,12 +1,14 @@
-% activate = 'system/MathOperation/Bias'
-function out = actport_bias(diagram, block)
-    import actport.GeneratorApi.*
+% activate = 'system/MathOperations/Bias'
+function model = actport_bias(model, block_id, model_path)
+    import actport.model.Matlab.*
 
-    block = addBlockExpr(block, 'simulink/Math Operations/Bias');
+    name = get_name(model, block_id);
+    block_path = sprintf('%s/%s', model_path, name);
 
-    block = setParamExpr(block, 'Bias', getParameter(block, 'Bias', '0.0'));
+    add_block('simulink/Math Operations/Bias', block_path);
+
+    set_param(block_path, 'Bias', get_parameter(model, block_id, 'Bias', '0.0'));
     %TODO: Handle overflow properly
 
-    block = addCommonProperties(block);
-    out = updateDiagram(diagram, block);
+    set_common_parameters(model, block_id, model_path);
 end

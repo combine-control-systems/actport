@@ -1,13 +1,15 @@
 % activate = 'system/MathOperations/TrigFunc'
-function out = actport_trigfunc(diagram, block)
-    import actport.GeneratorApi.*
+function model = actport_trigfunc(model, block_id, model_path)
+    import actport.model.Matlab.*
 
-    block = addBlockExpr(block, 'simulink/Math Operations/Trigonometric Function');
+    name = get_name(model, block_id);
+    block_path = sprintf('%s/%s', model_path, name);
+
+    add_block('simulink/Math Operations/Trigonometric Function', block_path);
 
     % All functions available in Activate have the same name in Simulink
-    func = getParameter(block, 'func', '''sin''');
-    block = setParamExpr(block, 'Operator', func(2:end-1));
+    func = get_parameter(model, block_id, 'func', '''sin''');
+    set_param(block_path, 'Operator', strrep(func, '''', ''));
 
-    block = addCommonProperties(block);
-    out = updateDiagram(diagram, block);
+    set_common_parameters(model, block_id, model_path);
 end

@@ -1,15 +1,17 @@
 % activate = 'system/MathOperations/Modulo'
-function out = actport_modulo(diagram, block)
-    import actport.GeneratorApi.*
+function model = actport_modulo(model, block_id, model_path)
+    import actport.model.Matlab.*
 
-    block = addBlockExpr(block, 'simulink/Math Operations/Math Function');
-    op = getParameter(block, 'op', 'Modulo');
+    name = get_name(model, block_id);
+    block_path = sprintf('%s/%s', model_path, name);
+
+    add_block('simulink/Math Operations/Math Function', block_path);
+    op = get_parameter(model, block_id, 'op', 'Modulo');
     if strcmp(op, 'Modulo')
-        block = setParamExpr(block, 'Operator', 'mod');
+        set_param(block_path, 'Operator', 'mod');
     else
-        block = setParamExpr(block, 'Operator', 'rem');
+        set_param(block_path, 'Operator', 'rem');
     end
 
-    block = addCommonProperties(block);
-    out = updateDiagram(diagram, block);
+    set_common_parameters(model, block_id, model_path);
 end

@@ -1,17 +1,19 @@
 % activate = 'system/MathOperations/Sign'
-function out = actport_sign(diagram, block)
-    import actport.GeneratorApi.*
+function model = actport_sign(model, block_id, model_path)
+    import actport.model.Matlab.*
 
-    block = addBlockExpr(block, 'simulink/Math Operations/Sign');
+    name = get_name(model, block_id);
+    block_path = sprintf('%s/%s', model_path, name);
 
-    zcross = strcmp(getParameter(block, 'nzc', '0'), '0');
+    add_block('simulink/Math Operations/Sign', block_path);
+
+    zcross = strcmp(get_parameter(model, block_id, 'nzz', '0'), '0');
     if zcross
-        block = setParamExpr(block, 'ZeroCross', 'off');
+        set_param(block_path, 'ZeroCross', 'off');
     else
-        block = setParamExpr(block, 'ZeroCross', 'on');
+        set_param(block_path, 'ZeroCross', 'on');
     end
     %TODO: Handle overflow properly
 
-    block = addCommonProperties(block);
-    out = updateDiagram(diagram, block);
+    set_common_parameters(model, block_id, model_path);
 end

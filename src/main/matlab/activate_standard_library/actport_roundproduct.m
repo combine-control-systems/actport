@@ -1,12 +1,14 @@
 % activate = 'system/MathOperations/RoundProduct'
-function out = actport_roundproduct(diagram, block)
-    import actport.GeneratorApi.*
+function model = actport_roundproduct(model, block_id, model_path)
+    import actport.model.Matlab.*
 
-    block = addBlockExpr(block, 'simulink/Math Operations/Product');
-    block = setParamExpr(block, 'Multiplication', 'Element-wise(.*)');
-    block = setParamExpr(block, 'Inputs', '**');
+    name = get_name(model, block_id);
+    block_path = sprintf('%s/%s', model_path, name);
+
+    add_block('simulink/Math Operations/Product', block_path);
+    set_param(block_path, 'Multiplication', 'Element-wise(.*)');
+    set_param(block_path, 'Inputs', '**');
     %TODO: Handle overflow properly
 
-    block = addCommonProperties(block);
-    out = updateDiagram(diagram, block);
+    set_common_parameters(model, block_id, model_path);
 end

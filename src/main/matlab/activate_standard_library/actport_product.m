@@ -1,19 +1,22 @@
 % activate = 'system/MathOperations/Product'
-function out = actport_product(diagram, block)
-    import actport.GeneratorApi.*
+function model = actport_product(model, block_id, model_path)
+    import actport.model.Matlab.*
 
-    block = addBlockExpr(block, 'simulink/Math Operations/Product');
-    block = setParamExpr(block, 'Multiplication', 'Element-wise(.*)');
+    name = get_name(model, block_id);
+    block_path = sprintf('%s/%s', model_path, name);
 
-    ops = getParameter(block, 'in_ports/sgn', {'*', '*'});
+    add_block('simulink/Math Operations/Product', block_path);
+    set_param(block_path, 'Multiplication', 'Element-wise(.*)');
+
+    ops = get_parameter(model, block_id, 'in_ports/sgn', {'*', '*'});
 
     inputs = '';
     for i = 1:length(ops)
         inputs = strcat(inputs, strrep(string(ops(i)), '''', ''));
     end
-    block = setParamExpr(block, 'Inputs', inputs);
+    set_param(block_path, 'Inputs', inputs);
 
-    round = getParameter(block, 'rmethod', '''Floor''');
+    round = get_parameter(model, block_id, 'rmethod', '''Floor''');
     switch round
         case '''Ceil'''
             round = 'Ceiling';
@@ -22,9 +25,8 @@ function out = actport_product(diagram, block)
         otherwise
             round = round(2:end-1);
     end
-    block = setParamExpr(block, 'RndMeth', round);
+    set_param(block_path, 'RndMeth', round);
     %TODO: Handle overflow properly
 
-    block = addCommonProperties(block);
-    out = updateDiagram(diagram, block);
+    set_common_parameters(model, block_id, model_path);
 end

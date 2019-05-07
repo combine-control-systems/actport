@@ -1,18 +1,20 @@
 % activate = 'system/Hybrid/Saturation'
-function out = actport_saturation(diagram, block)
-    import actport.GeneratorApi.*
+function model = actport_saturation(model, block_id, model_path)
+    import actport.model.Matlab.*
 
-    block = addBlockExpr(block, 'simulink/Discontinuities/Saturation');
-    block = setParamExpr(block, 'UpperLimit', getParameter(block, 'upper', '1'));
-    block = setParamExpr(block, 'LowerLimit', getParameter(block, 'lower', '-1'));
+    name = get_name(model, block_id);
+    block_path = sprintf('%s/%s', model_path, name);
 
-    zcross = strcmp(getParameter(block, 'zc', '0'), '0');
+    add_block('simulink/Discontinuities/Saturation', block_path);
+    set_param(block_path, 'UpperLimit', get_parameter(model, block_id, 'upper', '1'));
+    set_param(block_path, 'LowerLimit', get_parameter(model, block_id, 'lower', '-1'));
+
+    zcross = strcmp(get_parameter(model, block_id, 'zc', '0'), '0');
     if zcross
-        block = setParamExpr(block, 'ZeroCross', 'off');
+        set_param(block_path, 'ZeroCross', 'off');
     else
-        block = setParamExpr(block, 'ZeroCross', 'on');
+        set_param(block_path, 'ZeroCross', 'on');
     end
 
-    block = addCommonProperties(block);
-    out = updateDiagram(diagram, block);
+    set_common_parameters(model, block_id, model_path);
 end

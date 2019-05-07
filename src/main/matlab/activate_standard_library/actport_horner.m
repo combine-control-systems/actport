@@ -1,10 +1,12 @@
 % activate = 'system/MathOperations/Horner'
-function out = actport_horner(diagram, block)
-    import actport.GeneratorApi.*
+function model = actport_horner(model, block_id, model_path)
+    import actport.model.Matlab.*
 
-    block = addBlockExpr(block, 'simulink/Math Operations/Polynomial');
-    block = setParamExpr(block, 'Multiplication', 'Element-wise(.*)');
+    name = get_name(model, block_id);
+    block_path = sprintf('%s/%s', model_path, name);
 
-    block = addCommonProperties(block);
-    out = updateDiagram(diagram, block);
+    add_block('simulink/Math Operations/Polynomial');
+    set_param(block_path, 'Multiplication', 'Element-wise(.*)');
+
+    set_common_parameters(model, block_id, model_path);
 end

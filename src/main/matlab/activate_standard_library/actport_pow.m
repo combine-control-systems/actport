@@ -1,10 +1,12 @@
 % activate = 'system/MathOperations/Pow'
-function out = actport_pow(diagram, block)
-    import actport.GeneratorApi.*
+function model = actport_pow(model, block_id, model_path)
+    import actport.model.Matlab.*
 
-    block = addBlockExpr(block, 'simulink/Math Operations/Math Function');
-    block = setParamExpr(block, 'Operator', 'pow');
+    name = get_name(model, block_id);
+    block_path = sprintf('%s/%s', model_path, name);
 
-    block = addCommonProperties(block);
-    out = updateDiagram(diagram, block);
+    add_block('simulink/Math Operations/Math Function', block_path);
+    set_param(block_path, 'Operator', 'pow');
+
+    set_common_parameters(model, block_id, model_path);
 end
