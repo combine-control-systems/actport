@@ -258,8 +258,8 @@ object Matlab {
 
   /** Add block to diagram.
     *
-    * @param system diagram object
-    * @param block block object
+    * @param system    diagram object
+    * @param block     block object
     * @param blockName name to assign block (must be unique within the diagram)
     * @return diagram object
     */
@@ -430,41 +430,4 @@ object Matlab {
     java.lang.System.err.println("set_solver_parameters is not implemented yet")
     system
   }
-
-  /** Evaluates the model and generates Matlab commands to generate Simulink model.
-    *
-    * @param system diagram object
-    * @return serialized expressions
-    */
-//  def evaluate_model(system: ParsedSystem): String = {
-//    // Apply transforms before exporting diagram.
-//
-//    println(Model(system))
-//    ""
-
-//    system
-//      // Transforms are added here in the order they are supposed to be applied.
-//      .pipe(transforms.Split.eliminateSplitBlocks)
-//      .pipe(transforms.EventPortIndex.updatePortIndices)
-//      // Serialize model to Matlab commands.
-//      .pipe { s =>
-//        val systemName = if (s.name.isEmpty) "New Model" else s.name
-//
-//        val prelude = Seq(
-//          NewSystem(systemName), // Create a new system as a first thing.
-//          OpenSystem(systemName) // Open it immediately.
-//        )
-//
-//        // Convert the content of the root system into expressions.
-//        val rootSystem = s.toExpression(SimPath(""))
-//
-//        // Add an expression to arrange the root system.
-//        val arrangeSystem = Seq(ArrangeSystem(SimPath(systemName)))
-//
-//        (prelude ++ rootSystem ++ arrangeSystem)
-//          .map(_.serialize) // serialize the expressions
-//          .tap(_.foreach(println)) // print serialized expressions to the terminal
-//          .mkString("\n") // join expressions with a new line.
-//      }
-//  }
 }
