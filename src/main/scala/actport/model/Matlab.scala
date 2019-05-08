@@ -517,9 +517,6 @@ object Matlab {
     */
   def get_mapped_event_input_port(model: Model, blockId: Long, activatePort: Int): String = {
     val key = (BlockId(blockId), ActivatePort(activatePort), InputPort, EventLink)
-    println("-" * 40)
-    println(model)
-    println(key)
     model.portMap.get(key) match {
       case Some(InvalidPort) => null
       case Some(MappedPort(port)) => port
@@ -556,6 +553,22 @@ object Matlab {
       case Some(block) =>
         block.lens(_.appearance.rotation).modify(r => (r + 90) % 360)
             .pipe(b => model.lens(_.blocks).modify(_ + (b.id -> b)))
+      case None => throw new NoSuchElementException(s"could not find block with id $blockId")
+    }
+
+  /** Rotate block 90 degrees counter clockwise.
+    *
+    * @param model   data model
+    * @param blockId block id
+    * @throws NoSuchElementException if block does not exist
+    * @return updated model
+    */
+  @throws[NoSuchElementException]("if the block does not exist")
+  def rotate_counter_clockwise(model: Model, blockId: Long): Model =
+    model.blocks.get(BlockId(blockId)) match {
+      case Some(block) =>
+        block.lens(_.appearance.rotation).modify(r => (r - 90) % 360)
+          .pipe(b => model.lens(_.blocks).modify(_ + (b.id -> b)))
       case None => throw new NoSuchElementException(s"could not find block with id $blockId")
     }
 

@@ -43,7 +43,7 @@ object EliminateSampleClock {
     }.pipe { m =>
       // Delete sample clock block.
       m.lens(_.blocks).modify(_ - sampleClock.id)
-    }.tap(println)
+    }
   }
 
   private case class CollectedInfo(blocks: Set[Block] = Set.empty,

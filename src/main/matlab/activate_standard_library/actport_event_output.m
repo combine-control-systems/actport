@@ -11,5 +11,6 @@ function model = actport_event_input(model, block_id, model_path)
     % Hence, we do not need to calculate a new port number here.
     set_param(block_path, 'Port', get_parameter(model, block_id, 'portNumber', '1'));
 
+    model = rotate_clockwise(model, block_id);
     set_common_parameters(model, block_id, model_path);
 end

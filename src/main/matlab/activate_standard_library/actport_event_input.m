@@ -15,11 +15,9 @@ function model = actport_event_input(model, block_id, model_path)
     parent_id = get_parent(model, block_id);
     if parent_id ~= -1
         port = char(get_mapped_event_input_port(model, parent_id, port_number));
-        fprintf('HERE : Path: %s : BlockId = %d : ParentId = %d  : ActivatePort: %d -> SimulinkPort: %s\n', block_path, block_id, parent_id, port_number, port);
     else
         % Default to the given port if there is no parent present.
         port = num2str(port_number);
-        fprintf('THERE : %s : %d -> %s\n', block_path, port_number, port);
     end
 
     if ~isempty(port)
@@ -30,6 +28,7 @@ function model = actport_event_input(model, block_id, model_path)
                 add_block('simulink/Ports & Subsystems/In1', block_path);
                 set_param(block_path, 'Port', port);
         end
+        model = rotate_clockwise(model, block_id);
         set_common_parameters(model, block_id, model_path);
     end
     % Don't add anything if the port is invalid.
