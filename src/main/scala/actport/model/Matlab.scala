@@ -603,4 +603,20 @@ object Matlab {
       case Some(block) => block.sampleRate.getOrElse("")
       case None => throw new NoSuchElementException(s"could not find block with id $blockId")
     }
+
+  /** Get block context.
+    *
+    * The context contains initialization code for a subsystem.
+    *
+    * @param model   data model
+    * @param blockId block id
+    * @throws NoSuchElementException if block does not exist
+    * @return block context or empty string if no context is defined
+    */
+  @throws[NoSuchElementException]("if block does not exist")
+  def get_context(model: Model, blockId: Long): String =
+    model.blocks.get(BlockId(blockId)) match {
+      case Some(block) => block.context.getOrElse("")
+      case None => throw new NoSuchElementException(s"could not find block with id $blockId")
+    }
 }

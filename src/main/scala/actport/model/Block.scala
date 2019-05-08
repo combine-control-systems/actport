@@ -10,6 +10,7 @@ package actport.model
   * @param ports      port count
   * @param parameters dictionary of block parameters
   * @param sampleRate used to set an explicit sample rate of the block
+  * @param context    initialization code used to set variable values in subsystem
   */
 case class Block(id: BlockId,
                  parent: Option[BlockId],
@@ -18,4 +19,5 @@ case class Block(id: BlockId,
                  appearance: BlockAppearance,
                  ports: ActivatePortInfo,
                  parameters: BlockParameters = Map.empty,
-                 sampleRate: Option[String] = None)
+                 sampleRate: Option[String] = None,
+                 context: Option[String] = None)

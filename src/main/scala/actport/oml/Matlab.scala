@@ -74,7 +74,7 @@ object Matlab {
     * @return diagram object
     */
   def set_diagram_context(subsystem: ParsedSystem, context: Array[String]): ParsedSystem = {
-    subsystem.lens(_.context).set(context.toVector)
+    subsystem.lens(_.context).set(Some(context.mkString))
   }
 
   // -------------------- Blocks

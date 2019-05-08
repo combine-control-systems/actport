@@ -14,6 +14,12 @@ function model = evaluate_model(system)
     new_system(model_name);
     open_system(model_name);
 
+    % Set root context.
+    context = char(get_context(model, 0));
+    if ~isempty(context)
+        set_param(model_name, 'InitFcn', context);
+    end
+
     % Add blocks.
     fprintf('* Adding blocks to system.\n');
     model = add_blocks(model, 0, model_name);

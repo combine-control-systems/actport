@@ -15,5 +15,13 @@ function model = actport_subsystem(model, block_id, model_path)
 %        model = map_event_input_port(model, block_id, 1, 'Trigger');
 %    end
 
+    % Set context as mask initialization code.
+    context = char(get_context(model, block_id));
+    if ~isempty(context)
+%        mask = Simulink.Mask.create(block_path);
+%        mask.set('Initialization', context);
+        set_param(block_path, 'InitFcn', context);
+    end
+
     set_common_parameters(model, block_id, model_path);
 end

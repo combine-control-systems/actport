@@ -23,6 +23,7 @@ function model = actport_undefined(model, block_id, model_path)
         get_output_count(model, block_id) > 0)
 
         add_block('simulink/Ports & Subsystems/Trigger', sprintf('%s/Trigger', block_path));
+        set_param(sprintf('%s/Trigger', block_path), 'TriggerType', 'either');
         model = map_event_input_port(model, block_id, 1, 'Trigger');
     else
         for i = 1:get_event_input_count(model, block_id)
