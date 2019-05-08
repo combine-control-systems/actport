@@ -23,9 +23,10 @@ object EliminateSampleClock {
     // Find all links leaving the SampleClock block.
     val outLinks = model.links.values
       .filter(link => link.start.block == sampleClock.id && link.linkType == EventLink)
-    val collectedInfo = outLinks.foldLeft(CollectedInfo.empty) {
+    val collectedInfo = outLinks.foldLeft(CollectedInfo(links = outLinks.toSet)) {
       (ci, link) => ci + findTerminalBlock(model, link)
     }
+
     // Set sample time on all blocks.
     collectedInfo.blocks.foldLeft(model) { (m, b) =>
       val sampleRate = sampleClock.parameters.get(ParameterName("frequ")) match {
@@ -35,48 +36,55 @@ object EliminateSampleClock {
       m.lens(_.blocks).modify(_ + (b.id -> b.lens(_.sampleRate).set(Some(sampleRate))))
     }.pipe { m =>
       // Delete all involved links.
-      outLinks.foldLeft(m) { (m, link) => m.lens(_.links).modify(_ - link.id) }
+      collectedInfo.links.foldLeft(m) { (m, link) => m.lens(_.links).modify(_  - link.id) }
+    }.pipe { m =>
+      // Delete all blocks which should be deleted.
+      collectedInfo.blocksToRemove.foldLeft(m) { (m, b) => m.lens(_.blocks).modify(_ - b.id) }
     }.pipe { m =>
       // Delete sample clock block.
       m.lens(_.blocks).modify(_ - sampleClock.id)
-    }
+    }.tap(println)
   }
 
-  case class CollectedInfo(blocks: Vector[Block] = Vector.empty,
-                           links: Vector[Link] = Vector.empty,
-                           blocksToRemove: Vector[Block] = Vector.empty) {
+  private case class CollectedInfo(blocks: Set[Block] = Set.empty,
+                           links: Set[Link] = Set.empty,
+                           blocksToRemove: Set[Block] = Set.empty) {
     def +(c: CollectedInfo): CollectedInfo = CollectedInfo(blocks ++ c.blocks,
       links ++ c.links, blocksToRemove ++ c.blocksToRemove)
   }
 
-  object CollectedInfo {
+  private object CollectedInfo {
     def empty: CollectedInfo = CollectedInfo()
   }
 
   private def findTerminalBlock(model: Model, link: Link): CollectedInfo = {
-    model.blocks.values.find(_.id == link.end.block) match {
+    model.blocks.get(link.end.block) match {
       // If the link is connected to a subsystem we continue searching
       // from the event input.
       case Some(block) if block.activateId == ActivateId("Subsystem") =>
 
         // Find input port.
         model.blocks.values.foldLeft(CollectedInfo.empty) { (collectedInfo: CollectedInfo, b: Block) =>
-          // Look for matching event inputs.
-          if (b.parent.contains(block.id) &&
-            b.activateId == ActivateId("system/Ports/EventInput") &&
-            // The event ort must match the link.
-            b.parameters.get(ParameterName("portNumber")).contains(link.end.activatePort.index)) {
+          // Look for matching event inputs matching these conditions:
+          val containsBlock = b.parent.contains(block.id)
+          val isEventInput = b.activateId == ActivateId("system/Ports/EventInput")
+          val portNumberMatch = b.parameters.get(ParameterName("portNumber")) match {
+            case Some(pn: String) => pn.toInt == link.end.activatePort.index
+            case _ => false
+          }
+
+          if (containsBlock && isEventInput && portNumberMatch) {
 
             collectedInfo
               // Add the block (which is an event input) to the list of blocks to remove.
-              .lens(_.blocksToRemove).modify(_ :+ b)
+              .lens(_.blocksToRemove).modify(_ + b)
               .pipe { ci =>
                 // Find all links leaving the event input.
                 model.links.values
                   .filter(_.start.block == b.id)
                   .foldLeft(ci) { (ci, l) =>
                     // Add the link and other downstream links with any terminal blocks.
-                    ci.lens(_.links).modify(_ :+ l)
+                    ci.lens(_.links).modify(_ + l)
                       .pipe(_ + findTerminalBlock(model, l))
                   }
               }
@@ -85,7 +93,7 @@ object EliminateSampleClock {
         }
 
       // We might have found a terminal block.
-      case Some(block) => CollectedInfo(blocks = Vector(block), links = Vector(link))
+      case Some(block) => CollectedInfo(blocks = Set(block), links = Set(link))
 
       // Nothing found.
       case _ => CollectedInfo.empty

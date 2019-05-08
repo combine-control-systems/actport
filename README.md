@@ -13,7 +13,7 @@ To export a model from Activate you first need to
 convert it to an OML-file:
 
 ```Matlab
-bdeExportModelToOml(bdeGetCurrentMode, 'D:/mymodel.oml');
+bdeExportModelToOml(bdeGetCurrentModel, 'D:/mymodel.oml');
 ``` 
 
 In Matlab the JAR-file generated from the Scala code must 

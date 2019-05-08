@@ -54,6 +54,23 @@ object Matlab {
   def get_children(model: Model, parentBlockId: Long): Array[Long] =
     model.blocks.values.filter(_.parent.contains(BlockId(parentBlockId))).map(_.id.id).toArray
 
+  /** Get parent of block.
+    *
+    * @param model   data model
+    * @param blockId block whose parent should be found
+    * @throws NoSuchElementException if block is not found
+    * @return parent block id, -1 if no parent
+    */
+  @throws[NoSuchElementException]("if the block is not found")
+  def get_parent(model: Model, blockId: Long): Long =
+    model.blocks.get(BlockId(blockId)) match {
+      case Some(block) => block.parent match {
+        case Some(parentId) => parentId.id
+        case None => -1L
+      }
+      case None => throw new NoSuchElementException(s"no block with id $blockId found")
+    }
+
   /** Get all block id:s.
     *
     * @param model data model
@@ -498,12 +515,17 @@ object Matlab {
     * @param activatePort Activate port index
     * @return mapped port, null if it is invalid
     */
-  def get_mapped_event_input_port(model: Model, blockId: Long, activatePort: Int): String =
-    model.portMap.get((BlockId(blockId), ActivatePort(activatePort), InputPort, EventLink)) match {
+  def get_mapped_event_input_port(model: Model, blockId: Long, activatePort: Int): String = {
+    val key = (BlockId(blockId), ActivatePort(activatePort), InputPort, EventLink)
+    println("-" * 40)
+    println(model)
+    println(key)
+    model.portMap.get(key) match {
       case Some(InvalidPort) => null
       case Some(MappedPort(port)) => port
       case None => activatePort.toString
     }
+  }
 
   /** Get mapped port of an event output port.
     *
@@ -512,12 +534,14 @@ object Matlab {
     * @param activatePort Activate port index
     * @return mapped port, null if it is invalid
     */
-  def get_mapped_event_output_port(model: Model, blockId: Long, activatePort: Int): String =
-    model.portMap.get((BlockId(blockId), ActivatePort(activatePort), OutputPort, EventLink)) match {
+  def get_mapped_event_output_port(model: Model, blockId: Long, activatePort: Int): String = {
+    val key = (BlockId(blockId), ActivatePort(activatePort), OutputPort, EventLink)
+    model.portMap.get(key) match {
       case Some(InvalidPort) => null
       case Some(MappedPort(port)) => port
       case None => activatePort.toString
     }
+  }
 
   /** Rotate block 90 degrees clockwise.
     *

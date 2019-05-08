@@ -19,6 +19,10 @@ function set_common_parameters(model, block_id, model_path)
 
     sample_rate = char(get_sample_rate(model, block_id));
     if ~isempty(sample_rate)
-        set_param(block_path, 'SampleTime', sample_rate);
+        try
+            set_param(block_path, 'SampleTime', sample_rate);
+        catch e
+            % Do nothing. Just catching if the block does not support SampleTime.
+        end
     end
 end

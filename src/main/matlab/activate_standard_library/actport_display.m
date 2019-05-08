@@ -18,5 +18,5 @@ function model = actport_display(model, block_id, model_path)
     %       and "decimation" is given as every n:th sample.
     set_param(block_path, 'Decimation', '1');
 
-    add_common_properties(model, block_id, model_path);
+    set_common_parameters(model, block_id, model_path);
 end
