@@ -1,5 +1,5 @@
 % activate = 'system/SignalGenerators/SquareWaveGenerator'
-function out = actport_product(model, block_id, model_path)
+function model = actport_square_wave_generator(model, block_id, model_path)
     import actport.model.Matlab.*
 
     name = get_name(model, block_id);
@@ -21,8 +21,7 @@ function out = actport_product(model, block_id, model_path)
     % Constant block
     const_path = sprintf('%s/Const', block_path);
     add_block('simulink/Sources/Constant', const_path);
-    block = add_block('simulink/Sources/Constant', const_path);
-    block = set_param(const_path, 'Value', second);
+    set_param(const_path, 'Value', second);
 
     % Sum the Constant and Pulse Generator
     sum_path = sprintf('%s/Sum', block_path);
@@ -36,7 +35,7 @@ function out = actport_product(model, block_id, model_path)
     % Route Sum to output and Generators to Sum
     add_line(block_path, 'Sum/1', 'Out1/1');
     add_line(block_path, 'Const/1', 'Sum/1');
-    add_line(block_pathm, 'Generator/1', 'Sum/2');
+    add_line(block_path, 'Generator/1', 'Sum/2');
 
-    add_common_parameters(model, block_id, model_path);
+    set_common_parameters(model, block_id, model_path);
 end
