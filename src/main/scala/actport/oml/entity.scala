@@ -39,6 +39,8 @@ sealed trait ParsedEntity {
 
   /** Number of event output ports of block. */
   def eventOutputCount: Int
+
+  def mask: Option[ActivateStruct]
 }
 
 /** Instance of block which is not a super block.
@@ -71,8 +73,8 @@ case class ParsedBlock(blockType: String,
                        outputCount: Int = 0,
                        eventInputCount: Int = 0,
                        eventOutputCount: Int = 0,
-                       parameters: ActivateStruct = ActivateStruct.empty) extends ParsedEntity {
-}
+                       parameters: ActivateStruct = ActivateStruct.empty,
+                       mask: Option[ActivateStruct] = None) extends ParsedEntity
 
 /** Representation of a subsystem.
   *
@@ -110,7 +112,8 @@ case class ParsedSystem(name: String = "",
                         context: Option[String] = None,
                         explicitLinks: Vector[Link] = Vector.empty,
                         eventLinks: Vector[Link] = Vector.empty,
-                        atomic: Boolean = false) extends ParsedEntity {
+                        atomic: Boolean = false,
+                        mask: Option[ActivateStruct] = None) extends ParsedEntity {
 
   val blockType = "Subsystem"
 }

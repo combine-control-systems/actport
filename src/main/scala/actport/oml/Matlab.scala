@@ -291,8 +291,10 @@ object Matlab {
     * @return block object
     */
   def set_block_mask_impl(block: ParsedEntity, parameters: ActivateStruct, label: String): ParsedEntity = {
-    java.lang.System.err.println("set_block_mask_impl not implemented yet")
-    block
+    block match {
+      case b: ParsedBlock => b.lens(_.mask).set(Some(parameters))
+      case b: ParsedSystem => b.lens(_.mask).set(Some(parameters))
+    }
   }
 
   // -------------------- Super Block

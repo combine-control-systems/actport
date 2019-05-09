@@ -31,4 +31,6 @@ package object model {
   case class BlockName(name: String) extends AnyVal
   case class LinkId(id: Long) extends AnyVal
   case class ParameterName(name: String) extends AnyVal
+
+  case class MaskParameterName(name: String) extends AnyVal
 }

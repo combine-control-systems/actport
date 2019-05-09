@@ -25,4 +25,24 @@ function set_common_parameters(model, block_id, model_path)
             % Do nothing. Just catching if the block does not support SampleTime.
         end
     end
+
+    % Mask.
+    mask_parameters = get_mask_parameters(model, block_id);
+    if ~isempty(mask_parameters)
+        mask = Simulink.Mask.create(block_path);
+        for i = 1:length(mask_parameters)
+            value = get_mask_value(model, block_id, mask_parameters(i));
+            prompt = get_mask_prompt(model, block_id, mask_parameters(i));
+            evaluate = get_mask_evaluate(model, block_id, mask_parameters(i));
+            enabled = get_mask_enabled(model, block_id, mask_parameters(i));
+            visible = get_mask_visible(model, block_id, mask_parameters(i));
+            mask.addParameter(...
+                'Name', char(mask_parameters(i)), ...
+                'Prompt', char(prompt), ...
+                'Value', char(value), ...
+                'Evaluate', char(evaluate), ...
+                'Enabled', char(enabled), ...
+                'Visible', char(visible));
+        end
+    end
 end

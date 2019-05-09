@@ -24,6 +24,7 @@ object Model {
     // Root block.
     val root = Block(BlockId(0), None, BlockName(parsedRoot.name), ActivateId(parsedRoot.blockType),
       BlockAppearance(parsedRoot), ActivatePortInfo(parsedRoot), context = parsedRoot.context)
+      .pipe(MaskBlock(parsedRoot))
 
     def walkTree(system: ParsedSystem, parentId: BlockId, model: Model = Model()): Model = {
 
@@ -34,6 +35,7 @@ object Model {
           blockIdCounter = BlockId(blockIdCounter.id + 1)
           val block = Block(blockIdCounter, Some(parentId), BlockName(pb.name), ActivateId(pb.blockType),
             BlockAppearance(pb), ActivatePortInfo(pb), convertParameters(pb.parameters))
+              .pipe(MaskBlock(pb))
           // Add the block to the model.
           m.lens(_.blocks).modify(_ + (block.id -> block))
 
@@ -41,6 +43,7 @@ object Model {
           blockIdCounter = BlockId(blockIdCounter.id + 1)
           val block = Block(blockIdCounter, Some(parentId), BlockName(ps.name), ActivateId(ps.blockType),
             BlockAppearance(ps), ActivatePortInfo(ps), context = parsedRoot.context)
+              .pipe(MaskBlock(ps))
           // Add the block to the model.
           m.lens(_.blocks).modify(_ + (block.id -> block))
             // Add the children to the model.

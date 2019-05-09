@@ -20,4 +20,5 @@ case class Block(id: BlockId,
                  ports: ActivatePortInfo,
                  parameters: BlockParameters = Map.empty,
                  sampleRate: Option[String] = None,
-                 context: Option[String] = None)
+                 context: Option[String] = None,
+                 mask: Map[MaskParameterName, MaskParameter] = Map.empty)

@@ -364,10 +364,10 @@ object Matlab {
         link.end.activatePort.index == activatePort)
       // Set port mapping as invalid.
       .foldLeft(model) { (m, link) =>
-        val key = (link.end.block, link.end.activatePort, InputPort, ExplicitLink)
-        val value = InvalidPort
-        m.lens(_.portMap).modify(_ + (key -> value))
-      }
+      val key = (link.end.block, link.end.activatePort, InputPort, ExplicitLink)
+      val value = InvalidPort
+      m.lens(_.portMap).modify(_ + (key -> value))
+    }
 
   /** Set input port of block as illegal.
     *
@@ -384,10 +384,10 @@ object Matlab {
         link.start.activatePort.index == activatePort)
       // Set port mapping as invalid.
       .foldLeft(model) { (m, link) =>
-        val key = (link.start.block, link.start.activatePort, OutputPort, ExplicitLink)
-        val value = InvalidPort
-        m.lens(_.portMap).modify(_ + (key -> value))
-      }
+      val key = (link.start.block, link.start.activatePort, OutputPort, ExplicitLink)
+      val value = InvalidPort
+      m.lens(_.portMap).modify(_ + (key -> value))
+    }
 
   /** Set evnt input port of block as illegal.
     *
@@ -403,10 +403,10 @@ object Matlab {
       link.end.activatePort.index == activatePort)
       // Set port mapping as invalid.
       .foldLeft(model) { (m, link) =>
-        val key = (link.end.block, link.end.activatePort, InputPort, EventLink)
-        val value = InvalidPort
-        m.lens(_.portMap).modify(_ + (key -> value))
-      }
+      val key = (link.end.block, link.end.activatePort, InputPort, EventLink)
+      val value = InvalidPort
+      m.lens(_.portMap).modify(_ + (key -> value))
+    }
 
   /** Set input port of block as illegal.
     *
@@ -422,10 +422,10 @@ object Matlab {
       link.start.activatePort.index == activatePort)
       // Set port mapping as invalid.
       .foldLeft(model) { (m, link) =>
-        val key = (link.start.block, link.start.activatePort, OutputPort, EventLink)
-        val value = InvalidPort
-        m.lens(_.portMap).modify(_ + (key -> value))
-      }
+      val key = (link.start.block, link.start.activatePort, OutputPort, EventLink)
+      val value = InvalidPort
+      m.lens(_.portMap).modify(_ + (key -> value))
+    }
 
   /** Get array of link id:s.
     *
@@ -552,7 +552,7 @@ object Matlab {
     model.blocks.get(BlockId(blockId)) match {
       case Some(block) =>
         block.lens(_.appearance.rotation).modify(r => (r + 90) % 360)
-            .pipe(b => model.lens(_.blocks).modify(_ + (b.id -> b)))
+          .pipe(b => model.lens(_.blocks).modify(_ + (b.id -> b)))
       case None => throw new NoSuchElementException(s"could not find block with id $blockId")
     }
 
@@ -575,7 +575,6 @@ object Matlab {
   /** Swap width and height fields of block.
     *
     * @see rotate_clockwise - use together with 90 degree rotation.
-    *
     * @param model   data model
     * @param blockId block id
     * @throws NoSuchElementException if block does not exist
@@ -617,6 +616,125 @@ object Matlab {
   def get_context(model: Model, blockId: Long): String =
     model.blocks.get(BlockId(blockId)) match {
       case Some(block) => block.context.getOrElse("")
+      case None => throw new NoSuchElementException(s"could not find block with id $blockId")
+    }
+
+  /** Get an array of parameters in the mask.
+    *
+    * @param model   data model
+    * @param blockId block id
+    * @throws NoSuchElementException if block does not exist
+    * @return array of parameter names or an empty array if there is no mask
+    */
+  @throws[NoSuchElementException]("if block does not exist")
+  def get_mask_parameters(model: Model, blockId: Long): Array[String] =
+    model.blocks.get(BlockId(blockId)) match {
+      case Some(block) => block.mask.keys.map(_.name).toArray
+      case None => throw new NoSuchElementException(s"could not find block with id $blockId")
+    }
+
+  /** Get the value of a mask parameter.
+    *
+    * @param model         data model
+    * @param blockId       block id
+    * @param parameterName parameter name
+    * @throws NoSuchElementException if block does not exist
+    * @throws NoSuchFieldException   if parameter cannot be found
+    * @return the string stored as a value
+    */
+  @throws[NoSuchElementException]("if block does not exist")
+  @throws[NoSuchFieldException]("if parameter cannot be found")
+  def get_mask_value(model: Model, blockId: Long, parameterName: String): String =
+    model.blocks.get(BlockId(blockId)) match {
+      case Some(block) => block.mask.get(MaskParameterName(parameterName)) match {
+        case Some(mask) => mask.value
+        case None => throw new NoSuchFieldException(s"could not find value of mask parameter $parameterName " +
+          s"of block $blockId")
+      }
+      case None => throw new NoSuchElementException(s"could not find block with id $blockId")
+    }
+
+  /** Get the parameter prompt of a mask parameter.
+    *
+    * @param model         data model
+    * @param blockId       block id
+    * @param parameterName parameter name
+    * @throws NoSuchElementException if block does not exist
+    * @throws NoSuchFieldException   if parameter cannot be found
+    * @return parameter prompt
+    */
+  @throws[NoSuchElementException]("if block does not exist")
+  @throws[NoSuchFieldException]("if parameter cannot be found")
+  def get_mask_prompt(model: Model, blockId: Long, parameterName: String): String =
+    model.blocks.get(BlockId(blockId)) match {
+      case Some(block) => block.mask.get(MaskParameterName(parameterName)) match {
+        case Some(mask) => mask.prompt
+        case None => throw new NoSuchFieldException(s"could not find prompt of mask parameter $parameterName " +
+          s"block $blockId")
+      }
+      case None => throw new NoSuchElementException(s"could not find block with id $blockId")
+    }
+
+  /** Find out if the parameter should be evaluated.
+    *
+    * @param model         data model
+    * @param blockId       block id
+    * @param parameterName parameter name
+    * @throws NoSuchElementException if block does not exist
+    * @throws NoSuchFieldException   if parameter cannot be found
+    * @return true if the parameter should be evaluated
+    */
+  @throws[NoSuchElementException]("if block does not exist")
+  @throws[NoSuchFieldException]("if parameter cannot be found")
+  def get_mask_evaluate(model: Model, blockId: Long, parameterName: String): String =
+    model.blocks.get(BlockId(blockId)) match {
+      case Some(block) => block.mask.get(MaskParameterName(parameterName)) match {
+        case Some(mask) => if (mask.evaluate) "on" else "off"
+        case None => throw new NoSuchFieldException(s"could not find mask parameter $parameterName " +
+          s"of block $blockId")
+      }
+      case None => throw new NoSuchElementException(s"could not find block with id $blockId")
+    }
+
+  /** Find out if the parameter should be enabled.
+    *
+    * @param model         data model
+    * @param blockId       block id
+    * @param parameterName parameter name
+    * @throws NoSuchElementException if block does not exist
+    * @throws NoSuchFieldException   if parameter cannot be found
+    * @return true if the parameter should be enabled
+    */
+  @throws[NoSuchElementException]("if block does not exist")
+  @throws[NoSuchFieldException]("if parameter cannot be found")
+  def get_mask_enabled(model: Model, blockId: Long, parameterName: String): String =
+    model.blocks.get(BlockId(blockId)) match {
+      case Some(block) => block.mask.get(MaskParameterName(parameterName)) match {
+        case Some(mask) => if (mask.enable) "on" else "off"
+        case None => throw new NoSuchFieldException(s"could not find mask parameter $parameterName " +
+          s"of block $blockId")
+      }
+      case None => throw new NoSuchElementException(s"could not find block with id $blockId")
+    }
+
+  /** Find out if the parameter should be visible.
+    *
+    * @param model         data model
+    * @param blockId       block id
+    * @param parameterName parameter name
+    * @throws NoSuchElementException if block does not exist
+    * @throws NoSuchFieldException   if parameter cannot be found
+    * @return true if the parameter should be visible
+    */
+  @throws[NoSuchElementException]("if block does not exist")
+  @throws[NoSuchFieldException]("if parameter cannot be found")
+  def get_mask_visible(model: Model, blockId: Long, parameterName: String): String =
+    model.blocks.get(BlockId(blockId)) match {
+      case Some(block) => block.mask.get(MaskParameterName(parameterName)) match {
+        case Some(mask) => if (mask.visible) "on" else "off"
+        case None => throw new NoSuchFieldException(s"could not find mask parameter $parameterName " +
+          s"of block $blockId")
+      }
       case None => throw new NoSuchElementException(s"could not find block with id $blockId")
     }
 }
