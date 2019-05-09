@@ -42,7 +42,7 @@ object Model {
         case (m, ps: ParsedSystem) =>
           blockIdCounter = BlockId(blockIdCounter.id + 1)
           val block = Block(blockIdCounter, Some(parentId), BlockName(ps.name), ActivateId(ps.blockType),
-            BlockAppearance(ps), ActivatePortInfo(ps), context = parsedRoot.context)
+            BlockAppearance(ps), ActivatePortInfo(ps), context = ps.context)
               .pipe(MaskBlock(ps))
           // Add the block to the model.
           m.lens(_.blocks).modify(_ + (block.id -> block))

@@ -9,3 +9,4 @@ p = fullfile('C:', 'Users', 'Stefan Larsson', 'Projects', ...
 
 javarmpath(p);
 javaaddpath(p);
+clear p;
