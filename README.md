@@ -32,3 +32,15 @@ supported blocks and links.
 
 * Matlab versions from 2019a are supported.
 * Activate versions from 2019.2 are supported.
+
+## Build and test
+
+To build the software 
+[JDK 8](https://adoptopenjdk.net/)
+and [sbt](https://www.scala-sbt.org/) is needed. 
+Start a terminal and run `sbt assembly` in the
+folder where `build.sbt` is located.
+The resulting jar-file should end up in `target/scala-2.12`.
+Add that file to the Matlab path using `javaaddpath`.
+In Matlab, set the working directory to `src/main/matlab` and
+run `import_activate_oml('../resources/examples/Watertank.oml');'`.
