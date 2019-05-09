@@ -3,7 +3,11 @@ pipeline {
     stages {
 	stage('Build') {
 	    steps {
+		catchError {
+		    copyArtifacts(projectName: "${env.BRANCH_NAME}", selector: lastCompleted())
+		}
 		sh '/usr/bin/sbt assembly'
+		archiveArtifacts(artifacts: 'target/**', allowEmptyArchive: true)
 	    }
 	}
 	// in a declarative pipeline
