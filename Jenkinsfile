@@ -10,7 +10,6 @@ pipeline {
 		archiveArtifacts(artifacts: 'target/**', allowEmptyArchive: true)
 	    }
 	}
-	// in a declarative pipeline
 	stage('import OML') {
 	    environment {
 		LD_LIBRARY_PATH = '/usr/local/MATLAB/R2019a/bin/glnxa64:/usr/local/MATLAB/R2019a/sys/os/glnxa64'
@@ -18,29 +17,28 @@ pipeline {
 		MATLAB = '/usr/local/MATLAB/R2019a/bin/matlab'
 	    }
 	    steps {
-		prepareTests()
+		prepareImport()
 	    }
 	}
     }
 }
 
-// at the end of the file or in a shared library
-void prepareTests() {
-    def files = findFiles(glob: "src/main/resources/**/*.oml")
-    echo (files.toString())
+void prepareImport() {
+    def files = findFiles(glob: "src/test/resources/**.oml")
     def stages = [:]
     files.each { file ->
 	// Wrapper required to run parallel under script
-	String name = file.name.toString()
+	String name = file.name.toString().split('\\.')[0]
 	String path = file.path.toString()
-	stages.put(name, createStage(name, path))
+	stages.put(name, create_import_stage(name, path))
     }
     script {
 	parallel(stages)
     }
 }
 
-def createStage(String fileName, String filePath) {
+
+def create_import_stage(String fileName, String filePath) {
     return {
 	// here is the trick
 	stage(fileName) {
