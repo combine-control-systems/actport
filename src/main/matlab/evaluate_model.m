@@ -45,6 +45,17 @@ function model = evaluate_model(system)
     % Save model.
     fprintf('* Save system.\n');
     save_system(model_name, fullfile(target_path, model_name, model_name));
+
+    if getenv('JENKINS_HOME')
+	fprintf('* Setting Scopes to log data for testing');
+	scopes = find_system(model_name, 'BlockType', 'Scope');
+	for i = 1:length(scopes)
+	    set_param(scopes{i}, 'DataLogging', 'on');
+	    set_param(scopes{i}, 'DataLoggingSaveFormat', 'Structure With Time');
+	end
+	save_system(model_name, fullfile(target_path, model_name, model_name));
+	close_system(model_name);
+    end
 end
 
 function model = apply_transformations(model)
@@ -100,7 +111,7 @@ function model = add_links(model)
 
             start = sprintf('%s/%s', start_block_name, start_block_port);
             dest = sprintf('%s/%s', end_block_name, end_block_port);
-            
+
             %fprintf('%s : %s -> %s\n', system_path, start, dest);
             add_line(system_path, start, dest, 'autorouting', 'smart');
         end

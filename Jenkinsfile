@@ -20,11 +20,21 @@ pipeline {
 		prepareImport()
 	    }
 	}
+	stage('Simulate simulink') {
+	    environment {
+		LD_LIBRARY_PATH = '/usr/local/MATLAB/R2019a/bin/glnxa64:/usr/local/MATLAB/R2019a/sys/os/glnxa64'
+		PATH = '/usr/local/MATLAB/R2019a/bin/glnxa64:/usr/local/MATLAB/R2019a/bin:/usr/local/MATLAB/R2019a/sys/os/glnxa64:/lib64:/sbin:/usr/sbin:/bin:/usr/bin'
+		MATLAB = '/usr/local/MATLAB/R2019a/bin/matlab'
+	    }
+	    steps {
+		prepareSim()
+	    }
+	}
     }
 }
 
 void prepareImport() {
-    def files = findFiles(glob: "src/test/resources/**.oml")
+    def files = findFiles(glob: "src/test/**/*.oml")
     def stages = [:]
     files.each { file ->
 	// Wrapper required to run parallel under script
@@ -33,10 +43,13 @@ void prepareImport() {
 	stages.put(name, create_import_stage(name, path))
     }
     script {
-	parallel(stages)
+	try {
+	    parallel(stages)
+	} catch(e) {
+	    echo(e.toString())
+	}
     }
 }
-
 
 def create_import_stage(String fileName, String filePath) {
     return {
@@ -45,7 +58,35 @@ def create_import_stage(String fileName, String filePath) {
 	    withEnv(["MODEL=${env.WORKSPACE}/${filePath}"]) {
 		sh '''p="target/scala-2.12/actport-assembly-0.1-SNAPSHOT.jar"
 
-$MATLAB -nodesktop -nosplash -batch "javaaddpath(\'$p\'), cd \'src/main/matlab\', import_activate_oml(\'$MODEL\');"
+$MATLAB -nodesktop -nosplash -batch "javaaddpath(\'$p\'), cd \'src/main/matlab\', import_activate_oml(\'$MODEL\', \'$WORKSPACE/src/test\');"
+'''
+	    }
+	}
+    }
+}
+
+void prepareSim() {
+    def files = findFiles(glob: "src/test/**/*.slx")
+    echo (files.toString())
+    def stages = [:]
+    files.each { file ->
+	// Wrapper required to run parallel under script
+	String name = file.name.toString().split('\\.')[0]
+	String path = file.path.toString()
+	stages.put(name, create_slx_stage(name, path))
+    }
+    script {
+	parallel(stages)
+    }
+}
+
+def create_slx_stage(String fileName, String filePath) {
+    return {
+	// here is the trick
+	stage(fileName) {
+	    withEnv(["MODEL=${filePath}"]) {
+		sh '''
+$MATLAB -nodesktop -nosplash -batch "sim(\'$MODEL\');"
 '''
 	    }
 	}
