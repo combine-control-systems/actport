@@ -1,7 +1,13 @@
-function import_activate_oml(filename)
+function import_activate_oml(filename, target_path)
     %IMPORTACTIVATEOML Import OML-code exported from Activate to Simulink
     %   Detailed explanation goes here
     import actport.GeneratorLibrary.scanLibrary;
+
+    if nargin == 1
+        % Default path.
+        target_path = pwd;
+    end
+    setenv('ACTPORT_TARGET_PATH', target_path);
 
     global ACTPORT_LIBRARY;
 

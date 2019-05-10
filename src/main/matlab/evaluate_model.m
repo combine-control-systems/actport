@@ -3,6 +3,7 @@ function model = evaluate_model(system)
     import actport.model.Matlab.*
 
     model = create_model(system);
+    target_path = getenv('ACTPORT_TARGET_PATH');
 
     % Apply model transformations.
     fprintf('* Applying model transformations.\n');
@@ -20,6 +21,11 @@ function model = evaluate_model(system)
         set_param(model_name, 'InitFcn', context);
     end
 
+    % Create folder structure for model.
+    fprintf('* Creating folder structure.\n');
+    mkdir(fullfile(target_path, model_name, 'include'));
+    mkdir(fullfile(target_path, model_name, 'src'));
+
     % Add blocks.
     fprintf('* Adding blocks to system.\n');
     model = add_blocks(model, 0, model_name);
@@ -35,6 +41,10 @@ function model = evaluate_model(system)
     % Arrange model.
     fprintf('* Automatically rearranging model.\n');
     rearrange_model(model);
+
+    % Save model.
+    fprintf('* Save system.\n');
+    save_system(model_name, fullfile(target_path, model_name, model_name));
 end
 
 function model = apply_transformations(model)
