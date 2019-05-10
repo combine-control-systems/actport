@@ -47,7 +47,7 @@ function model = evaluate_model(system)
     save_system(model_name, fullfile(target_path, model_name, model_name));
 
     if getenv('JENKINS_HOME')
-	fprintf('* Setting Scopes to log data for testing');
+	fprintf('* Setting Scopes to log data for testing\n');
 	scopes = find_system(model_name, 'BlockType', 'Scope');
 	for i = 1:length(scopes)
 	    set_param(scopes{i}, 'DataLogging', 'on');

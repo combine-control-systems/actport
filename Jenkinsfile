@@ -31,6 +31,11 @@ pipeline {
 	    }
 	}
     }
+    post {
+	always {
+	    cleanWs deleteDirs: true, patterns: [[pattern: 'src/test/', type: 'INCLUDE']]
+	}
+    }
 }
 
 void prepareImport() {
