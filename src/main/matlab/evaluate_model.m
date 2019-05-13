@@ -129,7 +129,7 @@ function rearrange_model(model)
         if ~isempty(children)
             block_path = get_path(model, blocks(i));
             try
-                Simulink.BlockDiagram.arrangeSystem(block_path);
+                Simulink.BlockDiagram.arrangeSystem(char(block_path));
             catch e
                 fprintf('\t[W] ignored layout warning\n');
             end
