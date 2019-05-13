@@ -38,4 +38,7 @@ function model = actport_square_wave_generator(model, block_id, model_path)
     add_line(block_path, 'Generator/1', 'Sum/2');
 
     set_common_parameters(model, block_id, model_path);
+
+    % Rearrange the blocks in the subsystem.
+    Simulink.BlockDiagram.arrangeSystem(block_path);
 end
