@@ -360,8 +360,8 @@ object Matlab {
       case ("output", "input") => (first, second)
       case _ => throw new IllegalStateException(s"Only one output and input port are supported")
     }
-    //require(start(2) == "output", "3rd element of start must be \"output\"")
-    // require(destination(2) == "input", "3rd element of start must be \"input\"")
+    // require(start(2) == "output", "3rd element of start must be \"output\"")
+    // require(destination(2) == "input", "3rd element of destination must be \"input\"")
     val optPoints = Option(points)
     val link = Link(start(0), start(1).toInt, destination(0), destination(1).toInt, ExplicitLink,
       optPoints match {
