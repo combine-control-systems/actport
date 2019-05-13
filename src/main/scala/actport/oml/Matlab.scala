@@ -358,7 +358,7 @@ object Matlab {
     val (start: Array[String], destination: Array[String]) = (first(2), second(2)) match {
       case ("input", "output") => (second, first)
       case ("output", "input") => (first, second)
-      case _ => throw new IllegalStateException(s"Only one output and input port are supported")
+      case _ => throw new IllegalStateException("Only one output and input port are supported")
     }
     // require(start(2) == "output", "3rd element of start must be \"output\"")
     // require(destination(2) == "input", "3rd element of destination must be \"input\"")
