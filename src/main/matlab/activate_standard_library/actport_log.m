@@ -39,10 +39,11 @@ function model = actport_log(model, block_id, model_path)
         add_block('simulink/Sources/Constant', base_block_path);
         set_param(base_block_path, 'Value', base);
         add_line(block_path, 'Base/1', 'Log/2');
+
+        % Rearrange the blocks in the subsystem.
+        Simulink.BlockDiagram.arrangeSystem(block_path);
     end
 
     set_common_parameters(model, block_id, model_path);
 
-    % Rearrange the blocks in the subsystem.
-    Simulink.BlockDiagram.arrangeSystem(block_path);
 end
