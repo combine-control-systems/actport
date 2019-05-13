@@ -17,7 +17,7 @@ function model = actport_matrix_extractor(model, block_id, model_path)
     [yMode, yIndex, ySize] = parseDimension(model, block_id, 'y');
 
     set_param(block_path, 'NumberOfDimensions', '2', ...
-        'IndexOptionArray', {xMode, yMode}, ...
+        'IndexOptionArray', {xMode, yMode}, ... %sprintf('[''%s'';''%s'']', xMode, yMode), ...
         'IndexParamArray', {xIndex, yIndex}, ...
         'OutputSizeArray', {num2str(xSize), num2str(ySize)});
 
@@ -40,8 +40,8 @@ function [mode, index, size] = parseDimension(model, block_id, dimension)
     %                                        / New ports are exposed.
 
     % Default values.
-    mode = struct('mode', 'Select all');
-    index = 1;
+    mode = 'Select all';
+    index = '1';
     size = 1;
     % Defined as parameter - select rows by specified indices.
     % Possible values: 0, 1.
