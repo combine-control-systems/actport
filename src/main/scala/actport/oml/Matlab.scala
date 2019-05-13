@@ -344,19 +344,24 @@ object Matlab {
   /** Add an explicit link to diagram.
     *
     * @param system      diagram object
-    * @param start       start port, array of [block, string with port number, "output"]
-    * @param destination destination port, array of [block, string with port number, "input"]
+    * @param first       input or output port, array of [block, string with port number, "output"/"input"]
+    * @param second      input or output port, array of [block, string with port number, "output"/"input"]
     * @param points      array of points for routing of the link
     * @param unknownFlag NOT SURE WHAT THIS IS
     * @return diagram object
     */
-  def add_explicit_link(system: ParsedSystem, start: Array[String],
-                        destination: Array[String], points: Array[Array[Double]],
+  def add_explicit_link(system: ParsedSystem, first: Array[String],
+                        second: Array[String], points: Array[Array[Double]],
                         unknownFlag: Boolean): ParsedSystem = {
-    require(start.length == 3, "start must contain (block tag, port number, \"output\"")
-    require(start(2) == "output", "3rd element of start must be \"output\"")
-    require(destination.length == 3, "destination must contain (block tag, port number, \"input\"")
-    require(destination(2) == "input", "3rd element of start must be \"input\"")
+    require(first.length == 3, "start must contain (block tag, port number, direction (input/output)")
+    require(second.length == 3, "destination must contain (block tag, port number, direction (input/output)")
+    val (start: Array[String], destination: Array[String]) = (first(2), second(2)) match {
+      case ("input", "output") => (second, first)
+      case ("output", "input") => (first, second)
+      case _ => throw new IllegalStateException(s"Only one output and input port are supported")
+    }
+    //require(start(2) == "output", "3rd element of start must be \"output\"")
+    // require(destination(2) == "input", "3rd element of start must be \"input\"")
     val optPoints = Option(points)
     val link = Link(start(0), start(1).toInt, destination(0), destination(1).toInt, ExplicitLink,
       optPoints match {
