@@ -60,11 +60,14 @@ def create_import_stage(String fileName, String filePath) {
     return {
 	// here is the trick
 	stage(fileName) {
-	    withEnv(["MODEL=${env.WORKSPACE}/${filePath}"]) {
-		sh '''p="target/scala-2.12/actport-assembly-0.1-SNAPSHOT.jar"
+	    lock(label: "PARALLEL", quantity: 1, variable: "LOCK"){
+		withEnv(["MODEL=${env.WORKSPACE}/${filePath}"]) {
+		    echo("Locked resource: ${env.LOCK}")
+		    sh '''p="target/scala-2.12/actport-assembly-0.1-SNAPSHOT.jar"
 
 $MATLAB -nodesktop -nosplash -batch "javaaddpath(\'$p\'), cd \'src/main/matlab\', import_activate_oml(\'$MODEL\', \'$WORKSPACE/src/test\');"
 '''
+		}
 	    }
 	}
     }
@@ -72,7 +75,6 @@ $MATLAB -nodesktop -nosplash -batch "javaaddpath(\'$p\'), cd \'src/main/matlab\'
 
 void prepareSim() {
     def files = findFiles(glob: "src/test/**/*.slx")
-    echo (files.toString())
     def stages = [:]
     files.each { file ->
 	// Wrapper required to run parallel under script
@@ -89,10 +91,13 @@ def create_slx_stage(String fileName, String filePath) {
     return {
 	// here is the trick
 	stage(fileName) {
-	    withEnv(["MODEL=${filePath}"]) {
-		sh '''
+	    lock(label: "PARALLEL", quantity: 1, variable: "LOCK"){
+		withEnv(["MODEL=${filePath}"]) {
+		    echo("Locked resource: ${env.LOCK}")
+		    sh '''
 $MATLAB -nodesktop -nosplash -batch "sim(\'$MODEL\');"
 '''
+		}
 	    }
 	}
     }
