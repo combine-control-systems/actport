@@ -60,17 +60,17 @@ end
 
 function model = apply_transformations(model)
     import actport.model.transform.Matlab.*
-    fprintf('\t* Remove split blocks.\n');
+    fprintf('\t* Removing split blocks.\n');
     model = remove_split_blocks(model);
     fprintf('\t* Eliminating SampleClock blocks.\n');
     model = eliminate_sample_clock_blocks(model);
-    fprintf('\t* Map event ports.\n');
+    fprintf('\t* Mapping event ports.\n');
     model = map_event_ports(model);
 end
 
 function model = apply_post_blocks_transformations(model)
     import actport.model.transform.Matlab.*
-    fprintf('\t* Remove illegal links.\n');
+    fprintf('\t* Removing illegal links.\n');
     model = remove_illegal_links(model);
 end
 
@@ -113,7 +113,11 @@ function model = add_links(model)
             dest = sprintf('%s/%s', end_block_name, end_block_port);
 
             %fprintf('%s : %s -> %s\n', system_path, start, dest);
-            add_line(system_path, start, dest, 'autorouting', 'smart');
+            try
+                add_line(system_path, start, dest, 'autorouting', 'smart');
+            catch e
+                warning(sprintf('Failed to add line in %s between %s and %s.', system_path, start, dest));
+            end
         end
     end
 end
