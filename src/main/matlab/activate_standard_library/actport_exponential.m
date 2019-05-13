@@ -5,16 +5,16 @@ function model = actport_exponential(model, block_id, model_path)
     name = get_name(model, block_id);
     block_path = sprintf('%s/%s', model_path, name);
 
-    base = get_parameter(model, block_id, 'base', 'exp(1)');
-    if strcmp(base, 'exp(1)')
-        add_block('simulink/Math Operations/Math Func', block_path);
+    base = get_parameter(model, block_id, 'base', 'exp (1)');
+    if strcmp(base, 'exp (1)')
+        add_block('simulink/Math Operations/Math Function', block_path);
         set_param(block_path, 'Operator', 'exp');
     else
         % There isn't a block in Simulink able to select the base; use subblock and constant
         add_clean_subsystem(block_path);
         % Add exponential block
         exp_block_path = sprintf('%s/Power', block_path);
-        add_block('simulink/Math Operations/Math Func', exp_block_path);
+        add_block('simulink/Math Operations/Math Function', exp_block_path);
         set_param(exp_block_path, 'Operator', 'pow');
         % Add output port.
         add_block('simulink/Ports & Subsystems/Out1', sprintf('%s/Out1', block_path));
@@ -31,4 +31,7 @@ function model = actport_exponential(model, block_id, model_path)
     end
 
     set_common_parameters(model, block_id, model_path);
+
+    % Rearrange the blocks in the subsystem.
+    Simulink.BlockDiagram.arrangeSystem(block_path);
 end

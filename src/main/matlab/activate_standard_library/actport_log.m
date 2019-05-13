@@ -8,9 +8,9 @@ function model = actport_log(model, block_id, model_path)
     name = get_name(model, block_id);
     block_path = sprintf('%s/%s', model_path, name);
 
-    base = get_parameter(model, block_id, 'base', 'exp(1)');
-    if strcmp(base, 'exp(1)')
-        add_block('simulink/Math Operations/Math Func', block_path);
+    base = get_parameter(model, block_id, 'base', 'exp (1)');
+    if strcmp(base, 'exp (1)')
+        add_block('simulink/Math Operations/Math Function', block_path);
         set_param(block_path, 'Operator', 'log');
     else
         % There isn't a block in Simulink able to select the base; use subblock and constant
@@ -19,6 +19,7 @@ function model = actport_log(model, block_id, model_path)
         % There is no log(base)(value) available, so we calculate using log(u)/log(v)
         log_block_path = sprintf('%s/Log', block_path);
         add_block('simulink/User-Defined Functions/MATLAB Function', log_block_path);
+        sf = sfroot();
         block = sf.find('Path', log_block_path, '-isa', 'Stateflow.EMChart');
         block.Script = sprintf([...
             'function x = f(u, v)\n'...
@@ -41,4 +42,7 @@ function model = actport_log(model, block_id, model_path)
     end
 
     set_common_parameters(model, block_id, model_path);
+
+    % Rearrange the blocks in the subsystem.
+    Simulink.BlockDiagram.arrangeSystem(block_path);
 end

@@ -6,7 +6,8 @@ function model = actport_maxmin(model, block_id, model_path)
     block_path = sprintf('%s/%s', model_path, name);
 
     add_block('simulink/Math Operations/MinMax', block_path);
-    set_param(block_path, 'Function', lower(get_parameter(model, block_id, 'mm', 'Max')));
+    minmax = get_parameter(model, block_id, 'mm', '''Max''');
+    set_param(block_path, 'Function', strrep(lower(minmax), '''', ''));
     set_param(block_path, 'Inputs', get_parameter(model, block_id, 'nin', '2'));
 
     zcross = strcmp(get_parameter(model, block_id, 'zc', '0'), '0');

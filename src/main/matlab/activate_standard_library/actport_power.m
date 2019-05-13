@@ -7,10 +7,10 @@ function model = actport_power(model, block_id, model_path)
 
     exponent = get_parameter(model, block_id, 'power', '3');
     % There isn't a block in Simulink able to select the power; use subblock and constant
-    block = add_clean_subsystem(block_path);
+    add_clean_subsystem(block_path);
 
     power_block_path = sprintf('%s/Power', block_path);
-    add_block('simulink/Math Operations/Math Func', power_block_path);
+    add_block('simulink/Math Operations/Math Function', power_block_path);
     set_param(power_block_path, 'Operator', 'pow');
     % Add output port.
     add_block('simulink/Ports & Subsystems/Out1', sprintf('%s/Out1', block_path));
@@ -26,4 +26,7 @@ function model = actport_power(model, block_id, model_path)
     add_line(block_path, 'Exponent/1', 'Power/2');
 
     set_common_parameters(model, block_id, model_path);
+
+    % Rearrange the blocks in the subsystem.
+    Simulink.BlockDiagram.arrangeSystem(block_path);
 end

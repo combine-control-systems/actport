@@ -7,7 +7,7 @@ function model = actport_bias(model, block_id, model_path)
 
     add_block('simulink/Math Operations/Bias', block_path);
 
-    set_param(block_path, 'Bias', get_parameter(model, block_id, 'Bias', '0.0'));
+    set_param(block_path, 'Bias', get_parameter(model, block_id, 'b', '0.0'));
     %TODO: Handle overflow properly
 
     set_common_parameters(model, block_id, model_path);
