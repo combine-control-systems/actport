@@ -14,7 +14,8 @@ function model = actport_zero_cross(model, block_id, model_path)
 
     saturation_path = sprintf('%s/Saturation', block_path);
     add_block('simulink/Discontinuities/Saturation', saturation_path);
-    set_param(block_path, '')
+    set_param(saturation_path, 'UpperLimit', '1');
+    set_param(saturation_path, 'LowerLimit', '0');
 
     product_path = sprintf('%s/Product', block_path);
     add_block('simulink/Math Operations/Product', product_path);
