@@ -159,4 +159,26 @@ function set_model_parameters(model)
     % TODO: Add solver setting 'Solver' based on the following values translated from Activate:
     %       'VariableStepDiscrete' | {'ode45'} | 'ode23' | 'ode113' | 'ode15s' | 'ode23s' | 'ode23t'
     %       | 'ode23tb' | 'FixedStepDiscrete' |'ode8'| 'ode5' | 'ode4' | 'ode3' | 'ode2' | 'ode1' | 'ode14x'
+    %
+    % In Activate we have:
+    %
+    %                                      GUI-name | key
+    % ----------------------------------------------+----------------------
+    %                                         LSODA | lsodar
+    %                              CVODE-BDF-NEWTON | cvode1
+    %                          CVODE-BDF-Functional | cvode2
+    %                            CVODE-ADAMS-NEWTON | cvode3
+    %                        CVODE-ADAMS-Functional | cvode4
+    %                               Radau-IIA (ODE) | radauv_exp
+    %                                Backward Euler | euler_imp
+    %                            Implicit Trapezoid | trapezoid_imp
+    %                        Dopri (Dormand-Prince) | dopri5
+    %           Runge-Kutta (Fixed step. 5th Order) | rk5
+    % Classical Runge-Kutta (Fixed step. 4th Order) | rk4
+    %                                 Forward Euler | euler_exp
+    %                          Explicit Trapezoidal | trapezoid
+    %                   CPode (ODE with constraint) | cpodes1
+    %                                Ida (Sundials) | ida        (can have algebraic solvers Ida, Daskr or Fsolve)
+    %                               Radau-IIA (DAE) | radauv_imp (can have algebraic solvers Ida, Daskr or Fsolve)
+    %                                         DASKR | daskr      (can have algebraic solvers Ida, Daskr or Fsolve)
 end
