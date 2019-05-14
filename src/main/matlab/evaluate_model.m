@@ -46,7 +46,7 @@ function model = evaluate_model(system)
     set_model_parameters(model);
 
     % Save model.
-    fprintf('* Save system.\n');
+    fprintf('* Saving system.\n');
     save_system(model_name, fullfile(target_path, model_name, model_name));
 
     if getenv('JENKINS_HOME')

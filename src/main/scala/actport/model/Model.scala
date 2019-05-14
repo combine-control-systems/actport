@@ -147,5 +147,5 @@ object Model {
     // Ensure that the tolerance on time has a valid value.
     .pipe(_.lens(_.solverSettings.toleranceOnTime).modify(t => if (t == "-1") "10*128*eps" else t))
     // Correct default value for MaxStep.
-    .pipe(_.lens(_.solverSettings.maxStepSize).modify(ss => if (ss == "-1") "auto" else ss))
+    .pipe(_.lens(_.solverSettings.maxStepSize).modify(ss => if (ss == "-1" | ss == "0") "auto" else ss))
 }
