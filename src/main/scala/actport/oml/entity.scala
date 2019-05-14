@@ -2,6 +2,8 @@ package actport.oml
 
 import java.awt.Color
 
+import actport.model.SolverSettings
+
 /** Common properties of blocks in Activate. */
 sealed trait ParsedEntity {
   /** Name of block. */
@@ -113,7 +115,8 @@ case class ParsedSystem(name: String = "",
                         explicitLinks: Vector[Link] = Vector.empty,
                         eventLinks: Vector[Link] = Vector.empty,
                         atomic: Boolean = false,
-                        mask: Option[ActivateStruct] = None) extends ParsedEntity {
+                        mask: Option[ActivateStruct] = None,
+                        solverSettings: SolverSettings = SolverSettings.default) extends ParsedEntity {
 
   val blockType = "Subsystem"
 }

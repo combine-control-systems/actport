@@ -400,10 +400,8 @@ object Matlab {
     * @param workspace workspace
     * @return diagram object
     */
-  def set_model_workspace(system: ParsedSystem, workspace: Array[String]): ParsedSystem = {
-    java.lang.System.err.println("set_model_workspace is not implemented yet")
-    system
-  }
+  def set_model_workspace(system: ParsedSystem, workspace: Array[String]): ParsedSystem =
+    system.lens(_.context).modify(_.map(ctx => s"${workspace.mkString}\n$ctx"))
 
   /** Set initial time of simulation.
     *
@@ -411,10 +409,8 @@ object Matlab {
     * @param initialTime initial time as a string
     * @return diagram object
     */
-  def set_initial_time(system: ParsedSystem, initialTime: String): ParsedSystem = {
-    java.lang.System.err.println("set_initial_time is not implemented yet")
-    system
-  }
+  def set_initial_time(system: ParsedSystem, initialTime: String): ParsedSystem =
+    system.lens(_.solverSettings.initialTime).set(initialTime)
 
   /** Set final time of simulation.
     *
@@ -422,10 +418,8 @@ object Matlab {
     * @param finalTime final time as a string
     * @return diagram object
     */
-  def set_final_time(system: ParsedSystem, finalTime: String): ParsedSystem = {
-    java.lang.System.err.println("set_final_time is not implemented yet")
-    system
-  }
+  def set_final_time(system: ParsedSystem, finalTime: String): ParsedSystem =
+    system.lens(_.solverSettings.finalTime).set(finalTime)
 
   /** Set solver parameters.
     *
@@ -433,8 +427,13 @@ object Matlab {
     * @param parameters solver parameters
     * @return diagram
     */
-  def set_solver_parameters(system: ParsedSystem, parameters: Array[String]): ParsedSystem = {
-    java.lang.System.err.println("set_solver_parameters is not implemented yet")
-    system
-  }
+  def set_solver_parameters(system: ParsedSystem, parameters: Array[String]): ParsedSystem =
+    system.lens(_.solverSettings).set(system.solverSettings.copy(
+      absoluteTolerance = parameters(0),
+      relativeTolerance = parameters(1),
+      toleranceOnTime = parameters(2),
+      realtimeScaling = parameters(4),
+      solver = parameters(5),
+      maxStepSize = parameters(6)
+    ))
 }

@@ -8,7 +8,8 @@ import scala.util.chaining._
 
 case class Model(blocks: Map[BlockId, Block] = Map.empty,
                  links: Map[LinkId, Link] = Map.empty,
-                 portMap: Map[(BlockId, ActivatePort, PortType, LinkType), SimulinkPort] = Map.empty)
+                 portMap: Map[(BlockId, ActivatePort, PortType, LinkType), SimulinkPort] = Map.empty,
+                 solverSettings: SolverSettings = SolverSettings.default)
 
 object Model {
   /** Convert a system to a model.
@@ -76,7 +77,8 @@ object Model {
     // First add the root block.
     Model(blocks = Map(root.id -> root))
       // Continue with children.
-        .pipe(m => walkTree(parsedRoot, root.id, m))
+      .pipe(m => walkTree(parsedRoot, root.id, m))
+      .pipe(solverSettings(parsedRoot))
   }
 
   /** Folding function for links.
@@ -133,4 +135,17 @@ object Model {
 
     walkStruct(struct)
   }
+
+  /** Set solver settings.
+    *
+    * @param parsedSystem parsed system
+    * @param model        data model
+    * @return updated data model
+    */
+  private def solverSettings(parsedSystem: ParsedSystem)(model: Model): Model =
+    model.lens(_.solverSettings).set(parsedSystem.solverSettings)
+    // Ensure that the tolerance on time has a valid value.
+    .pipe(_.lens(_.solverSettings.toleranceOnTime).modify(t => if (t == "-1") "10*128*eps" else t))
+    // Correct default value for MaxStep.
+    .pipe(_.lens(_.solverSettings.maxStepSize).modify(ss => if (ss == "-1") "auto" else ss))
 }

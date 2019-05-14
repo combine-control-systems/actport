@@ -737,4 +737,46 @@ object Matlab {
       }
       case None => throw new NoSuchElementException(s"could not find block with id $blockId")
     }
+
+  /** Get the initial simulation time from the model.
+    *
+    * @param model data model
+    * @return initial simulation time
+    */
+  def get_initial_time(model: Model): String = model.solverSettings.initialTime
+
+  /** Get the final simulation time from the model.
+    *
+    * @param model data model
+    * @return final simulation time
+    */
+  def get_final_time(model: Model): String = model.solverSettings.finalTime
+
+  /** Get absolute tolerance setting.
+    *
+    * @param model data model
+    * @return absolute tolerance
+    */
+  def get_absolute_tolerance(model: Model): String = model.solverSettings.absoluteTolerance
+
+  /** Get relative tolerance setting.
+    *
+    * @param model data model
+    * @return relative tolerance
+    */
+  def get_relative_tolerance(model: Model): String = model.solverSettings.relativeTolerance
+
+  /** Get time tolerance.
+    *
+    * @param model data model
+    * @return time tolerance
+    */
+  def get_tolerance_on_time(model: Model): String = model.solverSettings.toleranceOnTime
+
+  /** Get max step size.
+    *
+    * @param model data model
+    * @return max step size
+    */
+  def get_max_step_size(model: Model): String = model.solverSettings.maxStepSize
 }

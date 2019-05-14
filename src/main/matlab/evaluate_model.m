@@ -42,6 +42,9 @@ function model = evaluate_model(system)
     fprintf('* Automatically rearranging model.\n');
     rearrange_model(model);
 
+    fprintf('* Setting model parameters.\n');
+    set_model_parameters(model);
+
     % Save model.
     fprintf('* Save system.\n');
     save_system(model_name, fullfile(target_path, model_name, model_name));
@@ -139,4 +142,21 @@ function rearrange_model(model)
             end
         end
     end
+end
+
+function set_model_parameters(model)
+    import actport.model.Matlab.*
+
+    name = char(get_name(model, 0));
+
+    set_param(name, 'StartTime', char(get_initial_time(model)));
+    set_param(name, 'StopTime', char(get_final_time(model)));
+    set_param(name, 'AbsTol', char(get_absolute_tolerance(model)));
+    set_param(name, 'RelTol', char(get_relative_tolerance(model)));
+    set_param(name, 'ConsecutiveZCsStepRelTol', char(get_tolerance_on_time(model)));
+    set_param(name, 'MaxStep', char(get_max_step_size(model)));
+
+    % TODO: Add solver setting 'Solver' based on the following values translated from Activate:
+    %       'VariableStepDiscrete' | {'ode45'} | 'ode23' | 'ode113' | 'ode15s' | 'ode23s' | 'ode23t'
+    %       | 'ode23tb' | 'FixedStepDiscrete' |'ode8'| 'ode5' | 'ode4' | 'ode3' | 'ode2' | 'ode1' | 'ode14x'
 end
