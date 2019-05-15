@@ -28,6 +28,8 @@ import_activate_oml('D:/mymodel.oml');
 A Simulink window should be opened and filled with
 supported blocks and links.
 
+Learn more about the [conversion process](docs/conversion-process.md).
+
 ## Supported versions
 
 * Matlab versions from 2019a are supported.
