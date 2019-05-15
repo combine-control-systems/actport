@@ -29,6 +29,7 @@ A Simulink window should be opened and filled with
 supported blocks and links.
 
 Learn more about the [conversion process](docs/conversion-process.md).
+There are currently some [limitations](docs/limitations.md).
 
 ## Supported versions
 
@@ -37,12 +38,11 @@ Learn more about the [conversion process](docs/conversion-process.md).
 
 ## Build and test
 
-To build the software 
-[JDK 8](https://adoptopenjdk.net/)
-and [sbt](https://www.scala-sbt.org/) is needed. 
-Start a terminal and run `sbt assembly` in the
-folder where `build.sbt` is located.
-The resulting jar-file should end up in `target/scala-2.12`.
-Add that file to the Matlab path using `javaaddpath`.
-In Matlab, set the working directory to `src/main/matlab` and
-run `import_activate_oml('../resources/examples/Watertank.oml');'`.
+First [build and install](docs/build-and-install.md) the software.
+Then `cd` to `src/main/matlab` and run
+
+```Matlab
+import_activate_oml('../resources/examples/Watertank.oml');
+```
+
+to convert the Watertank model.
