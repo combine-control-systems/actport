@@ -23,8 +23,10 @@ function model = evaluate_model(system)
 
     % Create folder structure for model.
     fprintf('* Creating folder structure.\n');
+    warning('off', 'MATLAB:MKDIR:DirectoryExists');
     mkdir(fullfile(target_path, model_name, 'include'));
     mkdir(fullfile(target_path, model_name, 'src'));
+    warning('on', 'MATLAB:MKDIR:DirectoryExists');
 
     % Add blocks.
     fprintf('* Adding blocks to system.\n');
