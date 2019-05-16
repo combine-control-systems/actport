@@ -83,7 +83,11 @@ void prepareSim() {
 	stages.put(name, create_slx_stage(name, path))
     }
     script {
-	parallel(stages)
+	try{
+	    parallel(stages)
+	} catch (e) {
+	    echo(e.toString())
+	}
     }
 }
 
