@@ -57,6 +57,7 @@ function model = evaluate_model(system)
 	for i = 1:length(scopes)
 	    set_param(scopes{i}, 'DataLogging', 'on');
 	    set_param(scopes{i}, 'DataLoggingSaveFormat', 'Structure With Time');
+	    set_param(scopes{i}, 'DataLoggingVariableName', get_param(scopes{i}, 'Name'));
 	end
 	save_system(model_name, fullfile(target_path, model_name, model_name));
 	close_system(model_name);
