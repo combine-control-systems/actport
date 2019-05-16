@@ -24,7 +24,11 @@ class GeneratorLibrary(library: Map[String, String]) {
     */
   def get(name: String, default: String): String = library.getOrElse(name, default)
 
-  def show(): Unit = {
+  /** Show all items in the library.
+    *
+    * Used for debugging purposes.
+    */
+  def show: Unit = {
     library.foreach { case (k, v) => println(s"$k -> $v") }
   }
 }

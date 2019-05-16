@@ -4,7 +4,7 @@ import actport.model.{InputPort, InvalidPort, Model, OutputPort}
 import monocle.macros.syntax.lens._
 
 object RemoveIllegalLinks {
-  /** Remove all illegal links from model.
+  /** Remove all links connected to ports mapped as illegal from model.
     *
     * @param model data model
     * @return filtered model
@@ -22,5 +22,5 @@ object RemoveIllegalLinks {
       if (startPort.contains(InvalidPort) || endPort.contains(InvalidPort)) {
         m.lens(_.links).modify(_ - link.id)
       } else m
-  }
+    }
 }

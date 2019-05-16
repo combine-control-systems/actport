@@ -27,7 +27,7 @@ object Matlab {
   @throws[NoSuchElementException]
   def get_name(model: Model, blockId: Long): String =
     model.blocks.get(BlockId(blockId)) match {
-      case Some(block) => block.name.name
+      case Some(block) => block.name.value
       case None => throw new NoSuchElementException(s"block with id $blockId not found")
     }
 
@@ -41,7 +41,7 @@ object Matlab {
   @throws[NoSuchElementException]("if the block is not found")
   def get_activate_id(model: Model, blockId: Long): String =
     model.blocks.get(BlockId(blockId)) match {
-      case Some(block) => block.activateId.id
+      case Some(block) => block.activateId.getValue
       case None => throw new NoSuchElementException(s"block with id $blockId not found")
     }
 
@@ -52,7 +52,7 @@ object Matlab {
     * @return array of block id:s which are children of the parent block
     */
   def get_children(model: Model, parentBlockId: Long): Array[Long] =
-    model.blocks.values.filter(_.parent.contains(BlockId(parentBlockId))).map(_.id.id).toArray
+    model.blocks.values.filter(_.parent.contains(BlockId(parentBlockId))).map(_.id.getValue).toArray
 
   /** Get parent of block.
     *
@@ -65,7 +65,7 @@ object Matlab {
   def get_parent(model: Model, blockId: Long): Long =
     model.blocks.get(BlockId(blockId)) match {
       case Some(block) => block.parent match {
-        case Some(parentId) => parentId.id
+        case Some(parentId) => parentId.getValue
         case None => -1L
       }
       case None => throw new NoSuchElementException(s"no block with id $blockId found")
@@ -76,7 +76,7 @@ object Matlab {
     * @param model data model
     * @return array of block id:s
     */
-  def get_all_blocks(model: Model): Array[Long] = model.blocks.values.map(_.id.id).toArray
+  def get_all_blocks(model: Model): Array[Long] = model.blocks.values.map(_.id.getValue).toArray
 
   /** Generate full path of a given block.
     *
@@ -87,20 +87,22 @@ object Matlab {
     */
   @throws[NoSuchElementException]("if parent is not found")
   def get_path(model: Model, blockId: Long): String = {
+    // Tail recursive function to recursively create the full path of the block by searching for the root.
     @tailrec
     def buildPath(b: Block, path: Vector[String] = Vector.empty): Vector[String] = {
-      val newPath = b.name.name +: path
+      // Prepend the name of the current block to the path.
+      val newPath = b.name.value +: path
       b.parent match {
         case None => newPath // terminator
         case Some(parentId) =>
-          model.blocks.values.find(_.id == parentId) match {
+          model.blocks.get(parentId) match {
             case None => throw new NoSuchElementException(s"parent $parentId not found for block ${b.id}")
             case Some(parent) => buildPath(parent, newPath)
           }
       }
     }
 
-    (model.blocks.values.find(_.id.id == blockId) match {
+    (model.blocks.get(BlockId(blockId)) match {
       case Some(block) => buildPath(block)
       case None => throw new NoSuchElementException(s"block with id $blockId not found")
     }).mkString("/")
@@ -267,18 +269,9 @@ object Matlab {
     * @param simulinkPort name of Simulink port
     * @return updated data model
     */
-  def map_event_input_port(model: Model, blockId: Long, activatePort: Int, simulinkPort: String): Model = {
-    val link = model.links.values.find(link =>
-      link.end.block.id == blockId &&
-        link.linkType == EventLink &&
-        link.end.activatePort.index == activatePort)
-    // Update model with port mapping.
-    link.map(l => model.lens(_.portMap).modify { pm =>
-      val key = (l.end.block, l.end.activatePort, InputPort, l.linkType)
-      val value = MappedPort(simulinkPort)
-      pm + (key -> value)
-    }).getOrElse(model)
-  }
+  def map_event_input_port(model: Model, blockId: Long, activatePort: Int, simulinkPort: String): Model =
+    model.addPortMapping(BlockId(blockId), ActivatePort(activatePort),
+      MappedPort(simulinkPort), EventLink, InputPort)
 
   /** Map the event output port to its equivalent Simulink port.
     *
@@ -290,18 +283,9 @@ object Matlab {
     * @param simulinkPort name of Simulink port
     * @return updated data model
     */
-  def map_event_output_port(model: Model, blockId: Long, activatePort: Int, simulinkPort: String): Model = {
-    val link = model.links.values.find(link =>
-      link.start.block.id == blockId &&
-        link.linkType == EventLink &&
-        link.start.activatePort.index == activatePort)
-    // Update model with port mapping.
-    link.map(l => model.lens(_.portMap).modify { pm =>
-      val key = (l.start.block, l.start.activatePort, OutputPort, l.linkType)
-      val value = MappedPort(simulinkPort)
-      pm + (key -> value)
-    }).getOrElse(model)
-  }
+  def map_event_output_port(model: Model, blockId: Long, activatePort: Int, simulinkPort: String): Model =
+    model.addPortMapping(BlockId(blockId), ActivatePort(activatePort),
+      MappedPort(simulinkPort), EventLink, OutputPort)
 
   /** Map the input port to its equivalent Simulink port.
     *
@@ -313,18 +297,10 @@ object Matlab {
     * @param simulinkPort name of Simulink port
     * @return updated data model
     */
-  def map_input_port(model: Model, blockId: Long, activatePort: Int, simulinkPort: String): Model = {
-    val link = model.links.values.find(link =>
-      link.end.block.id == blockId &&
-        link.linkType == ExplicitLink &&
-        link.end.activatePort.index == activatePort)
-    // Update model with port mapping.
-    link.map(l => model.lens(_.portMap).modify { pm =>
-      val key = (l.end.block, l.end.activatePort, InputPort, l.linkType)
-      val value = MappedPort(simulinkPort)
-      pm + (key -> value)
-    }).getOrElse(model)
-  }
+  def map_input_port(model: Model, blockId: Long, activatePort: Int, simulinkPort: String): Model =
+    model.addPortMapping(BlockId(blockId), ActivatePort(activatePort),
+      MappedPort(simulinkPort), ExplicitLink, InputPort)
+
 
   /** Map the output port to its equivalent Simulink port.
     *
@@ -336,32 +312,23 @@ object Matlab {
     * @param simulinkPort name of Simulink port
     * @return updated data model
     */
-  def map_output_port(model: Model, blockId: Long, activatePort: Int, simulinkPort: String): Model = {
-    val link = model.links.values.find(link =>
-      link.start.block.id == blockId &&
-        link.linkType == ExplicitLink &&
-        link.start.activatePort.index == activatePort)
-    // Update model with port mapping.
-    link.map(l => model.lens(_.portMap).modify { pm =>
-      val key = (l.start.block, l.start.activatePort, OutputPort, l.linkType)
-      val value = MappedPort(simulinkPort)
-      pm + (key -> value)
-    }).getOrElse(model)
-  }
+  def map_output_port(model: Model, blockId: Long, activatePort: Int, simulinkPort: String): Model =
+    model.addPortMapping(BlockId(blockId), ActivatePort(activatePort),
+      MappedPort(simulinkPort), ExplicitLink, OutputPort)
 
-  /** Set input port of block as illegal.
+  /** Set input port of block as invalid.
     *
     * @param model        data model
     * @param blockId      block id
     * @param activatePort index of activate port
     * @return updated data model
     */
-  def set_input_port_illegal(model: Model, blockId: Long, activatePort: Int): Model =
+  def set_input_port_invalid(model: Model, blockId: Long, activatePort: Int): Model =
   // Find all links ending up at the specified port.
     model.links.values.filter(link =>
-      link.end.block.id == blockId &&
+      link.end.block.getValue == blockId &&
         link.linkType == ExplicitLink &&
-        link.end.activatePort.index == activatePort)
+        link.end.activatePort.value == activatePort)
       // Set port mapping as invalid.
       .foldLeft(model) { (m, link) =>
       val key = (link.end.block, link.end.activatePort, InputPort, ExplicitLink)
@@ -376,18 +343,9 @@ object Matlab {
     * @param activatePort index of activate port
     * @return updated data model
     */
-  def set_output_port_illegal(model: Model, blockId: Long, activatePort: Int): Model =
-  // Find all links starting up at the specified port.
-    model.links.values.filter(link =>
-      link.start.block.id == blockId &&
-        link.linkType == ExplicitLink &&
-        link.start.activatePort.index == activatePort)
-      // Set port mapping as invalid.
-      .foldLeft(model) { (m, link) =>
-      val key = (link.start.block, link.start.activatePort, OutputPort, ExplicitLink)
-      val value = InvalidPort
-      m.lens(_.portMap).modify(_ + (key -> value))
-    }
+  def set_output_port_invalid(model: Model, blockId: Long, activatePort: Int): Model =
+    model.addPortMapping(BlockId(blockId), ActivatePort(activatePort),
+      InvalidPort, ExplicitLink, OutputPort)
 
   /** Set evnt input port of block as illegal.
     *
@@ -397,16 +355,8 @@ object Matlab {
     * @return updated data model
     */
   def set_event_input_port_illegal(model: Model, blockId: Long, activatePort: Int): Model =
-  // Find all links ending up at the specified port.
-    model.links.values.filter(link => link.end.block.id == blockId &&
-      link.linkType == EventLink &&
-      link.end.activatePort.index == activatePort)
-      // Set port mapping as invalid.
-      .foldLeft(model) { (m, link) =>
-      val key = (link.end.block, link.end.activatePort, InputPort, EventLink)
-      val value = InvalidPort
-      m.lens(_.portMap).modify(_ + (key -> value))
-    }
+    model.addPortMapping(BlockId(blockId), ActivatePort(activatePort),
+      InvalidPort, EventLink, InputPort)
 
   /** Set input port of block as illegal.
     *
@@ -416,16 +366,8 @@ object Matlab {
     * @return updated data model
     */
   def set_event_output_port_illegal(model: Model, blockId: Long, activatePort: Int): Model =
-  // Find all links ending up at the specified port.
-    model.links.values.filter(link => link.start.block.id == blockId &&
-      link.linkType == EventLink &&
-      link.start.activatePort.index == activatePort)
-      // Set port mapping as invalid.
-      .foldLeft(model) { (m, link) =>
-      val key = (link.start.block, link.start.activatePort, OutputPort, EventLink)
-      val value = InvalidPort
-      m.lens(_.portMap).modify(_ + (key -> value))
-    }
+    model.addPortMapping(BlockId(blockId), ActivatePort(activatePort),
+      InvalidPort, EventLink, OutputPort)
 
   /** Get array of link id:s.
     *
@@ -434,7 +376,7 @@ object Matlab {
     * @return array of link id:s
     */
   def get_links(model: Model, parentBlockId: Long): Array[Long] =
-    model.links.values.filter(_.parent.id == parentBlockId).map(_.id.id).toArray
+    model.links.values.filter(_.parent.getValue == parentBlockId).map(_.id.id).toArray
 
   /** Get start block id for link.
     *
@@ -446,7 +388,7 @@ object Matlab {
   @throws[NoSuchElementException]("if the link is not found")
   def get_start_block(model: Model, linkId: Long): Long =
     model.links.get(LinkId(linkId)) match {
-      case Some(link) => link.start.block.id
+      case Some(link) => link.start.block.getValue
       case None => throw new NoSuchElementException(s"link with id $linkId not found")
     }
 
@@ -460,7 +402,7 @@ object Matlab {
   @throws[NoSuchElementException]("if the link is not found")
   def get_end_block(model: Model, linkId: Long): Long =
     model.links.get(LinkId(linkId)) match {
-      case Some(link) => link.end.block.id
+      case Some(link) => link.end.block.getValue
       case None => throw new NoSuchElementException(s"link with id $linkId not found")
     }
 
@@ -481,7 +423,7 @@ object Matlab {
         model.portMap.get(key) match {
           case Some(InvalidPort) => throw new IllegalStateException(s"link with id $linkId has an invalid start port")
           case Some(MappedPort(port)) => port
-          case None => link.start.activatePort.index.toString
+          case None => link.start.activatePort.value.toString
         }
       case None => throw new NoSuchElementException(s"link with id $linkId not found")
     }
@@ -503,7 +445,7 @@ object Matlab {
         model.portMap.get(key) match {
           case Some(InvalidPort) => throw new IllegalStateException(s"link with id $linkId has an invalid start port")
           case Some(MappedPort(port)) => port
-          case None => link.end.activatePort.index.toString
+          case None => link.end.activatePort.value.toString
         }
       case None => throw new NoSuchElementException(s"link with id $linkId not found")
     }
@@ -629,7 +571,7 @@ object Matlab {
   @throws[NoSuchElementException]("if block does not exist")
   def get_mask_parameters(model: Model, blockId: Long): Array[String] =
     model.blocks.get(BlockId(blockId)) match {
-      case Some(block) => block.mask.keys.map(_.name).toArray
+      case Some(block) => block.mask.keys.map(_.value).toArray
       case None => throw new NoSuchElementException(s"could not find block with id $blockId")
     }
 

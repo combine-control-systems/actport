@@ -30,6 +30,7 @@ supported blocks and links.
 
 Learn more about the [conversion process](docs/conversion-process.md).
 There are currently some [limitations](docs/limitations.md).
+[Pull requests](docs/contributing.md) are welcome.
 
 ## Supported versions
 

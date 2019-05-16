@@ -1,36 +1,75 @@
 package actport
 
 package object model {
+  /** Type of parameter values. */
   type ParameterValue = Any
+  /** Type of block parameter dictionary. */
   type BlockParameters = Map[ParameterName, ParameterValue]
 
-  case class ActivateId(id: String) extends AnyVal
+  /** Value class for Activate identifiers.
+    *
+    * @param value Activate identifier like `system/SignalViewers/Scope`
+    */
+  case class ActivateId(value: String) extends AnyVal
 
 
+  /** ADT for link types. */
   sealed trait LinkType
+
+  /** Explicit link. */
   case object ExplicitLink extends LinkType
+
+  /** Event link. */
   case object EventLink extends LinkType
 
+  /** Start information of link. */
   case class LinkStart(block: BlockId, activatePort: ActivatePort)
+
+  /** End information of link. */
   case class LinkEnd(block: BlockId, activatePort: ActivatePort)
 
+  /** ADT for port types. */
   sealed trait PortType
+
+  /** Input port type. */
   case object InputPort extends PortType
+
+  /** Output port type. */
   case object OutputPort extends PortType
 
-  case class ActivatePort(index: Int) extends AnyVal
+  /** Value class for Activate port indices.
+    *
+    * @param value Activate port index
+    */
+  case class ActivatePort(value: Int) extends AnyVal
 
-  sealed trait SimulinkPort
-  case object InvalidPort extends SimulinkPort
-  case class MappedPort(name: String) extends SimulinkPort
-  object MappedPort {
-    def apply(index: Int): MappedPort = MappedPort(index.toString)
-  }
+  /** Value class of block identifiers.
+    *
+    * @param value block identifier
+    */
+  case class BlockId(value: Long) extends AnyVal
 
-  case class BlockId(id: Long) extends AnyVal
-  case class BlockName(name: String) extends AnyVal
-  case class LinkId(id: Long) extends AnyVal
-  case class ParameterName(name: String) extends AnyVal
+  /** Value class of block names.
+    *
+    * @param value name of block
+    */
+  case class BlockName(value: String) extends AnyVal
 
-  case class MaskParameterName(name: String) extends AnyVal
+  /** Value class of link identifiers.
+    *
+    * @param value link identifier
+    */
+  case class LinkId(value: Long) extends AnyVal
+
+  /** Value class of parameter names.
+    *
+    * @param value parameter name
+    */
+  case class ParameterName(value: String) extends AnyVal
+
+  /** Value class of mask parameter names.
+    *
+    * @param value mask parameter name
+    */
+  case class MaskParameterName(value: String) extends AnyVal
 }

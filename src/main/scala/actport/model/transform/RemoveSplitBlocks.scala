@@ -20,6 +20,12 @@ object RemoveSplitBlocks {
       }
     }
 
+  /** Remove split blocks from model.
+    *
+    * @param model data model
+    * @param block split block
+    * @return updated model
+    */
   private def removeSplitBlock(model: Model, block: Block): Model = {
     // A split block has one source...
     val linkToBlock = model.links.values.find(_.end.block == block.id) match {
@@ -32,7 +38,7 @@ object RemoveSplitBlocks {
     model.lens(_.blocks).modify(_ - block.id)
       // Remove the incoming link.
       .pipe(_.lens(_.links).modify(_ - linkToBlock.id))
-      // Modify start of the destination links to be equal to the incoming link's start.
+        // Modify the start of the destination links to be equal to the incoming link's start.
       .pipe(m => linksFromBlock.foldLeft(m) { (m, link) =>
         val updatedLink = link.lens(_.start).set(linkToBlock.start)
         m.lens(_.links).modify(_ + (updatedLink.id -> updatedLink))

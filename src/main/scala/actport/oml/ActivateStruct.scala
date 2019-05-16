@@ -1,7 +1,5 @@
 package actport.oml
 
-class ActivateStruct extends java.util.HashMap[String, Any]
-
 /** Alias for HashMap to be used for sending Matlab structs to Scala.
   *
   * Matlab does not serialize structs automatically when sending to a
@@ -11,6 +9,9 @@ class ActivateStruct extends java.util.HashMap[String, Any]
   * `ActivateStruct` instead. This can be done using the Matlab
   * function src/main/matlab/convert_struct.m.
   */
+class ActivateStruct extends java.util.HashMap[String, Any]
+
 object ActivateStruct {
+  /** Create an empty instance. */
   def empty = new ActivateStruct()
 }

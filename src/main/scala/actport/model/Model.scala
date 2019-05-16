@@ -9,7 +9,43 @@ import scala.util.chaining._
 case class Model(blocks: Map[BlockId, Block] = Map.empty,
                  links: Map[LinkId, Link] = Map.empty,
                  portMap: Map[(BlockId, ActivatePort, PortType, LinkType), SimulinkPort] = Map.empty,
-                 solverSettings: SolverSettings = SolverSettings.default)
+                 solverSettings: SolverSettings = SolverSettings.default) {
+
+  /** Create a mapped port.
+    *
+    * Supposed to be used from [[actport.model.Matlab.map_input_port]],
+    * [[actport.model.Matlab.map_output_port]],
+    * [[actport.model.Matlab.map_event_input_port]], and
+    * [[actport.model.Matlab.map_event_output_port]].
+    *
+    * @param blockId      block id
+    * @param activatePort index of activate port
+    * @param simulinkPort simulink port
+    * @param linkType     type of link
+    * @param portType     type of port
+    * @return mapped port
+    */
+  def addPortMapping(blockId: BlockId,
+                     activatePort: ActivatePort,
+                     simulinkPort: SimulinkPort,
+                     linkType: LinkType,
+                     portType: PortType): Model = {
+    // Find matching link.
+    val link: Option[Link] = this.links.values.find(link =>
+      link.start.block == blockId &&
+        link.linkType == linkType &&
+        link.start.activatePort == activatePort)
+    // Update model with port mapping.
+    // We must use map since link is Option[Link].
+    link.map(l => this.lens(_.portMap).modify { pm =>
+      val key = portType match {
+        case InputPort => (l.end.block, l.end.activatePort, portType, linkType)
+        case OutputPort => (l.start.block, l.start.activatePort, portType, linkType)
+      }
+      pm + (key -> simulinkPort)
+    }).getOrElse(this)
+  }
+}
 
 object Model {
   /** Convert a system to a model.
@@ -33,7 +69,7 @@ object Model {
         // Add blocks to the model.
 
         case (m, pb: ParsedBlock) =>
-          blockIdCounter = BlockId(blockIdCounter.id + 1)
+          blockIdCounter = BlockId(blockIdCounter.value + 1)
           val block = Block(blockIdCounter, Some(parentId), BlockName(pb.name), ActivateId(pb.blockType),
             BlockAppearance(pb), ActivatePortInfo(pb), convertParameters(pb.parameters))
               .pipe(MaskBlock(pb))
@@ -41,7 +77,7 @@ object Model {
           m.lens(_.blocks).modify(_ + (block.id -> block))
 
         case (m, ps: ParsedSystem) =>
-          blockIdCounter = BlockId(blockIdCounter.id + 1)
+          blockIdCounter = BlockId(blockIdCounter.value + 1)
           val block = Block(blockIdCounter, Some(parentId), BlockName(ps.name), ActivateId(ps.blockType),
             BlockAppearance(ps), ActivatePortInfo(ps), context = ps.context)
               .pipe(MaskBlock(ps))
@@ -60,13 +96,13 @@ object Model {
         // First we handle the explicit links.
         val explicitLinks = system.explicitLinks.foldLeft(Map.empty[LinkId, Link]) {
           case (state, link) =>
-            linkIdCounter = LinkId(linkIdCounter.id + 1)
+            linkIdCounter = LinkId(linkIdCounter.value + 1)
             linkFolder(linkIdCounter, parentId, blocks, ExplicitLink, state, link)
         }
         // Then we handle the event links.
         val eventLinks = system.eventLinks.foldLeft(Map.empty[LinkId, Link]) {
           case (state, link) =>
-            linkIdCounter = LinkId(linkIdCounter.id + 1)
+            linkIdCounter = LinkId(linkIdCounter.value + 1)
             linkFolder(linkIdCounter, parentId, blocks, EventLink, state, link)
         }
         m.lens(_.links).modify(_ ++ explicitLinks ++ eventLinks)

@@ -1,5 +1,16 @@
 package actport.model
 
+/** Model container for solver settings.
+  *
+  * @param initialTime       initial time of simulation
+  * @param finalTime         final time of simulation
+  * @param absoluteTolerance absolute tolerance of solver
+  * @param relativeTolerance relative tolerance of solver
+  * @param toleranceOnTime   tolerance on time of solver
+  * @param realtimeScaling   realtime scaling
+  * @param solver            solver algorithm
+  * @param maxStepSize       maximum step size
+  */
 case class SolverSettings(initialTime: String,
                           finalTime: String,
                           absoluteTolerance: String,
@@ -10,6 +21,7 @@ case class SolverSettings(initialTime: String,
                           maxStepSize: String)
 
 object SolverSettings {
+  /** Default values. */
   def default: SolverSettings = SolverSettings(
     initialTime = "0.0",
     finalTime = "30.0",

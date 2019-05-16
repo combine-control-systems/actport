@@ -2,11 +2,11 @@ package actport.model
 
 /** Model representation of a block.
   *
-  * @param id
-  * @param parent
-  * @param name
-  * @param activateId
-  * @param appearance
+  * @param id         block identifier
+  * @param parent     block parent
+  * @param name       block name
+  * @param activateId Activate identifier
+  * @param appearance block appearance
   * @param ports      port count
   * @param parameters dictionary of block parameters
   * @param sampleRate used to set an explicit sample rate of the block

@@ -118,5 +118,6 @@ case class ParsedSystem(name: String = "",
                         mask: Option[ActivateStruct] = None,
                         solverSettings: SolverSettings = SolverSettings.default) extends ParsedEntity {
 
+  // This is not a name which is present in Activate, but we need to call SuperBlocks something.
   val blockType = "Subsystem"
 }

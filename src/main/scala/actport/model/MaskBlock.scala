@@ -19,6 +19,7 @@ object MaskBlock {
     parsedEntity.mask.map(_.asScala.toMap) match {
       case Some(mask) =>
         mask.keys
+          // Fold the mask keys and create a dictionary of mask parameters.
           .foldLeft(Map.empty[MaskParameterName, MaskParameter]) { (m, name) =>
             m + (MaskParameterName(name) -> MaskParameter(name, mask))
           }.pipe(m => block.lens(_.mask).set(m))

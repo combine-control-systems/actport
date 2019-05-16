@@ -4,6 +4,26 @@ import actport.oml.ActivateStruct
 
 import scala.collection.JavaConverters._
 
+/** Model representation of a Mask Parameter.
+  *
+  * @param name           name of parameter
+  * @param rank           value rank
+  * @param value          value
+  * @param prompt         parameter label
+  * @param evaluate       parameter should be evaluated
+  * @param enable         parameter should be enabled or not
+  * @param visible        parameter should be visible or not
+  * @param parameterStyle parameter style information
+  * @param callback       parameter callback information
+  * @param tabName        parameter tab page name
+  * @param toolTip        parameter tooltip text
+  * @param buttonImage    parameter button image
+  * @param buttonText     parameter button text
+  * @param buttonToolTip  parameter button tooltip text
+  * @param parameterType  parameter data type
+  * @param dimensions     parameter matrix dimensions
+  * @param unit           parameter unit
+  */
 case class MaskParameter(name: String,
                          rank: Int,
                          value: String,
@@ -23,7 +43,14 @@ case class MaskParameter(name: String,
                          unit: String)
 
 object MaskParameter {
-  @throws[NoSuchFieldError]("if mask field is missing")
+  /** Create a mask parameter object from a dictionary of properties.
+    *
+    * @param name name of parameter
+    * @param mask dictionary of parameters
+    * @throws NoSuchElementException if the mask field is missing
+    * @return mask parameter data
+    */
+  @throws[NoSuchFieldException]("if mask field is missing")
   def apply(name: String, mask: Map[String, Any]): MaskParameter = {
     mask.get(name) match {
       case Some(x: ActivateStruct) =>
@@ -98,6 +125,12 @@ object MaskParameter {
     }
   }
 
+  /** Common error reporting function.
+    *
+    * @param name  parameter name
+    * @param field field name
+    * @return exception to throw
+    */
   private def error(name: String, field: String): NoSuchFieldException =
     new NoSuchFieldException(s"$field field missing for mask parameter $name")
 }

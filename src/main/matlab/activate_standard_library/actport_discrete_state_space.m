@@ -23,7 +23,7 @@ function model = actport_discrete_state_space(model, block_id, model_path)
     set_param(block_path, 'x0', x0);
 
     % We cannot trigger this block.
-    model = set_event_input_port_illegal(model, block_id, 1);
+    model = set_event_input_port_invalid(model, block_id, 1);
 
     set_common_parameters(model, block_id, model_path);
 end

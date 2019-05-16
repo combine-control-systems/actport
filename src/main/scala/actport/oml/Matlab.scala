@@ -5,14 +5,14 @@ import java.awt.Color
 import actport.{Configuration, oml}
 import monocle.macros.syntax.lens._
 
+import scala.util.chaining._
+
 object Matlab {
   /** Utility function to show type of input from Matlab call.
     *
     * @param a anything
     */
-  def showType(a: Object): Unit = {
-    println(a.getClass.getCanonicalName)
-  }
+  def showType(a: Object): Unit = println(a.getClass.getCanonicalName)
 
   // -------------------- Diagrams
 
@@ -20,9 +20,7 @@ object Matlab {
     *
     * @return Subsystem object
     */
-  def instantiate_diagram(): ParsedSystem = {
-    ParsedSystem()
-  }
+  def instantiate_diagram(): ParsedSystem = ParsedSystem()
 
   /** Set background color of diagram.
     *
@@ -61,9 +59,8 @@ object Matlab {
     * @param name      name of diagram
     * @return diagram object
     */
-  def set_diagram_name(subsystem: ParsedSystem, name: String): ParsedSystem = {
+  def set_diagram_name(subsystem: ParsedSystem, name: String): ParsedSystem =
     subsystem.lens(_.name).set(name)
-  }
 
   /** Set diagram context.
     *
@@ -73,9 +70,8 @@ object Matlab {
     * @param context   context
     * @return diagram object
     */
-  def set_diagram_context(subsystem: ParsedSystem, context: Array[String]): ParsedSystem = {
+  def set_diagram_context(subsystem: ParsedSystem, context: Array[String]): ParsedSystem =
     subsystem.lens(_.context).set(Some(context.mkString))
-  }
 
   // -------------------- Blocks
 
@@ -84,9 +80,8 @@ object Matlab {
     * @param blockType Activate block type string
     * @return block instance
     */
-  def instantiate_block(blockType: String): ParsedBlock = {
+  def instantiate_block(blockType: String): ParsedBlock =
     oml.ParsedBlock(blockType = blockType)
-  }
 
   /** Set block coordinate origin.
     *
@@ -146,16 +141,17 @@ object Matlab {
 
   /** Set block theta rotation angle?
     *
+    * The angle is given as a multiple of 90 degrees.
+    *
     * @param block block object
     * @param theta rotation angle
     * @return block object
     */
-  def set_block_theta(block: ParsedEntity, theta: Double): ParsedEntity = {
+  def set_block_theta(block: ParsedEntity, theta: Double): ParsedEntity =
     block match {
       case b: ParsedBlock => b.lens(_.theta).set(theta)
       case b: ParsedSystem => b.lens(_.theta).set(theta)
     }
-  }
 
   /** Set block background color.
     *
@@ -263,13 +259,11 @@ object Matlab {
     * @param blockName name to assign block (must be unique within the diagram)
     * @return diagram object
     */
-  def add_block_impl(system: ParsedSystem, block: ParsedEntity, blockName: String): ParsedSystem = {
-    val blockWithName: ParsedEntity = block match {
+  def add_block_impl(system: ParsedSystem, block: ParsedEntity, blockName: String): ParsedSystem =
+    (block match {
       case b: ParsedBlock => b.lens(_.name).set(blockName)
       case b: ParsedSystem => b.lens(_.name).set(blockName)
-    }
-    system.lens(_.children).modify(_ :+ blockWithName)
-  }
+    }).pipe(b => system.lens(_.children).modify(_ :+ b))
 
   /** Set block identity.
     *
@@ -290,12 +284,11 @@ object Matlab {
     * @param label      block label
     * @return block object
     */
-  def set_block_mask_impl(block: ParsedEntity, parameters: ActivateStruct, label: String): ParsedEntity = {
+  def set_block_mask_impl(block: ParsedEntity, parameters: ActivateStruct, label: String): ParsedEntity =
     block match {
       case b: ParsedBlock => b.lens(_.mask).set(Some(parameters))
       case b: ParsedSystem => b.lens(_.mask).set(Some(parameters))
     }
-  }
 
   // -------------------- Super Block
 
@@ -331,31 +324,30 @@ object Matlab {
   /** Set icon text of super block.
     *
     * @param block block object
-    * @param text1 text 1 ???
-    * @param text2 text 2 ???
+    * @param text1 identification of the icon text (the name)
+    * @param text2 the value
     * @return block object
     */
-  def set_block_icon_text(block: ParsedSystem, text1: String, text2: String): ParsedSystem = {
-    block
-  }
+  def set_block_icon_text(block: ParsedSystem, text1: String, text2: String): ParsedSystem = block // Do nothing.
 
   // -------------------- Links
 
   /** Add an explicit link to diagram.
     *
     * @param system      diagram object
-    * @param first       input or output port, array of [block, string with port number, "output"/"input"]
-    * @param second      input or output port, array of [block, string with port number, "output"/"input"]
+    * @param first       input or output port, array of [block, string with port number, "output" | "input"]
+    * @param second      input or output port, array of [block, string with port number, "output" | "input"]
     * @param points      array of points for routing of the link
-    * @param unknownFlag NOT SURE WHAT THIS IS
+    * @param coordType   if true the intermediate coordinate points are relative, if false they are absolute
     * @return diagram object
     */
   def add_explicit_link(system: ParsedSystem, first: Array[String],
                         second: Array[String], points: Array[Array[Double]],
-                        unknownFlag: Boolean): ParsedSystem = {
+                        coordType: Boolean): ParsedSystem = {
     require(first.length == 3, "start must contain (block tag, port number, direction (input/output)")
     require(second.length == 3, "destination must contain (block tag, port number, direction (input/output)")
-    val (start: Array[String], destination: Array[String]) = (first(2), second(2)) match {
+    // Find out which port is the start port and which is the destination port.
+    val (start, destination) = (first(2), second(2)) match {
       case ("input", "output") => (second, first)
       case ("output", "input") => (first, second)
       case _ => throw new IllegalStateException("Only one output and input port are supported")
@@ -364,31 +356,46 @@ object Matlab {
     // require(destination(2) == "input", "3rd element of destination must be \"input\"")
     val optPoints = Option(points)
     val link = Link(start(0), start(1).toInt, destination(0), destination(1).toInt, ExplicitLink,
+      // Process points, if necessary.
+      // TODO: Handle coordType properly here.
       optPoints match {
         case Some(p) => p.map { v => Point(v(0).toInt, v(1).toInt) }.toVector
         case _ => Vector.empty
       })
+    // Add the link to the explicit links.
     system.lens(_.explicitLinks).modify(_ :+ link)
   }
 
   /** Add event link to diagram.
     *
     * @param system      diagram object.
-    * @param start       start port, array of [block, string with event port number, "output"]
-    * @param destination destination port, array of [block, string with event port number, "input"]
+    * @param first       input or output port, array of [block, string with event port number, "output" | "input"]
+    * @param second      input or output port, array of [block, string with event port number, "output" | "input"]
     * @param points      array of points for routing of the link
-    * @param unknownFlag NOT SURE WHAT THIS IS
+    * @param coordType   if true the intermediate coordinate points are relative, if false they are absolute
     * @return diagram object
     */
-  def add_event_link(system: ParsedSystem, start: Array[String],
-                     destination: Array[String], points: Array[Array[Double]],
-                     unknownFlag: Boolean): ParsedSystem = {
+  def add_event_link(system: ParsedSystem, first: Array[String],
+                     second: Array[String], points: Array[Array[Double]],
+                     coordType: Boolean): ParsedSystem = {
+    require(first.length == 3, "start must contain (block tag, port number, direction (input/output)")
+    require(second.length == 3, "destination must contain (block tag, port number, direction (input/output)")
+    // Find out which port is the start port and which is the destination port.
+    val (start, destination) = (first(2), second(2)) match {
+      case ("input", "output") => (second, first)
+      case ("output", "input") => (first, second)
+      case _ => throw new IllegalStateException("Only one output and input port are supported")
+    }
+    // The points could possibly be null. Option(null) -> None
     val optPoints = Option(points)
     val link = oml.Link(start(0), start(1).toInt, destination(0), destination(1).toInt, EventLink,
+      // Process points, if necessary.
+      // TODO: Handle coordType properly here.
       optPoints match {
         case Some(p) => p.map { v => Point(v(0).toInt, v(1).toInt) }.toVector
         case _ => Vector.empty
       })
+    // Add the link to the event links.
     system.lens(_.eventLinks).modify(_ :+ link)
   }
 
@@ -423,12 +430,27 @@ object Matlab {
 
   /** Set solver parameters.
     *
+    * In the OML-file the parameters are represented by something like:
+    *
+    * ```
+    * tol = {'0.000001', '0.000001', '-1', '0' , '0', 'lsodar', '-1'};
+    *            ^            ^        ^    ^     ^       ^       ^
+    *            |            |        |    |     |       |       |
+    *            |            |        |    |     |       |       \-- Max Step Size        (0)
+    *            |            |        |    |     |       \---------- Solver               (1)
+    *            |            |        |    |     \------------------ Realtime Scaling     (2)
+    *            |            |        |    \------------------------ Initial Time         (3)
+    *            |            |        \----------------------------- Tolerance on Time    (4)
+    *            |            \-------------------------------------- Relative Tolerance   (5)
+    *            \--------------------------------------------------- Absolute Tolerance   (6)
+    * ```
+    *
     * @param system     diagram object
     * @param parameters solver parameters
     * @return diagram
     */
   def set_solver_parameters(system: ParsedSystem, parameters: Array[String]): ParsedSystem =
-    system.lens(_.solverSettings).set(system.solverSettings.copy(
+    system.lens(_.solverSettings).modify(_.copy(
       absoluteTolerance = parameters(0),
       relativeTolerance = parameters(1),
       toleranceOnTime = parameters(2),
