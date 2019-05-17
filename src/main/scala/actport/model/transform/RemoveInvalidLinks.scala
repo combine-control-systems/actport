@@ -3,8 +3,8 @@ package actport.model.transform
 import actport.model.{InputPort, InvalidPort, Model, OutputPort}
 import monocle.macros.syntax.lens._
 
-object RemoveIllegalLinks {
-  /** Remove all links connected to ports mapped as illegal from model.
+object RemoveInvalidLinks {
+  /** Remove all links connected to ports mapped as invalid from model.
     *
     * @param model data model
     * @return filtered model

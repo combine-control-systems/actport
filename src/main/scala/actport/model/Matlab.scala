@@ -41,7 +41,7 @@ object Matlab {
   @throws[NoSuchElementException]("if the block is not found")
   def get_activate_id(model: Model, blockId: Long): String =
     model.blocks.get(BlockId(blockId)) match {
-      case Some(block) => block.activateId.getValue
+      case Some(block) => block.activateId.value
       case None => throw new NoSuchElementException(s"block with id $blockId not found")
     }
 
@@ -52,7 +52,7 @@ object Matlab {
     * @return array of block id:s which are children of the parent block
     */
   def get_children(model: Model, parentBlockId: Long): Array[Long] =
-    model.blocks.values.filter(_.parent.contains(BlockId(parentBlockId))).map(_.id.getValue).toArray
+    model.blocks.values.filter(_.parent.contains(BlockId(parentBlockId))).map(_.id.value).toArray
 
   /** Get parent of block.
     *
@@ -65,7 +65,7 @@ object Matlab {
   def get_parent(model: Model, blockId: Long): Long =
     model.blocks.get(BlockId(blockId)) match {
       case Some(block) => block.parent match {
-        case Some(parentId) => parentId.getValue
+        case Some(parentId) => parentId.value
         case None => -1L
       }
       case None => throw new NoSuchElementException(s"no block with id $blockId found")
@@ -76,7 +76,7 @@ object Matlab {
     * @param model data model
     * @return array of block id:s
     */
-  def get_all_blocks(model: Model): Array[Long] = model.blocks.values.map(_.id.getValue).toArray
+  def get_all_blocks(model: Model): Array[Long] = model.blocks.values.map(_.id.value).toArray
 
   /** Generate full path of a given block.
     *
@@ -326,7 +326,7 @@ object Matlab {
   def set_input_port_invalid(model: Model, blockId: Long, activatePort: Int): Model =
   // Find all links ending up at the specified port.
     model.links.values.filter(link =>
-      link.end.block.getValue == blockId &&
+      link.end.block.value == blockId &&
         link.linkType == ExplicitLink &&
         link.end.activatePort.value == activatePort)
       // Set port mapping as invalid.
@@ -336,7 +336,7 @@ object Matlab {
       m.lens(_.portMap).modify(_ + (key -> value))
     }
 
-  /** Set input port of block as illegal.
+  /** Set input port of block as invalid.
     *
     * @param model        data model
     * @param blockId      block id
@@ -347,25 +347,25 @@ object Matlab {
     model.addPortMapping(BlockId(blockId), ActivatePort(activatePort),
       InvalidPort, ExplicitLink, OutputPort)
 
-  /** Set evnt input port of block as illegal.
+  /** Set evnt input port of block as invalid.
     *
     * @param model        data model
     * @param blockId      block id
     * @param activatePort index of activate port
     * @return updated data model
     */
-  def set_event_input_port_illegal(model: Model, blockId: Long, activatePort: Int): Model =
+  def set_event_input_port_invalid(model: Model, blockId: Long, activatePort: Int): Model =
     model.addPortMapping(BlockId(blockId), ActivatePort(activatePort),
       InvalidPort, EventLink, InputPort)
 
-  /** Set input port of block as illegal.
+  /** Set input port of block as invalid.
     *
     * @param model        data model
     * @param blockId      block id
     * @param activatePort index of activate port
     * @return updated data model
     */
-  def set_event_output_port_illegal(model: Model, blockId: Long, activatePort: Int): Model =
+  def set_event_output_port_invalid(model: Model, blockId: Long, activatePort: Int): Model =
     model.addPortMapping(BlockId(blockId), ActivatePort(activatePort),
       InvalidPort, EventLink, OutputPort)
 
@@ -376,7 +376,7 @@ object Matlab {
     * @return array of link id:s
     */
   def get_links(model: Model, parentBlockId: Long): Array[Long] =
-    model.links.values.filter(_.parent.getValue == parentBlockId).map(_.id.id).toArray
+    model.links.values.filter(_.parent.value == parentBlockId).map(_.id.value).toArray
 
   /** Get start block id for link.
     *
@@ -388,7 +388,7 @@ object Matlab {
   @throws[NoSuchElementException]("if the link is not found")
   def get_start_block(model: Model, linkId: Long): Long =
     model.links.get(LinkId(linkId)) match {
-      case Some(link) => link.start.block.getValue
+      case Some(link) => link.start.block.value
       case None => throw new NoSuchElementException(s"link with id $linkId not found")
     }
 
@@ -402,7 +402,7 @@ object Matlab {
   @throws[NoSuchElementException]("if the link is not found")
   def get_end_block(model: Model, linkId: Long): Long =
     model.links.get(LinkId(linkId)) match {
-      case Some(link) => link.end.block.getValue
+      case Some(link) => link.end.block.value
       case None => throw new NoSuchElementException(s"link with id $linkId not found")
     }
 

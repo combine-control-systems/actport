@@ -76,8 +76,8 @@ end
 
 function model = apply_post_blocks_transformations(model)
     import actport.model.transform.Matlab.*
-    fprintf('\t* Removing illegal links.\n');
-    model = remove_illegal_links(model);
+    fprintf('\t* Removing invalid links.\n');
+    model = remove_invalid_links(model);
 end
 
 function model = add_blocks(model, parentId, model_path)

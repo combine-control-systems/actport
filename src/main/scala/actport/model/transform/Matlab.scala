@@ -25,10 +25,10 @@ object Matlab {
     */
   def remove_split_blocks(model: Model): Model = RemoveSplitBlocks(model)
 
-  /** Remove illegal links from model.
+  /** Remove invalid links from model.
     *
     * @param model data model
     * @return updated data model
     */
-  def remove_illegal_links(model: Model): Model = RemoveIllegalLinks(model)
+  def remove_invalid_links(model: Model): Model = RemoveInvalidLinks(model)
 }
