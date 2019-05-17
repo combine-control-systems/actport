@@ -1,5 +1,5 @@
-% activate = 'system/LookupTables/LookupTable3D'
-function model = actport_lookup_table_3D(model, block_id, model_path)
+% activate = 'system/LookupTables/LookupTableND'
+function model = actport_lookup_table_ND(model, block_id, model_path)
     import actport.model.Matlab.*
 
     name = get_name(model, block_id);
@@ -7,34 +7,41 @@ function model = actport_lookup_table_3D(model, block_id, model_path)
 
     add_block('simulink/Lookup Tables/n-D Lookup Table', block_path);
 
-    x = get_parameter(model, block_id, 'xx', '[-1, 1]');
-    y = get_parameter(model, block_id, 'yy', '[-1, 1]');
-    z = get_parameter(model, block_id, 'zz', '[-1, 1]');
-    f = get_parameter(model, block_id, 'ff', '[-1, 1, -1, 1, -1, 1, -1, 1]');
+    nDims = eval(get_parameter(model, block_id, 'nDims', '1'));
+    dims = get_parameter(model, block_id, 'dims/dimi', '{''[-1, 1]''}');
 
-    xs = length(eval(x));
-    ys = length(eval(y));
-    zs = length(eval(z));
-    f = sprintf('reshape(%s, %d, %d, %d)', f, xs, ys, zs);
+    set_param(block_path, 'NumberOfTableDimensions', num2str(nDims));
+    for i = 1:nDims
+        dim = char(dims(i));
+        set_param(block_path, sprintf('BreakpointsForDimension%d', i), dim);
+    end
 
-    set_param(block_path, 'NumberOfTableDimensions', '3');
-    set_param(block_path, 'BreakpointsForDimension1', x);
-    set_param(block_path, 'BreakpointsForDimension2', y);
-    set_param(block_path, 'BreakpointsForDimension3', z);
-    set_param(block_path, 'Table', f);
+    f = get_parameter(model, block_id, 'ff', '[-1, 1]');
+    s = ['reshape(', f];
+    for i = 1:nDims
+        s = [s, sprintf(', %d', length(eval(dims(i))))];
+    end
+    s = [s, ')'];
+    set_param(block_path, 'Table', s);
 
     interpolation = strrep(get_parameter(model, block_id, 'Method', ''), '''', '');
     switch interpolation
-        case 'Trilinear interpolation'
+        case 'Hold'
             simulink_interpolation = 'Linear'
-        case 'Nearest_point'
+        case 'Nearest'
             simulink_interpolation = 'Nearest'
-        case 'Point_just_below'
+        case 'Linear'
             simulink_interpolation = 'Nearest'
             warning('Simulink does not support Point just below interpolation - falling back to Nearest.');
-        case 'Point_just_above'
-            simulink_interpolation = 'Nearest'
-            warning('Simulink does not support Point just above interpolation - falling back to Nearest.');
+        case 'Akima'
+            simulink_interpolation = 'Cubic spline'
+            warning('Simulink does not support Akima interpolation - falling back to Cubic spline.');
+        case 'Fritsch_Butland'
+            simulink_interpolation = 'Cubic spline'
+            warning('Simulink does not support Fritsch Butland interpolation - falling back to Cubic spline.');
+        case 'Steffen'
+            simulink_interpolation = 'Cubic spline'
+            warning('Simulink does not support Steffen interpolation - falling back to Nearest.');
         otherwise
             simulink_interpolation = 'Linear';
             warning(sprintf('Unknown interpolation method %s - falling back to Linear.', method));
@@ -48,8 +55,11 @@ function model = actport_lookup_table_3D(model, block_id, model_path)
             simulink_extrapolation = 'Clip';
         case 'Hold'
             simulink_extrapolation = 'Clip';
-        case 'Bilinear extrapolation'
+        case 'Linear'
             simulink_extrapolation = 'Linear';
+        case 'Error'
+            simulink_extrapolation = 'Clip';
+            set_param(block_path, 'DiagnosticForOutOfRangeInput', 'Error');
         otherwise
             warning(sprintf('Unknown extrapolation method %s - falling back to Linear Extrapolation', method));
             simulink_extrapolation = 'Linear';
