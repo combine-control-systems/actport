@@ -40,6 +40,7 @@ function model = actport_lookup_table(model, block_id, model_path)
             simulink_method = 'Nearest';
         otherwise
             warning(sprintf('Unknown interpolation method %s - falling back to Linear', method));
+            simulink_method = 'Linear';
     end
     set_param(block_path, 'InterpMethod', simulink_method);
 
@@ -60,6 +61,9 @@ function model = actport_lookup_table(model, block_id, model_path)
         case 'Repeat'
             warning('Simulink does not support Repeat extrapolation - falling back to Clip');
             simulink_extrapolation = 'Clip';
+        otherwise
+            warning(sprintf('Unknown extrpolation method %s - falling back to Bilinear Extrapolation', method));
+            simulink_extrapolation = 'Linear';
     end
     set_param(block_path, 'ExtrapMethod', simulink_extrapolation);
 
