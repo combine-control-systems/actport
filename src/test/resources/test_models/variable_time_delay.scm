@@ -6,7 +6,7 @@
       <property name="creator" value="Stefan Larsson"/>
       <property name="creationdate" value="05/17/19 04:59:43"/>
       <property name="revision" value="0"/>
-      <property name="lastmodifieddate" value="05/17/19 05:17:16"/>
+      <property name="lastmodifieddate" value="05/17/19 05:54:36"/>
       <property name="comments" value=""/>
     </properties>
   </edition>
@@ -82,9 +82,9 @@
       </ports>
       <parameters>
         <section name="Parameters">
-          <parameter name="T" value="1"/>
-          <parameter name="init" value="0"/>
-          <parameter name="N" value="1000"/>
+          <parameter name="T" value="2"/>
+          <parameter name="init" value="1"/>
+          <parameter name="N" value="500"/>
           <parameter name="dtype" value="&apos;Time&apos;"/>
         </section>
       </parameters>
@@ -383,9 +383,9 @@
       </ports>
       <parameters>
         <section name="Parameters">
-          <parameter name="T" value="1"/>
-          <parameter name="init" value="0"/>
-          <parameter name="N" value="1000"/>
+          <parameter name="T" value="3"/>
+          <parameter name="init" value="4"/>
+          <parameter name="N" value="750"/>
           <parameter name="dtype" value="&apos;Transport&apos;"/>
         </section>
       </parameters>
