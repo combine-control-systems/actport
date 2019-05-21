@@ -6,7 +6,7 @@
       <property name="creator" value="Stefan Larsson"/>
       <property name="creationdate" value="05/21/19 04:51:25"/>
       <property name="revision" value="0"/>
-      <property name="lastmodifieddate" value="05/21/19 06:04:14"/>
+      <property name="lastmodifieddate" value="05/21/19 07:57:11"/>
       <property name="comments" value=""/>
     </properties>
   </edition>
@@ -201,7 +201,7 @@
         <size width="40" height="40"/>
         <rotate angle="0"/>
         <texts>
-          <text name="text1" color="0,0,0,255" clip="1" x="0.5" y="0.25" rotate="1" visible="1" font="Arial,12" align="center">1</text>
+          <text name="text1" color="0,0,0,255" clip="1" x="0.5" y="0.25" rotate="1" visible="1" font="Arial,12" align="center">0.1</text>
           <text name="text2" color="0,0,0,255" clip="1" x="0.5" y="0.75" rotate="1" visible="1" font="Arial,12" align="center">0</text>
         </texts>
         <images>
@@ -230,7 +230,7 @@
       </ports>
       <parameters>
         <section name="Parameters">
-          <parameter name="frequ" value="1"/>
+          <parameter name="frequ" value="0.1"/>
           <parameter name="offset" value="0"/>
         </section>
       </parameters>

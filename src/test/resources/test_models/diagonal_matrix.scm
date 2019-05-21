@@ -1,0 +1,502 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model name="diagonal_matrix">
+  <header formatversion="2" hwxversion="2019.2" script="oml"/>
+  <edition>
+    <properties>
+      <property name="creator" value="Stefan Larsson"/>
+      <property name="creationdate" value="05/21/19 08:25:54"/>
+      <property name="revision" value="0"/>
+      <property name="lastmodifieddate" value="05/21/19 08:27:44"/>
+      <property name="comments" value=""/>
+    </properties>
+  </edition>
+  <initialization/>
+  <finalization/>
+  <diagram>
+    <block name="DiagonalMatrix" type="block">
+      <template name="system/MatrixOperations/DiagonalMatrix"/>
+      <properties>
+        <property name="inlinable" value="0"/>
+        <property name="masked" value="1"/>
+        <property name="atomic" value="0"/>
+      </properties>
+      <graphics>
+        <label position="bottom" visible="0" font="Arial,11" color="255,255,255,255"/>
+        <frame shape="rectangle" visible="1" color="0,0,0,255" thickness="1.5"/>
+        <background color="255,255,255,255"/>
+        <position x="-845.1277465820313" y="-989.2263793945313"/>
+        <size width="40" height="40"/>
+        <rotate angle="0"/>
+        <texts>
+          <text name="text1" color="0,0,0,255" clip="1" x="0.5" y="0.5" rotate="1" visible="1" font="Arial,12" align="center">Diag</text>
+        </texts>
+        <images>
+          <image name="image1" file="" visible="1" alpha="255" aspectratio="1" x="0" y="0" width="1" height="1" clip="1" rotate="1"/>
+        </images>
+        <flip value="0">
+          <images>
+            <image name="image2" file="" visible="1" alpha="255" aspectratio="1" x="0" y="0" width="1" height="1" clip="1" rotate="1"/>
+          </images>
+        </flip>
+      </graphics>
+      <ports>
+        <port name="" type="fixedport">
+          <properties>
+            <property name="iotype" value="out"/>
+            <property name="datatype" value="Explicit"/>
+            <property name="portnumber" value="1"/>
+          </properties>
+          <graphics>
+            <location position="right"/>
+            <label visible="1" font="Arial,10" color="255,255,255,255"/>
+            <frame shape="triangle" visible="1" color="64,64,64,255" thickness="1.5"/>
+            <background color="64,64,64,255"/>
+          </graphics>
+        </port>
+        <port name="" type="fixedport">
+          <properties>
+            <property name="iotype" value="in"/>
+            <property name="datatype" value="Explicit"/>
+            <property name="portnumber" value="1"/>
+          </properties>
+          <graphics>
+            <location position="left"/>
+            <label visible="1" font="Arial,10" color="255,255,255,255"/>
+            <frame shape="triangle" visible="1" color="64,64,64,255" thickness="1.5"/>
+            <background color="64,64,64,255"/>
+          </graphics>
+        </port>
+        <port name="" type="variableport">
+          <properties>
+            <property name="iotype" value="in"/>
+            <property name="datatype" value="Activation"/>
+            <property name="portnumber" value="externalActivation"/>
+          </properties>
+          <graphics>
+            <location position="top"/>
+            <label visible="1" font="Arial,10" color="255,255,255,255"/>
+            <frame shape="triangle" visible="1" color="183,15,19,255" thickness="1.5"/>
+            <background color="183,15,19,255"/>
+          </graphics>
+        </port>
+      </ports>
+      <parameters>
+        <section name="Parameters">
+          <parameter name="offset" value="0"/>
+          <parameter name="externalActivation" value="0"/>
+        </section>
+      </parameters>
+    </block>
+    <block name="Constant" type="block">
+      <template name="system/SignalGenerators/Constant"/>
+      <properties>
+        <property name="inlinable" value="0"/>
+        <property name="masked" value="1"/>
+        <property name="atomic" value="0"/>
+      </properties>
+      <graphics>
+        <label position="bottom" visible="0" font="Arial,11" color="255,255,255,255"/>
+        <frame shape="rectangle" visible="1" color="0,0,0,255" thickness="1.5"/>
+        <background color="255,255,255,255"/>
+        <position x="-919.6199340820313" y="-989.40478515625"/>
+        <size width="40" height="40"/>
+        <rotate angle="0"/>
+        <texts>
+          <text name="text1" color="0,0,0,255" clip="1" x="0.5" y="0.5" rotate="1" visible="1" font="Arial,12" align="center">[1,2,3]</text>
+        </texts>
+        <images>
+          <image name="image1" file="" visible="1" alpha="255" aspectratio="1" x="0" y="0" width="1" height="1" clip="1" rotate="1"/>
+        </images>
+        <flip value="0">
+          <images>
+            <image name="image2" file="" visible="1" alpha="255" aspectratio="1" x="0" y="0" width="1" height="1" clip="1" rotate="1"/>
+          </images>
+        </flip>
+      </graphics>
+      <ports>
+        <port name="" type="fixedport">
+          <properties>
+            <property name="iotype" value="out"/>
+            <property name="datatype" value="Explicit"/>
+            <property name="portnumber" value="1"/>
+          </properties>
+          <graphics>
+            <location position="right"/>
+            <label visible="1" font="Arial,10" color="255,255,255,255"/>
+            <frame shape="triangle" visible="1" color="64,64,64,255" thickness="1.5"/>
+            <background color="64,64,64,255"/>
+          </graphics>
+        </port>
+        <port name="" type="variableport">
+          <properties>
+            <property name="iotype" value="in"/>
+            <property name="datatype" value="Activation"/>
+            <property name="portnumber" value="externalActivation"/>
+          </properties>
+          <graphics>
+            <location position="top"/>
+            <label visible="1" font="Arial,10" color="255,255,255,255"/>
+            <frame shape="triangle" visible="1" color="183,15,19,255" thickness="1.5"/>
+            <background color="183,15,19,255"/>
+          </graphics>
+        </port>
+      </ports>
+      <parameters>
+        <section name="Parameters">
+          <parameter name="C" value="[1,2,3]"/>
+          <parameter name="typ" value="&apos;double&apos;"/>
+          <parameter name="externalActivation" value="0"/>
+        </section>
+      </parameters>
+    </block>
+    <block name="Display" type="block">
+      <template name="system/SignalViewers/Display"/>
+      <properties>
+        <property name="masked" value="1"/>
+        <property name="inlinable" value="0"/>
+        <property name="atomic" value="0"/>
+        <property name="status" value="1"/>
+      </properties>
+      <graphics>
+        <label position="bottom" visible="0" font="Arial,11" color="255,255,255,255"/>
+        <frame shape="rectangle" visible="1" color="0,0,0,255" thickness="1.5"/>
+        <background color="255,255,255,255"/>
+        <position x="-764.7507934570313" y="-993.2263793945313"/>
+        <size width="96" height="48"/>
+        <rotate angle="0"/>
+        <texts>
+          <text name="text1" color="0,0,0,255" clip="1" x="0.500000" y="0.500000" rotate="1" visible="1" font="Arial,10" align="center">        1        0        0&#xA;        0        2        0&#xA;        0        0        3</text>
+        </texts>
+        <images>
+          <image name="image1" file="" visible="1" alpha="255" aspectratio="1" x="0" y="0" width="1" height="1" clip="1" rotate="1"/>
+        </images>
+        <flip value="0">
+          <images>
+            <image name="image2" file="" visible="1" alpha="255" aspectratio="1" x="0" y="0" width="1" height="1" clip="1" rotate="1"/>
+          </images>
+        </flip>
+      </graphics>
+      <ports>
+        <port name="" type="fixedport">
+          <properties>
+            <property name="iotype" value="in"/>
+            <property name="datatype" value="explicit"/>
+            <property name="portnumber" value="1"/>
+          </properties>
+          <graphics>
+            <location position="left"/>
+            <label visible="0" font="Arial,10" color="255,255,255,255"/>
+            <frame shape="triangle" visible="1" color="64,64,64,255" thickness="1.5"/>
+            <background color="64,64,64,255"/>
+          </graphics>
+        </port>
+        <port name="" type="variableport">
+          <properties>
+            <property name="iotype" value="in"/>
+            <property name="datatype" value="activation"/>
+            <property name="portnumber" value="externalActivation"/>
+          </properties>
+          <graphics>
+            <location position="top"/>
+            <label visible="0" font="Arial,10" color="255,255,255,255"/>
+            <frame shape="triangle" visible="1" color="183,15,19,255" thickness="1.5"/>
+            <background color="183,15,19,255"/>
+          </graphics>
+        </port>
+      </ports>
+      <parameters>
+        <section name="Parameters">
+          <parameter name="fmt" value="&apos;%6g&apos;"/>
+          <parameter name="dt" value="1"/>
+          <parameter name="showatend" value="0"/>
+          <parameter name="externalActivation" value="0"/>
+        </section>
+      </parameters>
+    </block>
+    <block name="DiagonalMatrix_1" type="block">
+      <template name="system/MatrixOperations/DiagonalMatrix"/>
+      <properties>
+        <property name="inlinable" value="0"/>
+        <property name="masked" value="1"/>
+        <property name="atomic" value="0"/>
+      </properties>
+      <graphics>
+        <label position="bottom" visible="0" font="Arial,11" color="255,255,255,255"/>
+        <frame shape="rectangle" visible="1" color="0,0,0,255" thickness="1.5"/>
+        <background color="255,255,255,255"/>
+        <position x="-842.783935546875" y="-930.9298095703125"/>
+        <size width="40" height="40"/>
+        <rotate angle="0"/>
+        <texts>
+          <text name="text1" color="0,0,0,255" clip="1" x="0.5" y="0.5" rotate="1" visible="1" font="Arial,12" align="center">Diag</text>
+        </texts>
+        <images>
+          <image name="image1" file="" visible="1" alpha="255" aspectratio="1" x="0" y="0" width="1" height="1" clip="1" rotate="1"/>
+        </images>
+        <flip value="0">
+          <images>
+            <image name="image2" file="" visible="1" alpha="255" aspectratio="1" x="0" y="0" width="1" height="1" clip="1" rotate="1"/>
+          </images>
+        </flip>
+      </graphics>
+      <ports>
+        <port name="" type="fixedport">
+          <properties>
+            <property name="iotype" value="out"/>
+            <property name="datatype" value="Explicit"/>
+            <property name="portnumber" value="1"/>
+          </properties>
+          <graphics>
+            <location position="right"/>
+            <label visible="1" font="Arial,10" color="255,255,255,255"/>
+            <frame shape="triangle" visible="1" color="64,64,64,255" thickness="1.5"/>
+            <background color="64,64,64,255"/>
+          </graphics>
+        </port>
+        <port name="" type="fixedport">
+          <properties>
+            <property name="iotype" value="in"/>
+            <property name="datatype" value="Explicit"/>
+            <property name="portnumber" value="1"/>
+          </properties>
+          <graphics>
+            <location position="left"/>
+            <label visible="1" font="Arial,10" color="255,255,255,255"/>
+            <frame shape="triangle" visible="1" color="64,64,64,255" thickness="1.5"/>
+            <background color="64,64,64,255"/>
+          </graphics>
+        </port>
+        <port name="" type="variableport">
+          <properties>
+            <property name="iotype" value="in"/>
+            <property name="datatype" value="Activation"/>
+            <property name="portnumber" value="externalActivation"/>
+          </properties>
+          <graphics>
+            <location position="top"/>
+            <label visible="1" font="Arial,10" color="255,255,255,255"/>
+            <frame shape="triangle" visible="1" color="183,15,19,255" thickness="1.5"/>
+            <background color="183,15,19,255"/>
+          </graphics>
+        </port>
+      </ports>
+      <parameters>
+        <section name="Parameters">
+          <parameter name="offset" value="1"/>
+          <parameter name="externalActivation" value="0"/>
+        </section>
+      </parameters>
+    </block>
+    <block name="Split" type="regular_split">
+      <template name="system/Links/Split"/>
+      <properties>
+        <property name="inlinable" value="0"/>
+        <property name="masked" value="1"/>
+        <property name="atomic" value="0"/>
+      </properties>
+      <graphics>
+        <label position="bottom" visible="0" font="Arial,11" color="255,255,255,255"/>
+        <frame shape="ellipse" visible="1" color="0,0,0,255" thickness="1.5"/>
+        <background color="64,64,64,255"/>
+        <position x="-855.1277465820313" y="-969.40478515625"/>
+        <size width="0" height="0"/>
+        <rotate angle="0"/>
+        <texts>
+          <text name="text1" color="0,0,0,255" clip="1" x="0.5" y="0.5" rotate="1" visible="1" font="Arial,12" align="center"/>
+        </texts>
+        <images>
+          <image name="image1" file="" visible="1" alpha="255" aspectratio="1" x="0" y="0" width="1" height="1" clip="1" rotate="1"/>
+        </images>
+        <flip value="0">
+          <images>
+            <image name="image2" file="" visible="1" alpha="255" aspectratio="1" x="0" y="0" width="1" height="1" clip="1" rotate="1"/>
+          </images>
+        </flip>
+      </graphics>
+      <ports>
+        <port name="" type="fixedport">
+          <properties>
+            <property name="iotype" value="in"/>
+            <property name="datatype" value="Explicit"/>
+            <property name="portnumber" value="1"/>
+          </properties>
+          <graphics>
+            <location position="left"/>
+            <label visible="1" font="Arial,10" color="255,255,255,255"/>
+            <frame shape="point" visible="1" color="64,64,64,255" thickness="1.5"/>
+            <background color="64,64,64,255"/>
+          </graphics>
+        </port>
+        <port name="" type="fixedport">
+          <properties>
+            <property name="iotype" value="out"/>
+            <property name="datatype" value="Explicit"/>
+            <property name="portnumber" value="1"/>
+          </properties>
+          <graphics>
+            <location position="right"/>
+            <label visible="1" font="Arial,10" color="255,255,255,255"/>
+            <frame shape="point" visible="1" color="64,64,64,255" thickness="1.5"/>
+            <background color="64,64,64,255"/>
+          </graphics>
+        </port>
+        <port name="" type="fixedport">
+          <properties>
+            <property name="iotype" value="out"/>
+            <property name="datatype" value="Explicit"/>
+            <property name="portnumber" value="2"/>
+          </properties>
+          <graphics>
+            <location position="right"/>
+            <label visible="1" font="Arial,10" color="255,255,255,255"/>
+            <frame shape="point" visible="1" color="64,64,64,255" thickness="1.5"/>
+            <background color="64,64,64,255"/>
+          </graphics>
+        </port>
+        <port name="" type="fixedport">
+          <properties>
+            <property name="iotype" value="out"/>
+            <property name="datatype" value="Explicit"/>
+            <property name="portnumber" value="3"/>
+          </properties>
+          <graphics>
+            <location position="right"/>
+            <label visible="1" font="Arial,10" color="255,255,255,255"/>
+            <frame shape="point" visible="1" color="64,64,64,255" thickness="1.5"/>
+            <background color="64,64,64,255"/>
+          </graphics>
+        </port>
+      </ports>
+      <parameters>
+        <section name="Parameters">
+        </section>
+      </parameters>
+    </block>
+    <block name="Display_1" type="block">
+      <template name="system/SignalViewers/Display"/>
+      <properties>
+        <property name="masked" value="1"/>
+        <property name="inlinable" value="0"/>
+        <property name="atomic" value="0"/>
+        <property name="status" value="1"/>
+      </properties>
+      <graphics>
+        <label position="bottom" visible="0" font="Arial,11" color="255,255,255,255"/>
+        <frame shape="rectangle" visible="1" color="0,0,0,255" thickness="1.5"/>
+        <background color="255,255,255,255"/>
+        <position x="-779.5658569335938" y="-940.9298095703125"/>
+        <size width="132" height="60"/>
+        <rotate angle="0"/>
+        <texts>
+          <text name="text1" color="0,0,0,255" clip="1" x="0.500000" y="0.500000" rotate="1" visible="1" font="Arial,10" align="center">        0        1        0        0&#xA;        0        0        2        0&#xA;        0        0        0        3&#xA;        0        0        0        0</text>
+        </texts>
+        <images>
+          <image name="image1" file="" visible="1" alpha="255" aspectratio="1" x="0" y="0" width="1" height="1" clip="1" rotate="1"/>
+        </images>
+        <flip value="0">
+          <images>
+            <image name="image2" file="" visible="1" alpha="255" aspectratio="1" x="0" y="0" width="1" height="1" clip="1" rotate="1"/>
+          </images>
+        </flip>
+      </graphics>
+      <ports>
+        <port name="" type="fixedport">
+          <properties>
+            <property name="iotype" value="in"/>
+            <property name="datatype" value="explicit"/>
+            <property name="portnumber" value="1"/>
+          </properties>
+          <graphics>
+            <location position="left"/>
+            <label visible="0" font="Arial,10" color="255,255,255,255"/>
+            <frame shape="triangle" visible="1" color="64,64,64,255" thickness="1.5"/>
+            <background color="64,64,64,255"/>
+          </graphics>
+        </port>
+        <port name="" type="variableport">
+          <properties>
+            <property name="iotype" value="in"/>
+            <property name="datatype" value="activation"/>
+            <property name="portnumber" value="externalActivation"/>
+          </properties>
+          <graphics>
+            <location position="top"/>
+            <label visible="0" font="Arial,10" color="255,255,255,255"/>
+            <frame shape="triangle" visible="1" color="183,15,19,255" thickness="1.5"/>
+            <background color="183,15,19,255"/>
+          </graphics>
+        </port>
+      </ports>
+      <parameters>
+        <section name="Parameters">
+          <parameter name="fmt" value="&apos;%6g&apos;"/>
+          <parameter name="dt" value="1"/>
+          <parameter name="showatend" value="0"/>
+          <parameter name="externalActivation" value="0"/>
+        </section>
+      </parameters>
+    </block>
+    <link name="" type="Explicit">
+      <label position="bottom" visible="0" font="Arial,11" color="255,255,255,255"/>
+      <from block="Constant" port="1" iotype="out"/>
+      <to block="Split" port="1" iotype="in"/>
+      <pen shape="line" color="64,64,64,255" thickness="1.5"/>
+      <points/>
+    </link>
+    <link name="" type="Explicit">
+      <label position="bottom" visible="0" font="Arial,11" color="255,255,255,255"/>
+      <from block="DiagonalMatrix" port="1" iotype="out"/>
+      <to block="Display" port="1" iotype="in"/>
+      <pen shape="line" color="64,64,64,255" thickness="1.5"/>
+      <points/>
+    </link>
+    <link name="" type="Explicit">
+      <label position="bottom" visible="0" font="Arial,11" color="255,255,255,255"/>
+      <from block="Split" port="1" iotype="out"/>
+      <to block="DiagonalMatrix" port="1" iotype="in"/>
+      <pen shape="line" color="64,64,64,255" thickness="1.5"/>
+      <points/>
+    </link>
+    <link name="" type="Explicit">
+      <label position="bottom" visible="0" font="Arial,11" color="255,255,255,255"/>
+      <from block="Split" port="2" iotype="out"/>
+      <to block="DiagonalMatrix_1" port="1" iotype="in"/>
+      <pen shape="line" color="64,64,64,255" thickness="1.5"/>
+      <points>
+        <point x="-855.1277465820313" y="-910.9298095703125"/>
+      </points>
+    </link>
+    <link name="" type="Explicit">
+      <label position="bottom" visible="0" font="Arial,11" color="255,255,255,255"/>
+      <from block="DiagonalMatrix_1" port="1" iotype="out"/>
+      <to block="Display_1" port="1" iotype="in"/>
+      <pen shape="line" color="64,64,64,255" thickness="1.5"/>
+      <points/>
+    </link>
+    <context/>
+    <graphics>
+      <viewport width="800" height="800" topleftx="0" toplefty="0"/>
+      <window width="800" height="800" topleftx="0" toplefty="0"/>
+    </graphics>
+  </diagram>
+  <simulation>
+    <properties>
+      <property name="InitialTime" value="0"/>
+      <property name="FinalTime" value="30"/>
+      <property name="RealTimeScale" value="0"/>
+      <property name="AbsoluteErrorTolerance" value="0.000001"/>
+      <property name="RelativeErrorTolerance" value="0.000001"/>
+      <property name="MaxTimeInterval" value="-1"/>
+      <property name="TimeTolerance" value="-1"/>
+      <property name="Solver" value="lsodar"/>
+      <property name="MaxStepSize" value="-1"/>
+      <property name="InitialStepSize" value="-1"/>
+      <property name="MinimalStepSize" value="-1"/>
+      <property name="ZeroCrossingThreshold" value="-1"/>
+      <property name="NumberOfConsecutiveZeroCrossing" value="-1"/>
+      <property name="TimeToleranceZeroCrossing" value="-1"/>
+      <property name="AlgebraicSolver" value="idacalc"/>
+      <property name="JacobianMethod" value="1"/>
+    </properties>
+  </simulation>
+</model>
