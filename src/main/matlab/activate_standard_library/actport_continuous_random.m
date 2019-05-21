@@ -84,10 +84,16 @@ function model = actport_continuous_random(model, block_id, model_path)
                 'end\n'...
             ], theta, k);
             add_quantile_function(model, block_id, block_path, seed, qfunc);
-        %case 'chi'
-        %    K = char(get_parameter(model, block_id, 'Chi_param/K', '1'));
-        %    qfunc = ???;
-        %    add_quantile_function(model, block_id, block_path, seed, qfunc);
+        case 'chi'
+            K = char(get_parameter(model, block_id, 'Chi_param/K', '1'));
+            % Quantile function for chi-square-distribution.
+            qfunc = sprintf([...
+                'function x = f(y)\n'...
+                '%%#codegen\n'...
+                'x = gammaincinv(y, %s) * (%s);\n'...
+                'end\n'...
+            ], sprintf('%s/2', K), '2');
+            add_quantile_function(model, block_id, block_path, seed, qfunc);
         case 'exp'
             lambda = char(get_parameter(model, block_id, 'Exp_param/lambda', '1'));
             % Quantile function for exponential distribution.
@@ -98,15 +104,27 @@ function model = actport_continuous_random(model, block_id, model_path)
                 'end\n'...
             ], lambda);
             add_quantile_function(model, block_id, block_path, seed, qfunc);
-        %case 'F'
-        %    d1 = char(get_parameter(model, block_id, 'F_param/d1', '1'));
-        %    d2 = char(get_parameter(model, block_id, 'F_param/d2', '1'));
-        %    qfunc = ???;
-        %    add_quantile_function(model, block_id, block_path, seed, qfunc);
-        %case 'T'
-        %    t = char(get_parameter(model, block_id, 'T_param/t', '1'));
-        %    qfunc = ???;
-        %    add_quantile_function(model, block_id, block_path, seed, qfunc);
+        case 'F'
+            d1 = char(get_parameter(model, block_id, 'F_param/d1', '1'));
+            d2 = char(get_parameter(model, block_id, 'F_param/d2', '1'));
+            % Quantile function for F-distribution.
+            qfunc = sprintf([...
+                'function x = f(y)\n'...
+                '%%#codegen\n'...
+                'x = (1 / betaincinv(1-y, (%s)/2, (%s)/2)-1) * (%s) / (%s);\n'...
+                'end\n'...
+            ], d1, d2, d1, d2);
+            add_quantile_function(model, block_id, block_path, seed, qfunc);
+        case 'T'
+            t = char(get_parameter(model, block_id, 'T_param/t', '1'));
+            % Quantile function for t-distribution.
+            qfunc = sprintf([...
+                'function x = f(y)\n'...
+                '%%#codegen\n'...
+                'x = sign(y-.5) * sqrt((%s) * (1/betaincinv(2*min(y, 1-y), (%s)/2, .5)-1));\n'...
+                'end\n'...
+            ], t, t);
+            add_quantile_function(model, block_id, block_path, seed, qfunc);
         %case 'pearson'
         %    m = char(get_parameter(model, block_id, 'Pearson_param/mean', '1'));
         %    v = char(get_parameter(model, block_id, 'Pearson_param/variance', '1'));
