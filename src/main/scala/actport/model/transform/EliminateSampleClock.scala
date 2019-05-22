@@ -14,7 +14,13 @@ object EliminateSampleClock {
   def apply(model: Model): Model = {
     // Find all SampleClock blocks.
     val sampleClockBlocks = model.blocks.values
-      .filter(_.activateId == ActivateId("system/ActivationOperations/SampleClock"))
+      .filter(block =>
+        block.activateId == ActivateId("system/ActivationOperations/SampleClock") &&
+          // Only eliminate SampleClock blocks which has no offset.
+          (block.parameters.get(ParameterName("offset")) match {
+          case Some(o: String) if o == "0" => true
+          case _ => false
+        }))
 
     sampleClockBlocks.foldLeft(model) { (m, block) => eliminateSampleClock(m, block) }
   }
