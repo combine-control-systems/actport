@@ -148,7 +148,9 @@ void prepareSim() {
 	// Wrapper required to run parallel under script
 	String name = file.name.toString().split('\\.')[0]
 	String path = file.path.toString()
-	stages.put(name, create_slx_stage(name, path))
+	if(! importFailed.contains(name)) {
+	    stages.put(name, create_slx_stage(name, path))
+	}
     }
     script {
 	try{
