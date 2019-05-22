@@ -558,7 +558,7 @@ object Matlab {
   @throws[NoSuchElementException]("if block does not exist")
   def get_sample_rate(model: Model, blockId: Long): String =
     model.blocks.get(BlockId(blockId)) match {
-      case Some(block) => block.sampleRate.getOrElse("")
+      case Some(block) => block.sampleRate.getOrElse("-1")
       case None => throw new NoSuchElementException(s"could not find block with id $blockId")
     }
 
@@ -738,4 +738,11 @@ object Matlab {
     * @return max step size
     */
   def get_max_step_size(model: Model): String = model.solverSettings.maxStepSize
+
+  /** Get solver.
+    *
+    * @param model data model
+    * @return solver name
+    */
+  def get_solver(model: Model): String = model.solverSettings.solver
 }

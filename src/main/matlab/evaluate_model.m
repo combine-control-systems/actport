@@ -159,7 +159,6 @@ function set_model_parameters(model)
     set_param(name, 'ConsecutiveZCsStepRelTol', char(get_tolerance_on_time(model)));
     set_param(name, 'MaxStep', char(get_max_step_size(model)));
 
-    % TODO: Add solver setting 'Solver' based on the following values translated from Activate:
     %       'VariableStepDiscrete' | {'ode45'} | 'ode23' | 'ode113' | 'ode15s' | 'ode23s' | 'ode23t'
     %       | 'ode23tb' | 'FixedStepDiscrete' |'ode8'| 'ode5' | 'ode4' | 'ode3' | 'ode2' | 'ode1' | 'ode14x'
     %
@@ -184,4 +183,28 @@ function set_model_parameters(model)
     %                                Ida (Sundials) | ida        (can have algebraic solvers Ida, Daskr or Fsolve)
     %                               Radau-IIA (DAE) | radauv_imp (can have algebraic solvers Ida, Daskr or Fsolve)
     %                                         DASKR | daskr      (can have algebraic solvers Ida, Daskr or Fsolve)
+
+    % Default.
+    solver = 'VariableStepAuto';
+
+    activate_solver = char(get_solver(model));
+    switch activate_solver
+        % Variable-step stiff ODE
+        case {'lsodar', 'cvode1', 'cvode3', 'radauv_imp', 'cpodes1'}
+            solver = 'ode15s';
+        % Variable-step non-stiff ODE
+        case {'cvode2', 'cvode4', 'dopri5'}
+            solver = 'ode45';
+        % Variable-step DAE
+        case {'ida', 'radauv_imp', 'daskr'}
+            solver = 'ode15s';
+        % Fixed step-size stiff ODE
+        case {'euler_imp', 'trapezoid_imp'}
+            solver = 'ode23tb';
+        case {'euler_exp', 'trapezoid', 'rk4', 'rk5'}
+            solver = 'ode5';
+    end
+
+    fprintf('* Choosing Simulink Solver ''%s'' given Activate Solver ''%s''.\n', ...
+        solver, activate_solver);
 end
