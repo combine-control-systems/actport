@@ -1,0 +1,23 @@
+function e=eval_cost(p,ev,env)
+  vss_context=struct();
+  vss_context.T=p(1:4);
+  vss_context.gear=p(5:9);
+  vssRunSimulation(ev,vss_context,env);
+  Tf=getenvvalue(env,'Tf');
+  e=Tf.ch{1}.data;
+end
+
+me=omlfilename('fullpath');
+p=fileparts(me);
+model=[p,'/car_min_time_distance_1000_batch.scm'];
+T0=4*ones(4,1);
+gear0=[3.2;1.8;1.3;1;.8];
+p0=[T0;gear0];
+simobj=bdeCreateSimulationObject(model);
+ev=vssCreateEvaluator(model,simobj);
+env=getnewenv;
+cost=@(p) eval_cost(p,ev,env);
+options=optimset('MaxFunEvals',1000);
+p = fminunc(cost,p0,options);
+T=p([1:4])
+gear=p([5:9])

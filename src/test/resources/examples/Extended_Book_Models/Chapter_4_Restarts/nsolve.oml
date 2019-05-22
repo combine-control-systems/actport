@@ -1,0 +1,18 @@
+function [pnext,TT]=nsolve(p,gp,TT)
+n=length(p);N=size(TT,2);
+G=TT(1:n,:);P=TT(1+n:2*n,:);wi=TT(2*n+1,:);
+wi=wi*(1+1/n);
+[_x,idx]=max(wi);
+G(:,idx)=gp;P(:,idx)=p;wi(idx)=gp'*gp;
+[Q,R]=qr(G');r=rank(R);Gperp=Q*[zeros(N-r,r);eye(r)];
+At=ones(1,N)*Gperp;Bt=P*Gperp;Ct=Gperp;
+A=kron(At',eye(n));b=Bt(:);C=kron(Ct',eye(n));
+Wi=kron(diag(wi),eye(n));
+m=size(A,1);
+pnext=[eye(n),zeros(n,m)]*...
+inv([A,-C*Wi*C';zeros(n,n),A'])*[b;zeros(n,1)];
+if norm(p-pnext)<eps
+pnext=pnext+2*eps*rand(n,1);
+end
+TT=[G;P;wi];
+end
