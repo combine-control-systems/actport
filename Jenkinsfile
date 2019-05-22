@@ -77,9 +77,13 @@ ${upload_url}?name=$(basename $RELEASE)
     }
     post {
 	always {
+	    emailext(subject: "${env.JOB_NAME}-${env.BRANCH_NAME}-${env.BUILD_NUMBER}",
+		     body: "Results from the job in the subject can be found attached",
+		     from: "jenkins.actport@combine.se",
+		     to: "jenkins.actport@combine.se")
 	    cleanWs(deleteDirs: true,
-	    patterns: [[pattern: 'src/test/', type: 'INCLUDE'],
-		       [pattern: 'target/*.zip', type: 'INCLUDE']])
+		    patterns: [[pattern: 'src/test/', type: 'INCLUDE'],
+			       [pattern: 'target/*.zip', type: 'INCLUDE']])
 	}
     }
 }
