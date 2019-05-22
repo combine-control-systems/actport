@@ -38,5 +38,9 @@ function model = actport_undefined(model, block_id, model_path)
         model = map_event_output_port(model, block_id, i, sprintf('%d', get_output_count(model, block_id) + i));
     end
 
+    set_param(block_path, 'ShowPortLabels', 'none');
+    mask = Simulink.Mask.create(block_path);
+    mask.Display = sprintf('image(''%s'');\n', 'question_mark.png');
+
     set_common_parameters(model, block_id, model_path);
 end
