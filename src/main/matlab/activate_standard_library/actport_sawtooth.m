@@ -11,7 +11,7 @@ function model = actport_sawtooth(model, block_id, model_path)
     amplitude = (startv - endv) / 2;
     origin = (endv + amplitude);
     if not(strcmp(get_parameter(model, block_id, 'tinit', '0'), '0'))
-        warning('Time offset on sawtooth generator is not supported');
+        logger('Time offset on sawtooth generator is not supported', block_path);
     end
 
     % Simulink only defines Amplitude and Frequency

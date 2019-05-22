@@ -56,16 +56,16 @@ function [mode, index, size] = parseDimension(model, block_id, dimension)
     end
     if strcmp(get_parameter(model, block_id, sprintf('extract%c/%c_startingindexdecreasing', dimension, dimension), '0'), '1')
         mode = 'Starting index (dialog)';
-        error('Not implemented yet.');
+        logger(sprintf('%s not implemented yet.', mode), block_path);
         % Reverse the indices.
     end
     if strcmp(get_parameter(model, block_id, sprintf('extract%c/%c_vectorindexport', dimension, dimension), '0'), '1')
         mode = 'Starting index (port)';
-        error('Not implemented yet.');
+        logger(sprintf('%s not implemented yet.', mode), block_path);
     end
     if strcmp(get_parameter(model, block_id, sprintf('extract%c/%c_startingindexportdecreasing', dimension, dimension), '0'), '1')
         mode = 'Starting index (port)';
-        error('Not implemented yet.');
+        logger(sprintf('%s not implemented yet.', mode), block_path);
         % Reverse the indices somehow?
     end
 end

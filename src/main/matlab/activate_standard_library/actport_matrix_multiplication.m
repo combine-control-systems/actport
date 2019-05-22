@@ -42,7 +42,7 @@ function model = actport_matrix_multiplication(model, block_id, model_path)
                     % Connect port with product.
                     add_line(block_path, sprintf('In%d/1', i), sprintf('Product/%d', i));
                 otherwise
-                    error(sprintf('Invalid matrix multiplication sign %s in %s', signs(i), signs));
+                    logger(sprintf('Invalid matrix multiplication sign %s in %s', signs(i), signs), block_path);
             end
         end
         Simulink.BlockDiagram.arrangeSystem(block_path);

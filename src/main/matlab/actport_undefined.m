@@ -4,6 +4,8 @@ function model = actport_undefined(model, block_id, model_path)
     name = get_name(model, block_id);
     block_path = sprintf('%s/%s', model_path, name);
 
+    logger('Creating placeholder for block with no generator.', block_path);
+
     % Add an empty sub system.
     add_clean_subsystem(block_path);
 

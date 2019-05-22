@@ -14,7 +14,7 @@ function model = actport_signal_generator(model, block_id, model_path)
         case 'inherit'
             type =  'Inherit: Inherit via back propagation';
         case 'boolean'
-            error('Simulink does not have boolean as output type of Repeating Sequence');
+            logger('Simulink does not have boolean as output type of Repeating Sequence', block_path);
     end
     set_param(block_path, 'OutDataTypeStr', type);
 
@@ -23,32 +23,32 @@ function model = actport_signal_generator(model, block_id, model_path)
         case 'Linear'
             method = 'Interpolation-Use End Values';
         otherwise
-            warning('Simulink only supports linear interpolation');
+            logger('Simulink only supports linear interpolation', block_path);
     end
     set_param(block_path, 'LookUpMeth', method)
 
     left = strrep(get_parameter(model, block_id, 'Leftside', '''Zero'''), '''', '');
     if not(strcmp(left, 'Hold'))
-            warning('Simulink only supports Hold before time span');
+        logger('Simulink only supports Hold before time span', block_path);
     end
 
     right = strrep(get_parameter(model, block_id, 'Rightside', '''Hold'''), '''', '');
     if not(strcmp(left, 'Repeat'))
-            warning('Simulink only supports Repeat after time span');
+        logger('Simulink only supports Repeat after time span', block_path);
     end
 
     % Not supported properties
     if not(strcmp(get_parameter(model, block_id, 'outevent', '0'), '0'))
-            warning('Simulink does not support extracting time events');
+        logger('Simulink does not support extracting time events', block_path);
     end
     if not(strcmp(get_parameter(model, block_id, 'firstder', '0'), '0'))
-            warning('Simulink does not support setting first derivative');
+        logger('Simulink does not support setting first derivative', block_path);
     end
     if not(strcmp(get_parameter(model, block_id, 'secondder', '0'), '0'))
-            warning('Simulink does not support setting second derivative');
+        logger('Simulink does not support setting second derivative', block_path);
     end
     if not(strcmp(get_parameter(model, block_id, 'externalActivation', '0'), '0'))
-            warning('Simulink does not support external activation');
+        logger('Simulink does not support external activation', block_path);
     end
     
     set_common_parameters(model, block_id, model_path);

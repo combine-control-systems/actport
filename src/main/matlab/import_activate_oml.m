@@ -2,6 +2,7 @@ function import_activate_oml(filename, target_path)
     %IMPORTACTIVATEOML Import OML-code exported from Activate to Simulink
     %   Detailed explanation goes here
     import actport.GeneratorLibrary.scanLibrary;
+    import actport.Logger;
 
     global ACTPORT_LIBRARY;
 
@@ -13,6 +14,12 @@ function import_activate_oml(filename, target_path)
     end
 
     setenv('ACTPORT_TARGET_PATH', target_path);
+
+    % We do not know the name of the model at this stage.
+    % The log file is moved when evaluate_model has finished.
+    log_path = fullfile(target_path, 'actport.log');
+    Logger.initialize(log_path);
+    logger(sprintf('Initialized logger at %s.', log_path));
 
     ACTPORT_LIBRARY = scanLibrary('activate_standard_library');
 

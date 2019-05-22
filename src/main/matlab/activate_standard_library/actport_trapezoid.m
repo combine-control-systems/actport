@@ -15,7 +15,7 @@ function model = actport_trapezoid(model, block_id, model_path)
     y = [offset (offset+amplitude) (offset+amplitude) offset offset]
 
     if not(strcmp(get_parameter(model, block_id, 'nperiod', '-1'), '-1'))
-        warning('Only -1 is supported in Simulink as number of periods (repeating sequence)');
+        logger('Only -1 is supported in Simulink as number of periods (repeating sequence)', block_path);
     end
 
     % Simulink does not support delay

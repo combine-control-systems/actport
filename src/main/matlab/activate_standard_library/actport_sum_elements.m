@@ -17,7 +17,7 @@ function model = actport_sum_elements(model, block_id, model_path)
             set_param(block_path, 'CollapseMode', 'Specified dimension');
             set_param(block_path, 'CollapseDim', '1');
         otherwise
-            error('Unknown Sum along parameter');
+            logger('Unknown Sum along parameter', block_path);
     end
 
     switch get_parameter(model, block_id, 'overflow', '''Nothing''')
@@ -33,7 +33,7 @@ function model = actport_sum_elements(model, block_id, model_path)
     end
 
     if not(strcmp(get_parameter(model, block_id, 'externalActivation', '0'), '0'))
-        warning("External activation is not implemented in Simulink");
+        logger("External activation is not implemented in Simulink", block_path);
     end
 
     set_common_parameters(model, block_id, model_path);

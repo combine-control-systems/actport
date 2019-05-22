@@ -10,7 +10,7 @@ function model = actport_step_generator(model, block_id, model_path)
     set_param(block_path, 'start', get_parameter(model, block_id, 'startt', '0'));
     set_param(block_path, 'InitialOutput', get_parameter(model, block_id, 'initout', '0'));
     if strcmp(get_parameter(model, block_id, 'zc', '0'), '0')
-        error("Zero-crossing on ramp block not supported by Simulink");
+        logger("Zero-crossing on ramp block not supported by Simulink", block_path);
     end
 
     set_common_parameters(model, block_id, model_path);

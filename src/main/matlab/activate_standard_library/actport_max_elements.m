@@ -60,11 +60,11 @@ function model = actport_max_elements(model, block_id, model_path)
                 ]);
             end
         otherwise
-            error('Unknown Min along parameter');
+            logger('Unknown Min along parameter', block_path);
     end
 
     if not(strcmp(get_parameter(model, block_id, 'externalActivation', '0'), '0'))
-        warning("External activation is not implemented in Simulink");
+        logger("External activation is not implemented in Simulink", block_path);
     end
 
     set_common_parameters(model, block_id, model_path);

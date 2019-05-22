@@ -32,7 +32,7 @@ function model = actport_continuous_random(model, block_id, model_path)
     elseif strcmp(get_parameter(model, block_id, 'distrib/inv_beta', '0'), '1')
         distribution = 'inv_beta';
     else
-        warning(sprintf('unknown distribution %s - falling back onto uniform', distribution));
+        logger(sprintf('unknown distribution %s - falling back onto uniform', distribution), block_path);
     end
 
     seed = char(get_parameter(model, block_id, 'seed', '0'));
@@ -150,7 +150,7 @@ function model = actport_continuous_random(model, block_id, model_path)
         %    qfunc = ???;
         %    add_quantile_function(model, block_id, block_path, seed, qfunc);
         otherwise
-            warning(sprintf('random number generator for %s distribution not implemented', distribution));
+            logger(sprintf('random number generator for %s distribution not implemented', distribution), block_path);
             model = actport_undefined(model, block_id, model_path);
     end
 

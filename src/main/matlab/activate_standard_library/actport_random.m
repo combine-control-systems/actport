@@ -21,7 +21,7 @@ function model = actport_random(model, block_id, model_path)
             % Range value.
             set_param(block_path, 'Maximum', get_parameter(model, block_id, 'B', '1'));
         otherwise
-            error(sprintf('Unknown distribution %s', distribution));
+            logger(sprintf('Unknown distribution %s', distribution), block_path);
     end
 
     set_param(block_path, 'Seed', get_parameter(model, block_id, 'seed', '0'));

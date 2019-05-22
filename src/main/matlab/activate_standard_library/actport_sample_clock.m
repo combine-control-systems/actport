@@ -15,7 +15,7 @@ function model = actport_sample_clock(model, block_id, model_path)
 
     if strcmp(freq, '0')
         % Always active. Not sure how to handle this case.
-        error('Always active not implemented in Sample Clock.');
+        logger('Always active not implemented in Sample Clock.', block_path);
     else if strcmp(freq, '-1')
         % Activated at Initial Time
         offset = string(get_parameter(model, block_id, 'offset', '0'));

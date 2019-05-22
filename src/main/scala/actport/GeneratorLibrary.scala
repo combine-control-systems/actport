@@ -74,7 +74,7 @@ object GeneratorLibrary {
           case Parsed.Success(activateBlockName, _) =>
             Some((activateBlockName, file.getName.dropRight(2))) // drop ".m" from filename
           case Parsed.Failure(label, index, _) =>
-            System.err.println(s"Failed to scan ${file.getCanonicalPath} : $label : $index")
+            Logger.log(s"Failed to scan ${file.getCanonicalPath} : $label : $index")
             None
         }
       }

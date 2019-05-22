@@ -12,7 +12,7 @@ function model = actport_discr_trans_func(model, block_id, model_path)
     set_param(block_path, 'Denominator', get_parameter(model, block_id, 'den', '[1,1]'));
 
     if strcmp(get_parameter(model, block_id, 'externalActivation', '0'), '1')
-        warning("External activation not implemented yet");
+        logger("External activation not implemented yet", block_path);
     end
 
     set_common_parameters(model, block_id, model_path);

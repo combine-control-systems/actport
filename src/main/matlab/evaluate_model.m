@@ -6,14 +6,19 @@ function model = evaluate_model(system)
     target_path = getenv('ACTPORT_TARGET_PATH');
 
     % Apply model transformations.
-    fprintf('* Applying model transformations.\n');
+    logger('Applying model transformations.');
     model = apply_transformations(model);
 
     model_name = string(get_name(model, 0));
 
-    fprintf('* Creating new Simulink system: %s.\n', model_name);
-    new_system(model_name);
-    open_system(model_name);
+    logger(sprintf('Creating new Simulink system: %s.', model_name));
+    try
+        new_system(model_name);
+        open_system(model_name);
+    catch e
+        logger(sprintf('Failed to create new system: %s.', e.message));
+        return;
+    end
 
     % Set root context.
     context = char(get_context(model, 0));
@@ -22,61 +27,66 @@ function model = evaluate_model(system)
     end
 
     % Create folder structure for model.
-    fprintf('* Creating folder structure.\n');
+    logger('Creating folder structure.');
     warning('off', 'MATLAB:MKDIR:DirectoryExists');
     mkdir(fullfile(target_path, model_name, 'include'));
     mkdir(fullfile(target_path, model_name, 'src'));
     warning('on', 'MATLAB:MKDIR:DirectoryExists');
 
     % Add blocks.
-    fprintf('* Adding blocks to system.\n');
+    logger('Adding blocks to system.');
     model = add_blocks(model, 0, model_name);
 
     % Post add blocks transformations.
-    fprintf('* Applying post block model transformations.\n');
+    logger('Applying post block model transformations.');
     model = apply_post_blocks_transformations(model);
 
     % Add links.
-    fprintf('* Adding links.\n');
+    logger('Adding links.');
     model = add_links(model);
 
     % Arrange model.
-    fprintf('* Automatically rearranging model.\n');
+    logger('Automatically rearranging model.');
     rearrange_model(model);
 
-    fprintf('* Setting model parameters.\n');
+    logger('Setting model parameters.');
     set_model_parameters(model);
 
     % Save model.
-    fprintf('* Saving system.\n');
+    logger('Saving system.');
     save_system(model_name, fullfile(target_path, model_name, model_name));
 
     if getenv('JENKINS_HOME')
-	fprintf('* Setting Scopes to log data for testing\n');
+	logger('Setting Scopes to logger data for testing.');
 	scopes = find_system(model_name, 'BlockType', 'Scope');
 	for i = 1:length(scopes)
-	    set_param(scopes{i}, 'DataLogging', 'on');
-	    set_param(scopes{i}, 'DataLoggingSaveFormat', 'Structure With Time');
-	    set_param(scopes{i}, 'DataLoggingVariableName', get_param(scopes{i}, 'Name'));
+	    set_param(scopes{i}, 'Dataloggerging', 'on');
+	    set_param(scopes{i}, 'DataloggergingSaveFormat', 'Structure With Time');
+	    set_param(scopes{i}, 'DataloggergingVariableName', get_param(scopes{i}, 'Name'));
 	end
 	save_system(model_name, fullfile(target_path, model_name, model_name));
 	close_system(model_name);
     end
+
+    % Now we can move the log file to the correct location.
+    new_log_path = fullfile(target_path, model_name, 'actport.log');
+    logger(sprintf('Moving logfile to %s.', new_log_path));
+    movefile(fullfile(target_path, 'actport.log'), new_log_path);
 end
 
 function model = apply_transformations(model)
     import actport.model.transform.Matlab.*
-    fprintf('\t* Removing split blocks.\n');
+    logger('Removing split blocks.');
     model = remove_split_blocks(model);
-    fprintf('\t* Eliminating SampleClock blocks.\n');
+    logger('Eliminating SampleClock blocks.');
     model = eliminate_sample_clock_blocks(model);
-    fprintf('\t* Mapping event ports.\n');
+    logger('Mapping event ports.');
     model = map_event_ports(model);
 end
 
 function model = apply_post_blocks_transformations(model)
     import actport.model.transform.Matlab.*
-    fprintf('\t* Removing invalid links.\n');
+    logger('Removing invalid links.');
     model = remove_invalid_links(model);
 end
 
@@ -122,7 +132,7 @@ function model = add_links(model)
             try
                 add_line(system_path, start, dest, 'autorouting', 'smart');
             catch e
-                warning(sprintf('Failed to add line in %s between %s and %s.', system_path, start, dest));
+                logger(sprintf('Failed to add line in %s between %s and %s.', system_path, start, dest));
             end
         end
     end
@@ -137,11 +147,11 @@ function rearrange_model(model)
     for i = 1:length(blocks)
         children = get_children(model, blocks(i));
         if ~isempty(children)
-            block_path = get_path(model, blocks(i));
+            block_path = char(get_path(model, blocks(i)));
             try
-                Simulink.BlockDiagram.arrangeSystem(char(block_path));
+                Simulink.BlockDiagram.arrangeSystem(block_path);
             catch e
-                fprintf('\t[W] ignored layout warning\n');
+                logger(sprintf('Ignored layout warning for %s.', block_path));
             end
         end
     end
@@ -205,6 +215,6 @@ function set_model_parameters(model)
             solver = 'ode5';
     end
 
-    fprintf('* Choosing Simulink Solver ''%s'' given Activate Solver ''%s''.\n', ...
-        solver, activate_solver);
+    logger(sprintf('Choosing Simulink Solver ''%s'' given Activate Solver ''%s''.', ...
+        solver, activate_solver));
 end

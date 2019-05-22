@@ -23,27 +23,29 @@ function model = actport_lookup_table_2D(model, block_id, model_path)
             simulink_interpolation = 'Nearest';
         case 'Point_just_below'
             simulink_interpolation = 'Nearest';
-            warning('Simulink does not support Point just below interpolation - falling back to Nearest.');
+            logger('Simulink does not support Point just below interpolation - falling back to Nearest.', block_path);
         case 'Point_just_above'
             simulink_interpolation = 'Nearest';
-            warning('Simulink does not support Point just above interpolation - falling back to Nearest.');
+            logger('Simulink does not support Point just above interpolation - falling back to Nearest.', block_path);
         otherwise
             simulink_interpolation = 'Linear point-slope';
-            warning(sprintf('Unknown interpolation method %s - falling back to Bilinear Interpolation', method));
+            logger(sprintf('Unknown interpolation method %s - falling back to Bilinear Interpolation', method), ...
+                block_path);
     end
     set_param(block_path, 'InterpMethod', simulink_interpolation);
 
     extrapolation = strrep(get_parameter(model, block_id, 'DoOutside', 'Hold'), '''', '');
     switch extrapolation
         case 'Zero'
-            warning('Simulink does not support Zero extrapolation - falling back to Clip');
+            logger('Simulink does not support Zero extrapolation - falling back to Clip', block_path);
             simulink_extrapolation = 'Clip';
         case 'Hold'
             simulink_extrapolation = 'Clip';
         case 'Bilinear extrapolation'
             simulink_extrapolation = 'Linear';
         otherwise
-            warning(sprintf('Unknown extrapolation method %s - falling back to Linear Extrapolation', method));
+            logger(sprintf('Unknown extrapolation method %s - falling back to Linear Extrapolation', method), ...
+                block_path);
             simulink_extrapolation = 'Linear';
     end
     set_param(block_path, 'ExtrapMethod', simulink_extrapolation);

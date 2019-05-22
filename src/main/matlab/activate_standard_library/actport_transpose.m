@@ -14,7 +14,7 @@ function model = actport_transpose(model, block_id, model_path)
         case '''Hermitian(Transpose-Conjugate)'''
             set_param(block_path, 'Operator', 'hermitian');
         otherwise
-            error(sprintf('unsupported transpose rule %s', rule));
+            logger(sprintf('unsupported transpose rule %s', rule), block_path);
     end
 
     set_common_parameters(model, block_id, model_path);

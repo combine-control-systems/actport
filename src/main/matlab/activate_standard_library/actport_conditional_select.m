@@ -9,10 +9,10 @@ function model = actport_conditional_select(model, block_id, model_path)
     switch_path = sprintf('%s/Switch', block_path);
 
     add_block('simulink/Signal Routing/Switch', switch_path);
-    warning("Control input datatype is automatically decided by Simulink");
+    logger("Control input datatype is automatically decided by Simulink", block_path);
     thres = get_parameter(model, block_id, 'thra', '0');
     if min(size(str2num(thres))) > 1
-        error("Simulink only supports scalars and vectors for inputs and threshold of Switch block");
+        logger("Simulink only supports scalars and vectors for inputs and threshold of Switch block", block_path);
     end
     set_param(switch_path, 'Threshold', thres);
 
