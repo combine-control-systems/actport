@@ -11,7 +11,7 @@ object Logger {
     start = System.currentTimeMillis()
   }
 
-  private var file: File = null
+  private var file: File = _
   private var start: Long = 0
 
   def log(msg: String): Unit =
