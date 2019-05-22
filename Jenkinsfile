@@ -1,3 +1,8 @@
+import groovy.transform.Field
+
+@Field List simFailed = []
+@Field List importFailed = []
+
 pipeline {
     agent any
     stages {
@@ -77,9 +82,20 @@ ${upload_url}?name=$(basename $RELEASE)
     }
     post {
 	always {
+	    zip(zipFile: "target/results.zip", archive: true,
+		dir: "${env.WORKSPACE}",
+		glob: 'src/test/*/actport.log, src/test/*.log')
+	    emailext(subject: "${env.JOB_NAME}-${env.BUILD_NUMBER}-${currentBuild.result}",
+		     body: "Results from the job in the subject can be found attached<br>\
+If no files attached, please check ${env.BUILD_URL}.<br>\
+simFailed: ${simFailed}.<br>\
+importFailed: ${importFailed}.",
+		     from: "jenkins.actport@combine.se",
+		     to: "jenkins.actport@combine.se",
+		     attachmentsPattern: "target/results.zip")
 	    cleanWs(deleteDirs: true,
-	    patterns: [[pattern: 'src/test/', type: 'INCLUDE'],
-		       [pattern: 'target/*.zip', type: 'INCLUDE']])
+		    patterns: [[pattern: 'src/test/', type: 'INCLUDE'],
+			       [pattern: 'target/*.zip', type: 'INCLUDE']])
 	}
     }
 }
@@ -94,7 +110,7 @@ void prepareImport() {
 	stages.put(name, create_import_stage(name, path))
     }
     script {
-	try {
+	try{
 	    parallel(stages)
 	} catch(e) {
 	    echo(e.toString())
@@ -108,11 +124,17 @@ def create_import_stage(String fileName, String filePath) {
 	stage(fileName) {
 	    lock(label: "PARALLEL", quantity: 1, variable: "LOCK"){
 		withEnv(["MODEL=${env.WORKSPACE}/${filePath}"]) {
-		    echo("Locked resource: ${env.LOCK}")
-		    sh '''p="target/scala-2.12/actport-assembly-0.1-SNAPSHOT.jar"
+		    try {
+			echo("Locked resource: ${env.LOCK}")
+			sh '''p="target/scala-2.12/actport-assembly-0.1-SNAPSHOT.jar"
 
 $MATLAB -nodesktop -nosplash -batch "javaaddpath(\'$p\'), cd \'src/main/matlab\', import_activate_oml(\'$MODEL\', \'$WORKSPACE/src/test\');"
 '''
+		    } catch(e) {
+			echo("Failed import of model: ${fileName}")
+			importFailed.add(fileName)
+			throw(e)
+		    }
 		}
 	    }
 	}
@@ -126,12 +148,14 @@ void prepareSim() {
 	// Wrapper required to run parallel under script
 	String name = file.name.toString().split('\\.')[0]
 	String path = file.path.toString()
-	stages.put(name, create_slx_stage(name, path))
+	if(! importFailed.contains(name)) {
+	    stages.put(name, create_slx_stage(name, path))
+	}
     }
     script {
 	try{
 	    parallel(stages)
-	} catch (e) {
+	} catch(e) {
 	    echo(e.toString())
 	}
     }
@@ -143,10 +167,21 @@ def create_slx_stage(String fileName, String filePath) {
 	stage(fileName) {
 	    lock(label: "PARALLEL", quantity: 1, variable: "LOCK"){
 		withEnv(["MODEL=${filePath}"]) {
-		    echo("Locked resource: ${env.LOCK}")
-		    sh '''
-$MATLAB -nodesktop -nosplash -batch "sim(\'$MODEL\');"
+		    try {
+			echo("Locked resource: ${env.LOCK}")
+			sh '''
+#!/bin/bash
+
+set -o pipefail
+log=$(dirname "$MODEL")/actport.log
+$MATLAB -nodesktop -nosplash -batch "sim(\'$MODEL\');" |& tee --append "$log"
+set +o pipefail
 '''
+		    } catch(e) {
+			echo("Failed simulation of model: ${fileName}")
+			simFailed.add(fileName)
+			throw(e)
+		    }
 		}
 	    }
 	}
