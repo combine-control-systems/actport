@@ -16,8 +16,10 @@ function import_activate_oml(filename, target_path)
     setenv('ACTPORT_TARGET_PATH', target_path);
 
     % We do not know the name of the model at this stage.
-    % The log file is moved when evaluate_model has finished.
-    log_path = fullfile(target_path, 'actport.log');
+    % However, when exporting OML models, the filename and
+    % the model name remain consistent.
+    [~, basename] = fileparts(filename);
+    log_path = fullfile(target_path, sprintf('actport_%s.log', basename));
     Logger.initialize(log_path);
     logger(sprintf('Initialized logger at %s.', log_path));
 
@@ -45,8 +47,7 @@ function import_activate_oml(filename, target_path)
     % Add import of API.
     src = sprintf('import actport.oml.Matlab.*\n%s', src);
 
-    [~, filename] = fileparts(filename);
-    filename = sprintf('oml_import_%s_%10.0f.m', filename, posixtime(datetime));
+    filename = sprintf('oml_import_%s_%10.0f.m', basename, posixtime(datetime));
 
     fullpath = fullfile(tempdir, filename);
 

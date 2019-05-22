@@ -57,12 +57,12 @@ function model = evaluate_model(system)
     save_system(model_name, fullfile(target_path, model_name, model_name));
 
     if getenv('JENKINS_HOME')
-	logger('Setting Scopes to logger data for testing.');
+	logger('Setting Scopes to log data for testing.');
 	scopes = find_system(model_name, 'BlockType', 'Scope');
 	for i = 1:length(scopes)
-	    set_param(scopes{i}, 'Dataloggerging', 'on');
-	    set_param(scopes{i}, 'DataloggergingSaveFormat', 'Structure With Time');
-	    set_param(scopes{i}, 'DataloggergingVariableName', get_param(scopes{i}, 'Name'));
+	    set_param(scopes{i}, 'DataLogging', 'on');
+	    set_param(scopes{i}, 'DataLoggingSaveFormat', 'Structure With Time');
+	    set_param(scopes{i}, 'DataLoggingVariableName', get_param(scopes{i}, 'Name'));
 	end
 	save_system(model_name, fullfile(target_path, model_name, model_name));
 	close_system(model_name);
@@ -71,7 +71,7 @@ function model = evaluate_model(system)
     % Now we can move the log file to the correct location.
     new_log_path = fullfile(target_path, model_name, 'actport.log');
     logger(sprintf('Moving logfile to %s.', new_log_path));
-    movefile(fullfile(target_path, 'actport.log'), new_log_path);
+    movefile(fullfile(target_path, sprintf('actport_%s.log', model_name)), new_log_path);
 end
 
 function model = apply_transformations(model)
