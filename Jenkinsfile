@@ -82,10 +82,17 @@ ${upload_url}?name=$(basename $RELEASE)
     }
     post {
 	always {
-	    emailext(subject: "${env.JOB_NAME}-${env.BUILD_NUMBER}",
-		     body: "Results from the job in the subject can be found attached. simFailed: ${simFailed}. importFailed: ${importFailed}",
+	    zip(zipFile: "target/results.zip", archive: true,
+		dir: "${env.WORKSPACE}",
+		glob: 'src/test/*/actport.log, src/test/*.log')
+	    emailext(subject: "${env.JOB_NAME}-${env.BUILD_NUMBER}-${currentBuild.result}",
+		     body: "Results from the job in the subject can be found attached<br>\
+If no files attached, please check ${env.BUILD_URL}.<br>\
+simFailed: ${simFailed}.<br>\
+importFailed: ${importFailed}.",
 		     from: "jenkins.actport@combine.se",
-		     to: "jenkins.actport@combine.se")
+		     to: "jenkins.actport@combine.se",
+		     attachmentsPattern: "target/results.zip")
 	    cleanWs(deleteDirs: true,
 		    patterns: [[pattern: 'src/test/', type: 'INCLUDE'],
 			       [pattern: 'target/*.zip', type: 'INCLUDE']])
@@ -161,7 +168,12 @@ def create_slx_stage(String fileName, String filePath) {
 		    try {
 			echo("Locked resource: ${env.LOCK}")
 			sh '''
-$MATLAB -nodesktop -nosplash -batch "sim(\'$MODEL\');"
+#!/bin/bash
+
+set -o pipefail
+log=$(dirname "$MODEL")/actport.log
+$MATLAB -nodesktop -nosplash -batch "sim(\'$MODEL\');" |& tee --append "$log"
+set +o pipefail
 '''
 		    } catch(e) {
 			echo("Failed simulation of model: ${fileName}")
