@@ -124,6 +124,23 @@ object Matlab {
       case None => throw new NoSuchElementException(s"block with id $blockId not found")
     }
 
+  /** Get all parameters of a block.
+    *
+    * @param model   data model
+    * @param blockId block id
+    * @throws NoSuchElementException block is not present in model
+    * @return list of parameter values as key -> value
+    */
+  @throws[NoSuchElementException]("if the block is not found")
+  def get_parameter_list(model: Model, blockId: Long): Array[Array[String]] =
+    model.blocks.get(BlockId(blockId)) match {
+      case Some(block) => block.parameters.map {
+        case (k, v: Array[Any]) => Array(k.value, v.value.map(_.toString).mkString(", "))
+        case (k, v: Any) => Array(k.value, v.value.toString)
+      }.toArray
+      case None => throw new NoSuchElementException(s"block with id $blockId not found")
+    }
+
   /** Get block position.
     *
     * The result is returned as a string consumed by the Simulink API.
