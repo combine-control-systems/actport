@@ -126,9 +126,11 @@ def create_import_stage(String fileName, String filePath) {
 		withEnv(["MODEL=${env.WORKSPACE}/${filePath}"]) {
 		    try {
 			echo("Locked resource: ${env.LOCK}")
-			sh '''p="target/scala-2.12/actport-assembly-0.1-SNAPSHOT.jar"
+			sh '''#!/bin/bash
+p="target/scala-2.12/actport-assembly-0.1-SNAPSHOT.jar"
 
-$MATLAB -nodesktop -nosplash -batch "javaaddpath(\'$p\'), cd \'src/main/matlab\', import_activate_oml(\'$MODEL\', \'$WORKSPACE/src/test\');"
+log=src/test/actport_$(basename "$MODEL" | cut -d. -f1).log
+$MATLAB -nodesktop -nosplash -batch "javaaddpath(\'$p\'), cd \'src/main/matlab\', import_activate_oml(\'$MODEL\', \'$WORKSPACE/src/test\');" 2> >(tee --append "$log" >&2)
 '''
 		    } catch(e) {
 			echo("Failed import of model: ${fileName}")
@@ -169,8 +171,7 @@ def create_slx_stage(String fileName, String filePath) {
 		withEnv(["MODEL=${filePath}"]) {
 		    try {
 			echo("Locked resource: ${env.LOCK}")
-			sh '''
-#!/bin/bash
+			sh '''#!/bin/bash
 
 set -o pipefail
 log=$(dirname "$MODEL")/actport.log
