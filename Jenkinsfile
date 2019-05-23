@@ -171,8 +171,7 @@ def create_slx_stage(String fileName, String filePath) {
 		withEnv(["MODEL=${filePath}"]) {
 		    try {
 			echo("Locked resource: ${env.LOCK}")
-			sh '''#!/bin/bash
-
+			sh '''
 set -o pipefail
 log=$(dirname "$MODEL")/actport.log
 $MATLAB -nodesktop -nosplash -batch "sim(\'$MODEL\');" |& tee --append "$log"
