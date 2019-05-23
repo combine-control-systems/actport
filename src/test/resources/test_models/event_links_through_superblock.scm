@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model name="explicit_and_event_links_through_superblock">
+<model name="event_links_through_superblock">
   <header formatversion="2" hwxversion="2019.2" script="oml"/>
   <edition>
     <properties>

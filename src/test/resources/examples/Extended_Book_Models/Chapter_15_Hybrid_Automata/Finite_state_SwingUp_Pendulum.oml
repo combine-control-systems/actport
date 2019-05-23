@@ -814,7 +814,7 @@ scsm = instantiate_diagram();
 scsm = set_diagram_bg_color (scsm, [1, 1, 1]);
 scsm = set_diagram_3d (scsm, 1);
 scsm = set_diagram_zoom (scsm, 1);
-scsm = set_diagram_name (scsm, 'Finite_state_Buck');
+scsm = set_diagram_name (scsm, 'Finite_state_SwingUp_Pendulum');
 scsm = set_diagram_context(scsm, {['L=0.03;',char(10),'T=400e-6;',char(10),'R=220/2;',char(10),'C=47e-6;',char(10),'a=8.4;',char(10),'Vref=11.3;',char(10),'VL=3.8;',char(10),'VU=8.2;',char(10),'E=20;',char(10),'A11=-1/R/C;',char(10),'A12=1/C;',char(10),'A21=-1/L;',char(10),'A22=0;',char(10),'B11=0;',char(10),'B12=E/L;',char(10),'B21=0;',char(10),'B22=0;',char(10)]});
 blk = instantiate_super_block();
 scsm0 = subsystem_2();
@@ -1045,11 +1045,11 @@ blk = set_block_parameters (blk, params);
 out_1 = scsm;
 end
 
-Finite_state_Buck = subsystem_1();
-Finite_state_Buck = set_model_workspace (Finite_state_Buck, {''});
-Finite_state_Buck = set_initial_time (Finite_state_Buck, '0');
-Finite_state_Buck = set_final_time (Finite_state_Buck, '0.028');
+Finite_state_SwingUp_Pendulum = subsystem_1();
+Finite_state_SwingUp_Pendulum = set_model_workspace (Finite_state_SwingUp_Pendulum, {''});
+Finite_state_SwingUp_Pendulum = set_initial_time (Finite_state_SwingUp_Pendulum, '0');
+Finite_state_SwingUp_Pendulum = set_final_time (Finite_state_SwingUp_Pendulum, '0.028');
 tol = {'0.000001', '0.000001', '1e-10', '0' , '0', 'ida', '0'};
-Finite_state_Buck = set_solver_parameters( Finite_state_Buck, tol);
-Finite_state_Buck = evaluate_model (Finite_state_Buck);
-scsm = Finite_state_Buck;
+Finite_state_SwingUp_Pendulum = set_solver_parameters( Finite_state_SwingUp_Pendulum, tol);
+Finite_state_SwingUp_Pendulum = evaluate_model (Finite_state_SwingUp_Pendulum);
+scsm = Finite_state_SwingUp_Pendulum;

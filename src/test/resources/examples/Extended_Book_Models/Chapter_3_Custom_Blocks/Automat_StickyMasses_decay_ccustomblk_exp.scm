@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<model name="Automat_StickyMasses_decay_ccustomblock_explicit">
+<model name="Automat_StickyMasses_decay_ccustomblk_exp">
   <header formatversion="2" hwxversion="2018.1" script="oml"/>
   <edition>
     <properties>
@@ -5479,7 +5479,7 @@
       <position x="985.975037" y="1142.495178"/>
       <size width="346.0000000000001" height="28"/>
       <rotate angle="0"/>
-      <text font="Arial,10" color="0,0,0,255">Automat_StickyMasses_decay_ccustomblock_explicit.scm</text>
+      <text font="Arial,10" color="0,0,0,255">Automat_StickyMasses_decay_ccustomblk_exp.scm</text>
     </annotation>
     <context>m1=1;&#xA;m2=1;&#xA;k1=1;&#xA;k2=2;&#xA;a1=1;&#xA;a2=2;&#xA;x01=0;&#xA;v01=0;&#xA;x02=3;&#xA;v02=0;&#xA;&#xA;k3=(k1+k2);&#xA;a3=(k1*a1+k2*a2)/(a1+a2);&#xA;m3=m1+m2;&#xA;e=10;&#xA;Nmode=2;&#xA;Minitial=1;&#xA;</context>
     <graphics>
