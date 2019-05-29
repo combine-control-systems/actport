@@ -114,6 +114,7 @@ case class ParsedSystem(name: String = "",
                         context: Option[String] = None,
                         explicitLinks: Vector[Link] = Vector.empty,
                         eventLinks: Vector[Link] = Vector.empty,
+                        implicitLinks: Vector[Link] = Vector.empty,
                         atomic: Boolean = false,
                         mask: Option[ActivateStruct] = None,
                         solverSettings: SolverSettings = SolverSettings.default) extends ParsedEntity {

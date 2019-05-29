@@ -2,7 +2,7 @@ package actport.oml
 
 import java.awt.Color
 
-import actport.{Configuration, oml}
+import actport.{Configuration, Logger, oml}
 import monocle.macros.syntax.lens._
 
 import scala.util.chaining._
@@ -344,8 +344,8 @@ object Matlab {
   def add_explicit_link(system: ParsedSystem, first: Array[String],
                         second: Array[String], points: Array[Array[Double]],
                         coordType: Boolean): ParsedSystem = {
-    require(first.length == 3, "start must contain (block tag, port number, direction (input/output)")
-    require(second.length == 3, "destination must contain (block tag, port number, direction (input/output)")
+    require(first.length == 3, "first must contain (block tag, port number, direction (input/output)")
+    require(second.length == 3, "second must contain (block tag, port number, direction (input/output)")
     // Find out which port is the start port and which is the destination port.
     val (start, destination) = (first(2), second(2)) match {
       case ("input", "output") => (second, first)
@@ -378,8 +378,8 @@ object Matlab {
   def add_event_link(system: ParsedSystem, first: Array[String],
                      second: Array[String], points: Array[Array[Double]],
                      coordType: Boolean): ParsedSystem = {
-    require(first.length == 3, "start must contain (block tag, port number, direction (input/output)")
-    require(second.length == 3, "destination must contain (block tag, port number, direction (input/output)")
+    require(first.length == 3, "first must contain (block tag, port number, direction (input/output)")
+    require(second.length == 3, "second must contain (block tag, port number, direction (input/output)")
     // Find out which port is the start port and which is the destination port.
     val (start, destination) = (first(2), second(2)) match {
       case ("input", "output") => (second, first)
@@ -397,6 +397,41 @@ object Matlab {
       })
     // Add the link to the event links.
     system.lens(_.eventLinks).modify(_ :+ link)
+  }
+
+  /** Add implicit link to diagram.
+    *
+    * @param system      diagram object.
+    * @param first       input or output port, array of [block, string with event port number, "output" | "input"]
+    * @param second      input or output port, array of [block, string with event port number, "output" | "input"]
+    * @param points      array of points for routing of the link
+    * @param coordType   if true the intermediate coordinate points are relative, if false they are absolute
+    * @return diagram object
+    */
+  def add_implicit_link(system: ParsedSystem, first: Array[String],
+                        second: Array[String], points: Array[Array[Double]],
+                        coordType: Boolean): ParsedSystem = {
+    Logger.log(s"ignoring implicit link (${first.mkString(", ")} to ${second.mkString(", ")})")
+    system
+//    require(first.length == 3, "first must contain (block tag, port number, direction (input/ouptut)")
+//    require(second.length == 3, "second must contain (block tag, port number, direction (input/ouptut)")
+//    // Find out which port is the start port and which is the destination port.
+//    val (start, destination) = (first(2), second(2)) match {
+//      case ("input", "output") => (second, first)
+//      case ("output", "input") => (first, second)
+//      case _ => throw new IllegalStateException("Only one output and input port are supported")
+//    }
+//    // The points could possibly be null. Option(null) -> None
+//    val optPoints = Option(points)
+//    val link = oml.Link(start(0), start(1).toInt, destination(0), destination(1).toInt, ImplicitLink,
+//      // Process points, if necessary.
+//      // TODO: Handle coordType properly here.
+//      optPoints match {
+//        case Some(p) => p.map { v => Point(v(0).toInt, v(1).toInt) }.toVector
+//        case _ => Vector.empty
+//      })
+//    // Add the link to the implicit links.
+//    system.lens(_.implicitLinks).modify(_ :+ link)
   }
 
   // -------------------- Model specific details

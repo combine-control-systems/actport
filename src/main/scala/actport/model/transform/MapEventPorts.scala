@@ -25,7 +25,7 @@ object MapEventPorts {
   private def linkFolder(model: Model, link: Link): Model =
     link.linkType match {
 
-      case EventLink =>
+      case EventLink | ImplicitLink =>
         val startBlock = model.blocks.get(link.start.block)
         val endBlock = model.blocks.get(link.end.block)
         (startBlock, endBlock) match {

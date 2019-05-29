@@ -105,7 +105,13 @@ object Model {
             linkIdCounter = LinkId(linkIdCounter.value + 1)
             linkFolder(linkIdCounter, parentId, blocks, EventLink, state, link)
         }
-        m.lens(_.links).modify(_ ++ explicitLinks ++ eventLinks)
+        // And the implicit links.
+        val implicitLinks = system.implicitLinks.foldLeft(Map.empty[LinkId, Link]) {
+          case (state, link) =>
+            linkIdCounter = LinkId(linkIdCounter.value + 1)
+            linkFolder(linkIdCounter, parentId, blocks, ImplicitLink, state, link)
+        }
+        m.lens(_.links).modify(_ ++ explicitLinks ++ eventLinks ++ implicitLinks)
       }
     }
 

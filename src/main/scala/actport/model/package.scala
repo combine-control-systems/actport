@@ -22,6 +22,9 @@ package object model {
   /** Event link. */
   case object EventLink extends LinkType
 
+  /** Implicit link. */
+  case object ImplicitLink extends LinkType
+
   /** Start information of link. */
   case class LinkStart(block: BlockId, activatePort: ActivatePort)
 

@@ -333,6 +333,34 @@ object Matlab {
     model.addPortMapping(BlockId(blockId), ActivatePort(activatePort),
       MappedPort(simulinkPort), ExplicitLink, OutputPort)
 
+  /** Map the implicit input port to its equivalent Simulink port.
+    *
+    * If there is no link involved in the mapping an unmodified model is returned.
+    *
+    * @param model        data model
+    * @param blockId      block id
+    * @param activatePort index of activate port
+    * @param simulinkPort name of Simulink port
+    * @return updated data model
+    */
+  def map_implicit_input_port(model: Model, blockId: Long, activatePort: Int, simulinkPort: String): Model =
+    model.addPortMapping(BlockId(blockId), ActivatePort(activatePort),
+      MappedPort(simulinkPort), ImplicitLink, InputPort)
+
+  /** Map the implicit output port to its equivalent Simulink port.
+    *
+    * If there is no link involved in the mapping an unmodified model is returned.
+    *
+    * @param model        data model
+    * @param blockId      block id
+    * @param activatePort index of activate port
+    * @param simulinkPort name of Simulink port
+    * @return updated data model
+    */
+  def map_implicit_output_port(model: Model, blockId: Long, activatePort: Int, simulinkPort: String): Model =
+    model.addPortMapping(BlockId(blockId), ActivatePort(activatePort),
+      MappedPort(simulinkPort), ImplicitLink, OutputPort)
+
   /** Set input port of block as invalid.
     *
     * @param model        data model
@@ -364,7 +392,7 @@ object Matlab {
     model.addPortMapping(BlockId(blockId), ActivatePort(activatePort),
       InvalidPort, ExplicitLink, OutputPort)
 
-  /** Set evnt input port of block as invalid.
+  /** Set event input port of block as invalid.
     *
     * @param model        data model
     * @param blockId      block id
@@ -375,7 +403,7 @@ object Matlab {
     model.addPortMapping(BlockId(blockId), ActivatePort(activatePort),
       InvalidPort, EventLink, InputPort)
 
-  /** Set input port of block as invalid.
+  /** Set event output port of block as invalid.
     *
     * @param model        data model
     * @param blockId      block id
@@ -385,6 +413,28 @@ object Matlab {
   def set_event_output_port_invalid(model: Model, blockId: Long, activatePort: Int): Model =
     model.addPortMapping(BlockId(blockId), ActivatePort(activatePort),
       InvalidPort, EventLink, OutputPort)
+
+  /** Set evnt input port of block as invalid.
+    *
+    * @param model        data model
+    * @param blockId      block id
+    * @param activatePort index of activate port
+    * @return updated data model
+    */
+  def set_implicit_input_port_invalid(model: Model, blockId: Long, activatePort: Int): Model =
+    model.addPortMapping(BlockId(blockId), ActivatePort(activatePort),
+      InvalidPort, ImplicitLink, InputPort)
+
+  /** Set input port of block as invalid.
+    *
+    * @param model        data model
+    * @param blockId      block id
+    * @param activatePort index of activate port
+    * @return updated data model
+    */
+  def set_implicit_output_port_invalid(model: Model, blockId: Long, activatePort: Int): Model =
+    model.addPortMapping(BlockId(blockId), ActivatePort(activatePort),
+      InvalidPort, ImplicitLink, OutputPort)
 
   /** Get array of link id:s.
     *
