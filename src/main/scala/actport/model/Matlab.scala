@@ -136,6 +136,7 @@ object Matlab {
     model.blocks.get(BlockId(blockId)) match {
       case Some(block) => block.parameters.map {
         case (k, v: Array[Any]) => Array(k.value, v.value.map(_.toString).mkString(", "))
+        case (k, v) if v == null => Array(k.value, "")
         case (k, v: Any) => Array(k.value, v.value.toString)
       }.toArray
       case None => throw new NoSuchElementException(s"block with id $blockId not found")
