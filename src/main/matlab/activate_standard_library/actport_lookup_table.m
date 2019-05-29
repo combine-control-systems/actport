@@ -47,7 +47,7 @@ function model = actport_lookup_table(model, block_id, model_path)
     extrapolation_left = strrep(get_parameter(model, block_id, 'Leftside', 'Hold'), '''', '');
     extrapolation_right = strrep(get_parameter(model, block_id, 'Rightside', 'Hold'), '''', '');
     if ~strcmp(extrapolation_left, extrapolation_right)
-        logger(sprintf(['Simulink interpolation block does not support different extrapolation on '
+        logger(sprintf(['Simulink interpolation block does not support different extrapolation on ' ...
             'each side - using right side.']), block_path);
     end
     switch extrapolation_right

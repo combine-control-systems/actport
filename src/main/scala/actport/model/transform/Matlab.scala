@@ -31,4 +31,11 @@ object Matlab {
     * @return updated data model
     */
   def remove_invalid_links(model: Model): Model = RemoveInvalidLinks(model)
+
+  /** Correct invalid block name characters.
+    *
+    * @param model data model
+    * @return updated data model
+    */
+  def correct_invalid_block_names(model: Model): Model = CorrectInvalidBlockNames(model)
 }

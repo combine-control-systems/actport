@@ -32,9 +32,17 @@ case class Model(blocks: Map[BlockId, Block] = Map.empty,
                      portType: PortType): Model = {
     // Find matching link.
     val link: Option[Link] = this.links.values.find(link =>
-      link.start.block == blockId &&
-        link.linkType == linkType &&
-        link.start.activatePort == activatePort)
+      portType match {
+        // Depends on the direction of the link relative to the block.
+        case InputPort =>
+          link.end.block == blockId &&
+          link.linkType == linkType &&
+          link.end.activatePort == activatePort
+        case OutputPort =>
+          link.start.block == blockId &&
+          link.linkType == linkType &&
+          link.start.activatePort == activatePort
+      })
     // Update model with port mapping.
     // We must use map since link is Option[Link].
     link.map(l => this.lens(_.portMap).modify { pm =>
