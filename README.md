@@ -43,7 +43,7 @@ First [build and install](docs/build-and-install.md) the software.
 Then `cd` to `src/main/matlab` and run
 
 ```Matlab
-import_activate_oml('../resources/examples/Watertank.oml');
+import_activate_oml('../../test/resources/examples/Watertank.oml');
 ```
 
 to convert the Watertank model.
