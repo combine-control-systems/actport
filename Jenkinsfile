@@ -82,20 +82,26 @@ ${upload_url}?name=$(basename $RELEASE)
     }
     post {
 	always {
-	    zip(zipFile: "target/results.zip", archive: true,
-		dir: "${env.WORKSPACE}",
-		glob: 'src/test/*/actport.log, src/test/*.log')
-	    emailext(subject: "${env.JOB_NAME}-${env.BUILD_NUMBER}-${currentBuild.result}",
-		     body: "Results from the job in the subject can be found attached<br>\
+	    script {
+		zip(zipFile: "target/results.zip", archive: true,
+		    dir: "${env.WORKSPACE}",
+		    glob: 'src/test/*/actport.log, src/test/*.log')
+		def String numFailSim = simFailed.size()
+		def String numFailImp = importFailed.size()
+		def String printSim = simFailed.join('<br>')
+		def String printImp = importFailed.join('<br>')
+		emailext(subject: "${env.JOB_NAME}-${env.BUILD_NUMBER}-${currentBuild.result}",
+			 body: "Results from the job in the subject can be found attached<br>\
 If no files attached, please check ${env.BUILD_URL}.<br>\
-simFailed: ${simFailed}.<br>\
-importFailed: ${importFailed}.",
-		     from: "jenkins.actport@combine.se",
-		     to: "jenkins.actport@combine.se",
-		     attachmentsPattern: "target/results.zip")
-	    cleanWs(deleteDirs: true,
-		    patterns: [[pattern: 'src/test/', type: 'INCLUDE'],
-			       [pattern: 'target/*.zip', type: 'INCLUDE']])
+simFailed (${numFailSim}): ${printSim}.<br>\
+importFailed (${numFailImp}): ${printImp}.",
+			 from: "jenkins.actport@combine.se",
+			 to: "jenkins.actport@combine.se",
+			 attachmentsPattern: "target/results.zip")
+		cleanWs(deleteDirs: true,
+			patterns: [[pattern: 'src/test/', type: 'INCLUDE'],
+				   [pattern: 'target/*.zip', type: 'INCLUDE']])
+	    }
 	}
     }
 }
