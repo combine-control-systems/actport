@@ -69,7 +69,7 @@ node {
 			    dir: "${env.WORKSPACE}",
 			    glob: 'target/scala*/*.jar, src/main/matlab/**')
 			echo "Publishing release on GitHub"
-			sh "ci/deploy.sh"
+			sh "src/test/resources/ci/deploy.sh"
 		    }
 		}
 	    } else {
@@ -116,7 +116,7 @@ def create_import_stage(String fileName, String filePath) {
 		withEnv(["MODEL=${env.WORKSPACE}/${filePath}"]) {
 		    try {
 			echo("Locked resource: ${env.LOCK}")
-			sh "ci/import.sh"
+			sh "src/test/resources/ci/import.sh"
 		    } catch(e) {
 			echo("Failed import of model: ${fileName}")
 			importFailed.add(fileName)
@@ -135,7 +135,7 @@ def create_slx_stage(String fileName, String filePath) {
 	    withEnv(["MODEL=${filePath}"]) {
 		try {
 		    echo("Locked resource: ${env.LOCK}")
-		    sh "ci/simulate.sh"
+		    sh "src/test/resources/ci/simulate.sh"
 		} catch(e) {
 		    echo("Failed simulation of model: ${fileName}")
 		    simFailed.add(fileName)
