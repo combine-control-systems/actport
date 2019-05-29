@@ -24,6 +24,8 @@ function model = actport_signal_generator(model, block_id, model_path)
             method = 'Interpolation-Use End Values';
         otherwise
             logger('Simulink only supports linear interpolation', block_path);
+            % We must have a default value.
+            method = 'Interpolation-Use End Values';
     end
     set_param(block_path, 'LookUpMeth', method)
 
