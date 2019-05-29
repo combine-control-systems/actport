@@ -15,7 +15,5 @@ function model = actport_last_input(model, block_id, model_path)
             add_block('simulink/Discrete/Memory', block_path);
         end
 
-        model = map_event_input_port(model, block_id, 1, 'Trigger');
-
         set_common_parameters(model, block_id, model_path);
 end
