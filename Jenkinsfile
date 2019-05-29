@@ -111,7 +111,8 @@ importFailed (${numFailImp}): ${printImp}.",
 }
 
 void prepareImport() {
-    def files = findFiles(glob: "src/test/**/*.oml")
+    def files = findFiles(glob: "src/test/**/*.oml",
+			  excludes: "**/nsolve.oml, **/car_min_time_distance_1000_batch.oml")
     def stages = [:]
     files.each { file ->
 	// Wrapper required to run parallel under script
