@@ -93,6 +93,10 @@ ${upload_url}?name=$(basename $RELEASE)
 		emailext(subject: "${env.JOB_NAME}-${env.BUILD_NUMBER}-${currentBuild.result}",
 			 body: "Results from the job in the subject can be found attached<br>\
 If no files attached, please check ${env.BUILD_URL}.<br>\
+<br>\
+Commit tested: $GIT_COMMIT<br>\
+URL: https://github.com/combine-control-systems-ab/actport/commit/${GIT_COMMIT}<br>\
+<br>\
 simFailed (${numFailSim}): ${printSim}.<br>\
 importFailed (${numFailImp}): ${printImp}.",
 			 from: "jenkins.actport@combine.se",
