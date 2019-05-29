@@ -77,6 +77,8 @@ end
 
 function model = apply_transformations(model)
     import actport.model.transform.Matlab.*
+    logger('Correcting invalid block names.');
+    model = correct_invalid_block_names(model);
     logger('Removing split blocks.');
     model = remove_split_blocks(model);
     logger('Eliminating SampleClock blocks.');
