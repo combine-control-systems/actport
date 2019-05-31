@@ -16,6 +16,7 @@ object RemoveSplitBlocks {
       block.activateId match {
         case ActivateId("system/Links/Split") => removeSplitBlock(m, block)
         case ActivateId("system/Links/ActivationSplit") => removeSplitBlock(m, block)
+        case ActivateId("system/Links/SplitN") => removeSplitBlock(m, block)
         case _ => m
       }
     }
