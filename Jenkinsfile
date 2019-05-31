@@ -77,14 +77,19 @@ node {
 	    }
 	}
     } finally {
+	String numFailSim = simFailed.size()
+	String numFailImp = importFailed.size()
+	String printSim = simFailed.join('<br>')
+	String printImp = importFailed.join('<br>')
+	if(numFailImp.toInteger() > 0 || numFailSim.toInteger() > 50) {
+	    currentBuild.result = 'FAILURE'
+	} else {
+	    currentBuild.result = 'SUCCESS'
+	}
 	stage('Post-processing') {
 	    zip(zipFile: "target/results.zip", archive: true,
 		dir: "${env.WORKSPACE}",
 		glob: 'src/test/*/actport.log, src/test/*.log')
-	    String numFailSim = simFailed.size()
-	    String numFailImp = importFailed.size()
-	    String printSim = simFailed.join('<br>')
-	    String printImp = importFailed.join('<br>')
 	    emailext(subject: "${env.JOB_NAME}-${env.BUILD_NUMBER}-${currentBuild.result}",
 		     body: "Results from the job in the subject can be found attached<br>\
 If no files attached, please check ${env.BUILD_URL}.<br>\
