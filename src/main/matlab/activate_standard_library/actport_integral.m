@@ -1,5 +1,5 @@
 % activate = 'system/Dynamical/Integral'
-function model = actport_integrator(model, block_id, model_path)
+function model = actport_integral(model, block_id, model_path)
     import actport.model.Matlab.*
 
     name = get_name(model, block_id);
