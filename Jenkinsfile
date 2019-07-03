@@ -65,10 +65,14 @@ node {
 		withCredentials([string(
 			    credentialsId: 'aebcf262-4e35-4e35-a334-6272504480cb',
 			    variable: "GITHUB_TOKEN")]) {
-		    withEnv(["RELEASE=target/actport-${env.TAG_NAME}.zip"]){
+		    withEnv(["RELEASE=target/actport-${env.TAG_NAME}.zip",
+			     "ACTPORT_DIR=actport"]){
+			sh "mkdir $ACTPORT_DIR"
+			sh "cp target/scala*/*.jar $ACTPORT_DIR/actport.jar"
+			sh "cp --archive src/main/matlab/* $ACTPORT_DIR"
 			zip(zipFile: "$RELEASE", archive: true,
 			    dir: "${env.WORKSPACE}",
-			    glob: 'LICENSE, target/scala*/*.jar, src/main/matlab/**, README.md, docs/**')
+			    glob: "LICENSE, $ACTPORT_DIR/**, README.md, docs/**")
 			echo "Publishing release on GitHub"
 			sh "src/test/resources/ci/deploy.sh"
 		    }
