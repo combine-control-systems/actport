@@ -1,4 +1,4 @@
-% activate = 'system/AdvancedDynamical/ContTransFunc_X
+% activate = 'system/AdvancedDynamical/ContTransFunc_X'
 function model = actport_cont_trans_func_x(model, block_id, model_path)
     import actport.model.Matlab.*
 

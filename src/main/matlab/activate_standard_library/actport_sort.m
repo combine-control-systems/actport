@@ -1,4 +1,4 @@
-% activate = 'system/MatrixOperations/Sort
+% activate = 'system/MatrixOperations/Sort'
 function model = actport_sort(model, block_id, model_path)
     import actport.model.Matlab.*
 

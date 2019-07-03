@@ -1,4 +1,4 @@
-% activate = 'system/MathOperations/Atan2
+% activate = 'system/MathOperations/Atan2'
 function model = actport_atan2(model, block_id, model_path)
     import actport.model.Matlab.*
 

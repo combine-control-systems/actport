@@ -16,6 +16,7 @@ node {
 		echo(e.toString())
 	    }
 	    sh '/usr/bin/sbt assembly'
+	    sh '/usr/local/bin/python2.7 src/main/python/blocks-info-gen.py'
 	    archiveArtifacts(artifacts: 'target/**', allowEmptyArchive: true)
 	}
 	stage('import OML') {

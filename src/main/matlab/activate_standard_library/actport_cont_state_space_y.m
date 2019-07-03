@@ -1,4 +1,4 @@
-% activate = 'system/AdvancedDynamical/ContStateSpace_Y
+% activate = 'system/AdvancedDynamical/ContStateSpace_Y'
 function model = actport_cont_state_space_y(model, block_id, model_path)
     import actport.model.Matlab.*
 

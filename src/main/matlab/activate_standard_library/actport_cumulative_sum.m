@@ -1,4 +1,4 @@
-% activate = 'system/MatrixOperations/CumulativeSum
+% activate = 'system/MatrixOperations/CumulativeSum'
 function model = actport_cumulative_sum(model, block_id, model_path)
     import actport.model.Matlab.*
 
