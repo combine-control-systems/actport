@@ -34,7 +34,7 @@ There are currently some [limitations](docs/limitations.md).
 
 ## Supported versions
 
-* Matlab versions from 2019a are supported.
+* Matlab versions from 2019a have been tested (earlier version may work).
 * Activate versions from 2019.2 are supported.
 
 ## Build and test
