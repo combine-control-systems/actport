@@ -2,7 +2,38 @@
 
 Convert Altair Activate models to Matlab/Simulink.
 
-## Overview
+## Overview for Users
+
+First [download a release](https://github.com/combine-control-systems-ab/actport/releases)
+and unzip the file.
+Start Matlab and change the current directory to the `actport` directory
+of the newly unzipped archive. Initialize ActPort:
+
+```Matlab
+init_actport
+```
+
+In Activate you can export your model to an OML-file using:
+
+```Matlab
+bdeExportModelToOml(bdeGetCurrentModel, 'D:/mymodel.oml');
+```
+
+Then import it into Simulink using the following command in Matlab:
+
+```Matlab
+import_activate_oml('D:/mymodel.oml');
+```
+
+There are some [limitations](docs/limitations.md) 
+of what ActPort can convert right now.
+
+In the docs folder of the zip-archive there is a file
+called `blocks-info.md` in which all the in-source
+comments have been extracted from the blocks showing
+documented limitations for each block.
+
+## Overview for Developers
 
 The tool is written in Matlab and Scala. Matlab
 is acting as master and the code in Scala is
