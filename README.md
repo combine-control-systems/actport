@@ -33,6 +33,10 @@ called `blocks-info.md` in which all the in-source
 comments have been extracted from the blocks showing
 documented limitations for each block.
 
+## Support
+
+If you need commercial support, please contact [Combine Control Systems](https://combine.se/) by mail: <mailto:support.actport@combine.se>.
+
 ## Overview for Developers
 
 The tool is written in Matlab and Scala. Matlab
@@ -61,7 +65,10 @@ supported blocks and links.
 
 Learn more about the [conversion process](docs/conversion-process.md).
 There are currently some [limitations](docs/limitations.md).
-[Pull requests](docs/contributing.md) are welcome.
+
+## Contributing
+
+If you'd like to contribute to the project, refer to the [contributing documentation](docs/contributing.md).
 
 ## Supported versions
 
